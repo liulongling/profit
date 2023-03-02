@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>股票记录</title>
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap3.4.1.min.css"
+          th:href="@{/css/lib/bootstrap3.4.1.min.css}">
+    <!-- Bootstrap-table CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap-table.min.css"
+          th:href="@{/css/lib/bootstrap-table.min.css}">
+    <!-- jquery-ui CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/jquery-ui.min.css" th:href="@{/css/lib/jquery-ui.min.css}">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="../../static/css/table.css" th:href="@{/css/table.css}">
+</head>
+
+<body onload="init();">
+
+<div class="panel-body" style="padding-bottom:0;">
+    <div class="panel panel-default">
+        <ul id="myTab" class="nav nav-tabs">
+            <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter();">股票</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filterEtf();">ETF</a></li>
+        </ul>
+    </div>
+
+    <div id="toolbar" class="btn-group">
+        <button id="btn_add" type="button" class="btn btn-default" data-toggle="modal" data-target="#addModal">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>添加股票
+        </button>
+    </div>
+    <table id="table"></table>
+</div>
+
+<!-- 模态框（Modal） 新增 -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="addModalLabel">
+                    添加股票信息
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_id">股票代码</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="insert_input_id">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_name">股票名称</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="insert_input_name" title="不能为空">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_price">当前价格</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="insert_input_price">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_plate">所属板块</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="insert_input_plate">
+                                <option value="上证">上证</option>
+                                <option value="深证">深证</option>
+                                <option value="创业板">创业板</option>
+                                <option value="ETF">ETF</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="insert();">添加</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!--模态框（Modal） 编辑-->
+<div class="modal fade" id="alterModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="alterModalLabel">
+                    编辑股票信息
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_id">股票代码</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="alert_input_id">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_name">股票名称</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="alert_input_name" title="不能为空">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_price">当前价格</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="alert_input_price">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_plate">所属板块</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="alert_input_plate">
+                                <option value="上证">上证</option>
+                                <option value="深证">深证</option>
+                                <option value="创业板">创业板</option>
+                                <option value="ETF">ETF</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="alter()">编辑</button>
+            </div>
+        </div> <!--/.modal-content -->
+    </div><!--/.modal-->
+</div>
+
+
+<!-- JavaScript files-->
+<!-- jquery.js -->
+<script src="../../static/js/lib/jquery.min.js" th:src="@{/js/lib/jquery.min.js}"></script>
+<!-- Bootstrap.js -->
+<script src="../../static/js/lib/bootstrap3.4.1.min.js" th:src="@{/js/lib/bootstrap3.4.1.min.js}"></script>
+<!-- Bootstrap-table.js -->
+<script src="../../static/js/lib/bootstrap-table.min.js" th:src="@{/js/lib/bootstrap-table.min.js}"></script>
+<script src="../../static/js/lib/bootstrap-table-zh-CN.min.js"
+        th:src="@{/js/lib/bootstrap-table-zh-CN.min.js}"></script>
+<!-- sweetalert2.js -->
+<script src="../../static/js/lib/sweetalert.min.js" th:src="@{/js/lib/sweetalert.min.js}"></script>
+<script src="../../static/js/lib/es6-promise.auto.min.js" th:src="@{/js/lib/es6-promise.auto.min.js}"></script>
+<!-- jquery-ui.js -->
+<script src="../../static/js/lib/jquery-ui.min.js" th:src="@{/js/lib/jquery-ui.min.js}"></script>
+<script src="../../static/js/common.js" th:src="@{/js/common.js}"></script>
+<script src="../../static/js/dragModel.js" th:src="@{/js/dragModel.js}"></script>
+<script>
+    /** 初始化 */
+    let $table = $('#table');
+
+    changeToolTip();
+
+    // 服务器分页获取数据
+    function getServerPaging(node, url, queryParams) {
+        initTable(node, url, [10, 25, 50, 100, "All"], queryParams, [{
+            checkbox: true
+        }, {
+            field: 'id',
+            title: '股票代码',
+            width: "170px",
+            formatter: stringFormatter
+        }, {
+            field: 'name',
+            title: '股票名称',
+            width: "170px",
+            formatter: stringFormatter
+        }, {
+            field: 'price',
+            title: '当前股价',
+            width: '70px',
+            formatter: stringFormatter
+        }, {
+            field: 'plate',
+            title: '所属板块',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'createTime',
+            title: '创建时间',
+            width: "170px",
+            formatter: dateFormatter
+        }, {
+            field: 'updateTime',
+            title: '修改时间',
+            width: "170px",
+            formatter: dateFormatter
+        }, {
+            field: 'operation',
+            title: '操作',
+            width: '170px',
+            formatter: operateFormatter // 自定义方法，添加操作按钮
+        }]);
+    }
+
+    function operateFormatter(value, row, index) {  // 赋予的参数
+        return [
+            '<button class="btn btn-primary view" data-toggle="modal" data-target="#alterModal" onclick="initUpdate('+ index +');">编辑</button>&nbsp;&nbsp;'+
+            '<button class="btn btn-primary view" data-toggle="modal" onclick="bondInfo('+ index +');">购买</button>&nbsp;&nbsp;'+
+            '<button class="btn btn-danger view"  onclick="deleteOne('+ index +');">删除</button>'
+        ].join('');
+    }
+
+    function bondInfo(index){
+      let url = "http://127.0.0.1:8080/bond/?id="+$table.bootstrapTable('getData')[index].id;
+      window.open(url);
+    }
+
+
+    function init() {
+        getServerPaging($table, "/bond/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC" };
+        });
+    }
+
+
+
+    function filter() {
+        let data = {
+            plate: 'NOT ETF'
+        };
+        getServerPaging($table, "/bond/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", name: data.plate};
+        });
+    }
+
+    function filterEtf() {
+        let data = {
+            plate: 'ETF'
+        };
+        getServerPaging($table, "/bond/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", name: data.plate};
+        });
+    }
+
+    dragTheModalDialog();
+    function insert() {
+        let data = {
+            name: $('#insert_input_name').val(),
+            id: $('#insert_input_id').val(),
+            price: $('#insert_input_price').val(),
+            plate: $('#insert_input_plate').val()
+        };
+        if ("" === data.name) {
+            swal("操作提示", "姓名不能为空", "info");
+        } else if (data.id <= 0) {
+            swal("操作提示", "请输入股票代码", "info");
+        } else if (data.price <= 0) {
+            swal("操作提示", "价格不合法", "info");
+        } else {
+            parameterPostRequest("/bond/insert", data, () => {
+                $('#addModal').modal('hide');
+                swal("正确", "添加成功", "success");
+                init();
+            });
+        }
+    }
+    
+    function deleteOne(index) {
+        dialog("确定删除吗？", () => {
+            let data = { id: $table.bootstrapTable('getData')[index].id };
+            parameterPostRequest("/student/delete", data, () => {
+                swal("正确", "删除成功", "success");
+                init();
+            });
+        });
+    }
+
+    // alter记录id
+    let alterId;
+    function initUpdate(index) {
+        let rows = $table.bootstrapTable('getData');
+        $('#alert_input_id').val(rows[index].id);
+        $('#alert_input_name').val(rows[index].name);
+        $('#alert_input_plate').val(rows[index].plate);
+        $('#alert_input_price').val(rows[index].price);
+        alterId = rows[index].id;
+    }
+    
+    function alter() {
+        let data = {
+            id: alterId,
+            name: $('#alert_input_name').val(),
+            plate: $('#alert_input_plate').val(),
+            price: $('#alert_input_price').val()
+        };
+        if ("" === data.id) {
+            swal("操作提示", "用户不存在", "info");
+        } else if ("" === data.name) {
+            swal("操作提示", "姓名不能为空", "info");
+        }  else {
+            parameterPostRequest("/bond/update", data, () => {
+                $('#alterModal').modal('hide');
+                swal("正确", "编辑成功", "success");
+                init();
+            });
+        }
+    }
+
+</script>
+</body>
+</html>

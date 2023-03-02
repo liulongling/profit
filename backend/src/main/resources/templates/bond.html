@@ -24,6 +24,7 @@
         <ul id="myTab" class="nav nav-tabs">
             <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter();">短线</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_dx_1();">短线(未卖出)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_wg();">网格</a></li>
         </ul>
     </div>
@@ -247,6 +248,11 @@
             width: "170px",
             formatter: stringFormatter
         }, {
+            field: 'cost',
+            title: '税费佣金',
+            width: "170px",
+            formatter: stringFormatter
+        }, {
             field: 'operTime',
             title: '修改时间',
             width: "170px",
@@ -290,6 +296,17 @@
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", type: data.type,id:$id};
         });
     }
+
+    function filter_dx_1() {
+        let data = {
+            type: '1',
+            status:'0'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", type: data.type,id:$id,status:data.status};
+        });
+    }
+
 
     function filter_wg() {
         let data = {
@@ -335,7 +352,7 @@
         $('#alert_input_buy_date').val(rows[index].buyDate);
         alterId = rows[index].id;
     }
-    
+
     function alter() {
         let data = {
             id: alterId,

@@ -49,6 +49,11 @@ public class BondBuyLog {
     private String buyDate;
 
     /**
+     * 0:未售完 1:已售完
+     */
+    private Byte status;
+
+    /**
      * 操作时间
      */
     private Date operTime;
@@ -128,6 +133,14 @@ public class BondBuyLog {
 
     public void setBuyDate(String buyDate) {
         this.buyDate = buyDate == null ? null : buyDate.trim();
+    }
+
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
     }
 
     public Date getOperTime() {

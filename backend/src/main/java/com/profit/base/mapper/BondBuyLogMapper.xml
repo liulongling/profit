@@ -11,6 +11,7 @@
     <result column="sell_count" jdbcType="INTEGER" property="sellCount" />
     <result column="sell_income" jdbcType="DOUBLE" property="sellIncome" />
     <result column="buy_date" jdbcType="VARCHAR" property="buyDate" />
+    <result column="status" jdbcType="TINYINT" property="status" />
     <result column="oper_time" jdbcType="TIMESTAMP" property="operTime" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -73,8 +74,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, gp_id, price, `count`, cost, `type`, sell_count, sell_income, buy_date, oper_time,
-    create_time
+    id, gp_id, price, `count`, cost, `type`, sell_count, sell_income, buy_date, `status`,
+    oper_time, create_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondBuyLogExample" resultMap="BaseResultMap">
     select
@@ -109,12 +110,12 @@
   <insert id="insert" parameterType="com.profit.base.domain.BondBuyLog">
     insert into bond_buy_log (id, gp_id, price,
     `count`, cost, `type`, sell_count,
-    sell_income, buy_date, oper_time,
-    create_time)
+    sell_income, buy_date, `status`,
+    oper_time, create_time)
     values (#{id,jdbcType=BIGINT}, #{gpId,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE},
     #{count,jdbcType=INTEGER}, #{cost,jdbcType=DOUBLE}, #{type,jdbcType=TINYINT}, #{sellCount,jdbcType=INTEGER},
-    #{sellIncome,jdbcType=DOUBLE}, #{buyDate,jdbcType=VARCHAR}, #{operTime,jdbcType=TIMESTAMP},
-    #{createTime,jdbcType=TIMESTAMP})
+    #{sellIncome,jdbcType=DOUBLE}, #{buyDate,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT},
+    #{operTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog">
     insert into bond_buy_log
@@ -145,6 +146,9 @@
       </if>
       <if test="buyDate != null">
         buy_date,
+      </if>
+      <if test="status != null">
+        `status`,
       </if>
       <if test="operTime != null">
         oper_time,
@@ -180,6 +184,9 @@
       </if>
       <if test="buyDate != null">
         #{buyDate,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
       </if>
       <if test="operTime != null">
         #{operTime,jdbcType=TIMESTAMP},
@@ -225,6 +232,9 @@
       <if test="record.buyDate != null">
         buy_date = #{record.buyDate,jdbcType=VARCHAR},
       </if>
+      <if test="record.status != null">
+        `status` = #{record.status,jdbcType=TINYINT},
+      </if>
       <if test="record.operTime != null">
         oper_time = #{record.operTime,jdbcType=TIMESTAMP},
       </if>
@@ -247,6 +257,7 @@
     sell_count = #{record.sellCount,jdbcType=INTEGER},
     sell_income = #{record.sellIncome,jdbcType=DOUBLE},
     buy_date = #{record.buyDate,jdbcType=VARCHAR},
+    `status` = #{record.status,jdbcType=TINYINT},
     oper_time = #{record.operTime,jdbcType=TIMESTAMP},
     create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -280,6 +291,9 @@
       <if test="buyDate != null">
         buy_date = #{buyDate,jdbcType=VARCHAR},
       </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=TINYINT},
+      </if>
       <if test="operTime != null">
         oper_time = #{operTime,jdbcType=TIMESTAMP},
       </if>
@@ -299,6 +313,7 @@
     sell_count = #{sellCount,jdbcType=INTEGER},
     sell_income = #{sellIncome,jdbcType=DOUBLE},
     buy_date = #{buyDate,jdbcType=VARCHAR},
+    `status` = #{status,jdbcType=TINYINT},
     oper_time = #{operTime,jdbcType=TIMESTAMP},
     create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}

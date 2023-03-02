@@ -10,6 +10,7 @@ import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.constants.TemplatePath;
 import com.profit.commons.utils.BondUtils;
+import com.profit.commons.utils.LogUtil;
 import com.profit.commons.utils.PageUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -42,7 +43,12 @@ public class BondOperController {
         }
         BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
         if (params.get("type") != null) {
-            bondBuyLogExample.createCriteria().andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
+            if (params.get("status") != null) {
+                byte status = Byte.valueOf(params.get("status").toString());
+                bondBuyLogExample.createCriteria().andTypeEqualTo(Byte.valueOf(params.get("type").toString())).andStatusEqualTo(status);
+            } else {
+                bondBuyLogExample.createCriteria().andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
+            }
         }
 
         bondBuyLogExample.createCriteria().andGpIdEqualTo(id);
@@ -62,6 +68,7 @@ public class BondOperController {
         bondBuyLog.setOperTime(new Date());
         bondBuyLog.setSellCount(0);
         bondBuyLog.setSellIncome(0.00);
+        bondBuyLog.setStatus((byte) 0);
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
         bondBuyLog.setCost(BondUtils.getTaxation(bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
         bondBuyLogMapper.insert(bondBuyLog);
@@ -75,7 +82,8 @@ public class BondOperController {
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
 
         //卖出税费计算
-        double sellTaxation= BondUtils.getTaxation(bondInfo.getPlate(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
+        double sellTaxation = BondUtils.getTaxation(bondInfo.getPlate(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
+        LogUtil.info(bondSellLog.getId() + "sellTaxation" + sellTaxation);
         bondSellLog.setCost(sellTaxation);
         bondBuyLog.setCost(bondBuyLog.getCost() + bondSellLog.getCost());
 
@@ -86,7 +94,7 @@ public class BondOperController {
 
         bondSellLog.setIncome(Double.parseDouble(String.format("%.3f", income)));
         bondBuyLog.setSellIncome(bondBuyLog.getSellIncome() + bondSellLog.getIncome());
-
+        bondBuyLog.setSellCount(bondBuyLog.getSellCount() + bondSellLog.getCount());
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 

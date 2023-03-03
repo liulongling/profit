@@ -16,7 +16,7 @@ public class BondUtils {
             }
         }
         //券商佣金
-        double zqyj= total * 0.00001;
+        double zqyj= total * 0.0001;
         if(zqyj < 1){
             zqyj = 1;
         }

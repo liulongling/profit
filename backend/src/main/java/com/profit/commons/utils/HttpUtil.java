@@ -55,6 +55,7 @@ public class HttpUtil {
                         .append("&");
             }
             uri = sb.substring(0, sb.length() - 1);
+            LogUtil.debug(uri);
             return uri;
         }
         return sb.toString();

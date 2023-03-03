@@ -1,8 +1,11 @@
 package com.profit.job;
 
 import com.profit.commons.utils.LogUtil;
+import com.profit.service.BondService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @Author:liulongling
@@ -10,14 +13,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AnalysisDataJob {
-
+    @Resource
+    private BondService bondService;
     /**
      * 每分钟执行一次
      */
     @Scheduled(cron = "0 */1 * * * ?")
     public void task1() {
         LogUtil.info("定时任务[task1]开始执行");
-
+        bondService.refurbish();
         LogUtil.info("定时任务[task1]执行结束");
 
     }

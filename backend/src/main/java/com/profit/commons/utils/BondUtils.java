@@ -1,12 +1,14 @@
 package com.profit.commons.utils;
 
 
+import com.profit.base.domain.BondInfo;
+
 public class BondUtils {
 
-    public static Double getTaxation(String plate, Double total, boolean isSell) {
+    public static Double getTaxation(BondInfo bondInfo, Double total, boolean isSell) {
         Double taxation = 0.000;
-        if(!plate.equals("ETF")){
-            if (plate.equals("上证")) {
+        if(!bondInfo.getName().contains("ETF")){
+            if (bondInfo.getPlate().equals("sh")) {
                 //过户费成交金额0.002%
                 taxation += total * 0.00002;
             }

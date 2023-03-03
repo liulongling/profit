@@ -95,7 +95,7 @@ public class BondOperController {
         bondBuyLog.setSellIncome(0.00);
         bondBuyLog.setStatus((byte) 0);
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
-        bondBuyLog.setCost(BondUtils.getTaxation(bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
+        bondBuyLog.setCost(BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
         bondBuyLogMapper.insert(bondBuyLog);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
@@ -107,13 +107,13 @@ public class BondOperController {
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
 
         //卖出税费计算
-        double sellTaxation = BondUtils.getTaxation(bondInfo.getPlate(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
+        double sellTaxation = BondUtils.getTaxation(bondInfo, bondSellLog.getPrice() * bondSellLog.getCount(), true);
         LogUtil.info(bondSellLog.getId() + "sellTaxation" + sellTaxation);
         bondSellLog.setCost(sellTaxation);
         bondBuyLog.setCost(bondBuyLog.getCost() + bondSellLog.getCost());
 
         //买入税费计算
-        double buyTaxation = BondUtils.getTaxation(bondInfo.getPlate(), bondBuyLog.getPrice() * bondSellLog.getCount(), false);
+        double buyTaxation = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondSellLog.getCount(), false);
         //计算收益
         double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
 
@@ -142,7 +142,7 @@ public class BondOperController {
 
         //未出售的状态下才能修改税费
         if (bondBuyLog1.getSellCount() == 0) {
-            Double buyCost = BondUtils.getTaxation(bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+            Double buyCost = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(buyCost);
         }
 

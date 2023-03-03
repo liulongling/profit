@@ -53,7 +53,7 @@ public class BondController {
     @PostMapping("update")
     public ResultDO<Void> update(@RequestBody BondInfo bondInfo) {
         bondInfo.setUpdateTime(new Date());
-        bondInfoMapper.updateByPrimaryKey(bondInfo);
+        bondInfoMapper.updateByPrimaryKeySelective(bondInfo);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 

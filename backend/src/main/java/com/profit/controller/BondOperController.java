@@ -8,18 +8,15 @@ import com.profit.base.mapper.BondBuyLogMapper;
 import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.constants.ResultCode;
-import com.profit.commons.constants.TemplatePath;
+import com.profit.commons.utils.BeanUtils;
 import com.profit.commons.utils.BondUtils;
 import com.profit.commons.utils.LogUtil;
 import com.profit.commons.utils.PageUtils;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import com.profit.dto.BondBuyLogDTO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,30 +33,44 @@ public class BondOperController {
     private BondSellLogMapper bondSellLogMapper;
 
     @GetMapping("list")
-    public ResultDO<PageUtils<BondBuyLog>> getBonds(@RequestParam Map<String, Object> params) {
+    public ResultDO<PageUtils<BondBuyLogDTO>> getBonds(@RequestParam Map<String, Object> params) {
         String id = params.get("id").toString();
         if (id == null) {
             return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
         }
-        BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
-        if (params.get("type") != null) {
-            if (params.get("status") != null) {
-                byte status = Byte.valueOf(params.get("status").toString());
-                bondBuyLogExample.createCriteria().andTypeEqualTo(Byte.valueOf(params.get("type").toString())).andStatusEqualTo(status);
-            } else {
-                bondBuyLogExample.createCriteria().andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
-            }
-        }
+        BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(id);
 
-        bondBuyLogExample.createCriteria().andGpIdEqualTo(id);
+        BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+        BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
+        criteria.andGpIdEqualTo(id);
+        if (params.get("type") != null) {
+            criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
+        }
+        if (params.get("status") != null) {
+            byte status = Byte.valueOf(params.get("status").toString());
+            criteria.andStatusEqualTo(status);
+        }
         bondBuyLogExample.setOrderByClause("id desc");
         Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()));
         List<BondBuyLog> result = bondBuyLogMapper.selectByExample(bondBuyLogExample);
         if (result == null) {
             return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
         }
+        List<BondBuyLogDTO> list = new ArrayList<>(result.size());
+        for (BondBuyLog bondBuyLog : result) {
+            //查看是否股票是否全部售出
+            if (bondBuyLog.getCount().intValue() == bondBuyLog.getSellCount().intValue()) {
+                if (bondBuyLog.getStatus() == 0) {
+                    bondBuyLog.setStatus((byte) 1);
+                    bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
+                }
+            }
+            BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
+            buyLogDTO.setName(bondInfo.getName());
+            list.add(buyLogDTO);
+        }
 
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), result));
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
 
     @PostMapping("insert")
@@ -95,6 +106,11 @@ public class BondOperController {
         bondSellLog.setIncome(Double.parseDouble(String.format("%.3f", income)));
         bondBuyLog.setSellIncome(bondBuyLog.getSellIncome() + bondSellLog.getIncome());
         bondBuyLog.setSellCount(bondBuyLog.getSellCount() + bondSellLog.getCount());
+
+        //查看是否股票是否全部售出
+        if (bondBuyLog.getCount() == bondBuyLog.getSellCount()) {
+            bondBuyLog.setStatus((byte) 1);
+        }
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 
@@ -109,6 +125,7 @@ public class BondOperController {
 
         Double buyCost = BondUtils.getTaxation(bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
         bondBuyLog.setCost(buyCost);
+
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }

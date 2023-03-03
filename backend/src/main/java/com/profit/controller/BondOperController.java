@@ -67,6 +67,20 @@ public class BondOperController {
             }
             BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
             buyLogDTO.setName(bondInfo.getName());
+            if (bondBuyLog.getSellCount() > 0) {
+                //卖出均价= (卖出数量*买入价格+ 收益) / 卖出数量
+                double sellAvgPrice = (bondBuyLog.getPrice() * bondBuyLog.getSellCount() + bondBuyLog.getSellIncome() + bondBuyLog.getCost()) / bondBuyLog.getSellCount();
+                Double avg = Double.parseDouble(String.format("%.3f", sellAvgPrice));
+                buyLogDTO.setSellAvgPrice(avg + "(" + String.format("%.2f", ((avg - bondBuyLog.getPrice()) / avg) * 100) + "%)");
+            }
+            //当前持股盈亏
+            if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
+                int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
+                Double curIncome = bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
+                //涨跌幅
+                Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
+                buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.3f", curIncome)) + "(" + zdf + "%)");
+            }
             list.add(buyLogDTO);
         }
 
@@ -120,11 +134,17 @@ public class BondOperController {
 
     @PostMapping("update")
     public ResultDO<Void> update(@RequestBody BondBuyLog bondBuyLog) {
+        BondBuyLog bondBuyLog1 = bondBuyLogMapper.selectByPrimaryKey(bondBuyLog.getId());
+
+
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
         bondBuyLog.setOperTime(new Date());
 
-        Double buyCost = BondUtils.getTaxation(bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
-        bondBuyLog.setCost(buyCost);
+        //未出售的状态下才能修改税费
+        if (bondBuyLog1.getSellCount() == 0) {
+            Double buyCost = BondUtils.getTaxation(bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+            bondBuyLog.setCost(buyCost);
+        }
 
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);

@@ -24,7 +24,7 @@
         <ul id="myTab" class="nav nav-tabs">
             <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter();">短线</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_dx_1();">短线(未卖出)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell();">未出售</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_wg();">网格</a></li>
         </ul>
     </div>
@@ -225,6 +225,11 @@
             width: '70px',
             formatter: stringFormatter
         }, {
+            field: 'typeName',
+            title: '类型',
+            width: '70px',
+            formatter: stringFormatter
+        }, {
             field: 'price',
             title: '购买价格',
             width: '70px',
@@ -242,8 +247,20 @@
             align: "center",
             formatter: stringFormatter
         }, {
+            field: 'sellAvgPrice',
+            title: '出售均价',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
             field: 'sellIncome',
-            title: '出售收益',
+            title: '出售盈亏',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'curIncome',
+            title: '持股盈亏',
             width: '70px',
             align: "center",
             formatter: stringFormatter
@@ -302,13 +319,12 @@
         });
     }
 
-    function filter_dx_1() {
+    function filter_no_sell() {
         let data = {
-            type: '1',
             status:'0'
         };
         getServerPaging($table, "/bond/operating/list", params => {
-            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", type: data.type,id:$id,status:data.status};
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status};
         });
     }
 

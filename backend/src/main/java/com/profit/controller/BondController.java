@@ -3,6 +3,8 @@ package com.profit.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.profit.base.ResultDO;
+import com.profit.base.domain.BondBuyLog;
+import com.profit.base.domain.BondBuyLogExample;
 import com.profit.base.domain.BondInfo;
 import com.profit.base.domain.BondInfoExample;
 import com.profit.base.mapper.BondBuyLogMapper;
@@ -29,7 +31,7 @@ public class BondController {
     private BondBuyLogMapper bondBuyLogMapper;
 
     @GetMapping("list")
-    public ResultDO<PageUtils<BondInfo>> getBonds(@RequestParam Map<String, Object> params) {
+    public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) {
         BondInfoExample bondInfoExample = new BondInfoExample();
         if (params.get("isEtf") != null) {
             bondInfoExample.createCriteria().andIsEtfEqualTo(Byte.valueOf(params.get("isEtf").toString()));
@@ -40,9 +42,55 @@ public class BondController {
         if (result == null) {
             return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
         }
+        List<BondInfoDTO> list = new ArrayList<>(result.size());
+        for (BondInfo bondInfo : result) {
+            BondInfoDTO bondInfoDTO = BeanUtils.copyBean(new BondInfoDTO(), bondInfo);
+            Double stubProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 1);
+            if (stubProfit == null) stubProfit = 0.00;
+            bondInfoDTO.setStubProfit(Double.parseDouble(String.format("%.2f", stubProfit)));
+            Double gridProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 0);
+            if (gridProfit == null) gridProfit = 0.00;
+            bondInfoDTO.setGridProfit(Double.parseDouble(String.format("%.2f", gridProfit)));
+
+            bondInfoDTO.setStubCount(count(bondInfo, (byte) 1));
+            bondInfoDTO.setGridCount(count(bondInfo, (byte) 0));
+
+            //当前持股盈亏
+            BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+            BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
+            criteria.andGpIdEqualTo(bondInfo.getId());
+            criteria.andStatusEqualTo((byte) 0);
+            List<BondBuyLog> bondBuyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
+            if (bondBuyLogs != null) {
+                Double total = 0.00;
+                for (BondBuyLog bondBuyLog : bondBuyLogs) {
+                    if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
+                        int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
+                        total += bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
+                    }
+                }
+                bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
+            }
+            list.add(bondInfoDTO);
+        }
+
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
+    }
 
 
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), result));
+    public long count(BondInfo bondInfo, byte type) {
+        long buyCount = 0, sellCount = 0;
+        Map<Object, Object> map = bondBuyLogMapper.sumBuySellCount(bondInfo.getId(), type);
+        if (map != null) {
+            for (Object o : map.keySet()) {
+                if (o.equals("buyCount")) {
+                    buyCount = Long.valueOf(map.get(o).toString());
+                } else if (o.equals("sellCount")) {
+                    sellCount = Long.valueOf(map.get(o).toString());
+                }
+            }
+        }
+        return buyCount - sellCount;
     }
 
     @PostMapping("insert")

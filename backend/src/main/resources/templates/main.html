@@ -191,6 +191,36 @@
             align: "center",
             formatter: stringFormatter
         }, {
+            field: 'stubProfit',
+            title: '短线收益',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'stubCount',
+            title: '短线持股数量',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'gridProfit',
+            title: '网格收益',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'gridCount',
+            title: '网格持股数量',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'gpProfit',
+            title: '持股盈亏',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
             field: 'createTime',
             title: '创建时间',
             width: "170px",
@@ -232,19 +262,19 @@
 
     function filter() {
         let data = {
-            plate: 'NOT ETF'
+           isEtf: '0'
         };
         getServerPaging($table, "/bond/list", params => {
-            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", name: data.plate};
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", isEtf: data.isEtf};
         });
     }
 
     function filterEtf() {
         let data = {
-            plate: 'ETF'
+            isEtf: '1'
         };
         getServerPaging($table, "/bond/list", params => {
-            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", name: data.plate};
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", isEtf: data.isEtf};
         });
     }
 

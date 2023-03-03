@@ -3,6 +3,8 @@ package com.profit.base.mapper;
 import com.profit.base.domain.BondBuyLog;
 import com.profit.base.domain.BondBuyLogExample;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface BondBuyLogMapper {
@@ -27,4 +29,8 @@ public interface BondBuyLogMapper {
     int updateByPrimaryKeySelective(BondBuyLog record);
 
     int updateByPrimaryKey(BondBuyLog record);
+
+    Double sumSellIncome(@Param("gp_id") String gp_id,@Param("type") Byte type);
+
+    Map<Object, Object> sumBuySellCount(@Param("gp_id") String gp_id, @Param("type") Byte type);
 }

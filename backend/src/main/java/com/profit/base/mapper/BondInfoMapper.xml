@@ -6,6 +6,7 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="price" jdbcType="DOUBLE" property="price" />
     <result column="plate" jdbcType="VARCHAR" property="plate" />
+    <result column="is_etf" jdbcType="TINYINT" property="isEtf" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -68,7 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, `name`, price, plate, create_time, update_time
+    id, `name`, price, plate, is_etf, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondInfoExample" resultMap="BaseResultMap">
     select
@@ -102,11 +103,11 @@
   </delete>
   <insert id="insert" parameterType="com.profit.base.domain.BondInfo">
     insert into bond_info (id, `name`, price,
-    plate, create_time, update_time
-    )
+    plate, is_etf, create_time,
+    update_time)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE},
-    #{plate,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-    )
+    #{plate,jdbcType=VARCHAR}, #{isEtf,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP},
+    #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.profit.base.domain.BondInfo">
     insert into bond_info
@@ -122,6 +123,9 @@
       </if>
       <if test="plate != null">
         plate,
+      </if>
+      <if test="isEtf != null">
+        is_etf,
       </if>
       <if test="createTime != null">
         create_time,
@@ -142,6 +146,9 @@
       </if>
       <if test="plate != null">
         #{plate,jdbcType=VARCHAR},
+      </if>
+      <if test="isEtf != null">
+        #{isEtf,jdbcType=TINYINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -172,6 +179,9 @@
       <if test="record.plate != null">
         plate = #{record.plate,jdbcType=VARCHAR},
       </if>
+      <if test="record.isEtf != null">
+        is_etf = #{record.isEtf,jdbcType=TINYINT},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -189,6 +199,7 @@
     `name` = #{record.name,jdbcType=VARCHAR},
     price = #{record.price,jdbcType=DOUBLE},
     plate = #{record.plate,jdbcType=VARCHAR},
+    is_etf = #{record.isEtf,jdbcType=TINYINT},
     create_time = #{record.createTime,jdbcType=TIMESTAMP},
     update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -207,6 +218,9 @@
       <if test="plate != null">
         plate = #{plate,jdbcType=VARCHAR},
       </if>
+      <if test="isEtf != null">
+        is_etf = #{isEtf,jdbcType=TINYINT},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -221,6 +235,7 @@
     set `name` = #{name,jdbcType=VARCHAR},
     price = #{price,jdbcType=DOUBLE},
     plate = #{plate,jdbcType=VARCHAR},
+    is_etf = #{isEtf,jdbcType=TINYINT},
     create_time = #{createTime,jdbcType=TIMESTAMP},
     update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=VARCHAR}

@@ -375,6 +375,66 @@ public class BondInfoExample {
             return (Criteria) this;
         }
 
+        public Criteria andIsEtfIsNull() {
+            addCriterion("is_etf is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfIsNotNull() {
+            addCriterion("is_etf is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfEqualTo(Byte value) {
+            addCriterion("is_etf =", value, "isEtf");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfNotEqualTo(Byte value) {
+            addCriterion("is_etf <>", value, "isEtf");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfGreaterThan(Byte value) {
+            addCriterion("is_etf >", value, "isEtf");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfGreaterThanOrEqualTo(Byte value) {
+            addCriterion("is_etf >=", value, "isEtf");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfLessThan(Byte value) {
+            addCriterion("is_etf <", value, "isEtf");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfLessThanOrEqualTo(Byte value) {
+            addCriterion("is_etf <=", value, "isEtf");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfIn(List<Byte> values) {
+            addCriterion("is_etf in", values, "isEtf");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfNotIn(List<Byte> values) {
+            addCriterion("is_etf not in", values, "isEtf");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfBetween(Byte value1, Byte value2) {
+            addCriterion("is_etf between", value1, value2, "isEtf");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsEtfNotBetween(Byte value1, Byte value2) {
+            addCriterion("is_etf not between", value1, value2, "isEtf");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

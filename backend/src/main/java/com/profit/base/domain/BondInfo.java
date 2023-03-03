@@ -24,6 +24,11 @@ public class BondInfo {
     private String plate;
 
     /**
+     * 是否ETF
+     */
+    private Byte isEtf;
+
+    /**
      *
      */
     private Date createTime;
@@ -63,6 +68,14 @@ public class BondInfo {
 
     public void setPlate(String plate) {
         this.plate = plate == null ? null : plate.trim();
+    }
+
+    public Byte getIsEtf() {
+        return isEtf;
+    }
+
+    public void setIsEtf(Byte isEtf) {
+        this.isEtf = isEtf;
     }
 
     public Date getCreateTime() {

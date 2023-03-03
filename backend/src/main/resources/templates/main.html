@@ -73,10 +73,17 @@
                         <label class="col-sm-2 control-label label-font" for="insert_input_plate">所属板块</label>
                         <div class="col-sm-10">
                             <select class="form-control" id="insert_input_plate">
-                                <option value="上证">上证</option>
-                                <option value="深证">深证</option>
-                                <option value="创业板">创业板</option>
-                                <option value="ETF">ETF</option>
+                                <option value="sh">sh</option>
+                                <option value="sz">sz</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_isetf">是否ETF</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="insert_input_isetf">
+                                <option value="0">不是</option>
+                                <option value="1">是</option>
                             </select>
                         </div>
                     </div>
@@ -126,10 +133,17 @@
                         <label class="col-sm-2 control-label label-font" for="alert_input_plate">所属板块</label>
                         <div class="col-sm-10">
                             <select class="form-control" id="alert_input_plate">
-                                <option value="上证">上证</option>
-                                <option value="深证">深证</option>
-                                <option value="创业板">创业板</option>
-                                <option value="ETF">ETF</option>
+                                <option value="sh">sh</option>
+                                <option value="sz">sz</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_isetf">是否ETF(1是)</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="alert_input_isetf">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
                             </select>
                         </div>
                     </div>
@@ -284,6 +298,7 @@
             name: $('#insert_input_name').val(),
             id: $('#insert_input_id').val(),
             price: $('#insert_input_price').val(),
+            isEtf: $('#insert_input_isetf').val(),
             plate: $('#insert_input_plate').val()
         };
         if ("" === data.name) {
@@ -319,6 +334,7 @@
         $('#alert_input_name').val(rows[index].name);
         $('#alert_input_plate').val(rows[index].plate);
         $('#alert_input_price').val(rows[index].price);
+        $('#alert_input_isetf').val(rows[index].isEtf);
         alterId = rows[index].id;
     }
     
@@ -327,6 +343,7 @@
             id: alterId,
             name: $('#alert_input_name').val(),
             plate: $('#alert_input_plate').val(),
+            isEtf: $('#alert_input_isetf').val(),
             price: $('#alert_input_price').val()
         };
         if ("" === data.id) {

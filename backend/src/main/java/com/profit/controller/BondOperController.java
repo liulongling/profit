@@ -114,7 +114,7 @@ public class BondOperController {
         double sellTaxation = BondUtils.getTaxation(bondInfo, bondSellLog.getPrice() * bondSellLog.getCount(), true);
         LogUtil.info(bondSellLog.getId() + "sellTaxation" + sellTaxation);
         bondSellLog.setCost(sellTaxation);
-        bondBuyLog.setCost(bondBuyLog.getCost() + bondSellLog.getCost());
+        bondBuyLog.setCost(Double.parseDouble(String.format("%.3f", bondBuyLog.getCost() + bondSellLog.getCost())));
 
         //买入税费计算
         double buyTaxation = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondSellLog.getCount(), false);

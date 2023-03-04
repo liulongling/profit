@@ -25,5 +25,21 @@ public class BondInfoDTO extends BondInfo {
      * 持股盈亏
      */
     public Double gpProfit;
+    /**
+     * 当前总盈亏
+     */
+    public Double curProfit;
+    /**
+     * 当前总盈亏
+     */
+    public Double profit;
+
+    public Double getCurProfit() {
+        return Double.parseDouble(String.format("%.2f", stubProfit + gridProfit + gpProfit));
+    }
+
+    public Double getProfit() {
+        return Double.parseDouble(String.format("%.2f", stubProfit + gridProfit));
+    }
 
 }

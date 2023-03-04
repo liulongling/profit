@@ -43,14 +43,18 @@ public class BondOperController {
         BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
         BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
         criteria.andGpIdEqualTo(id);
+        bondBuyLogExample.setOrderByClause("buy_date desc");
         if (params.get("type") != null) {
             criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
+            if(params.get("type").equals("0")){
+                bondBuyLogExample.setOrderByClause("price desc");
+            }
         }
         if (params.get("status") != null) {
             byte status = Byte.valueOf(params.get("status").toString());
             criteria.andStatusEqualTo(status);
         }
-        bondBuyLogExample.setOrderByClause("id desc");
+
         Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()));
         List<BondBuyLog> result = bondBuyLogMapper.selectByExample(bondBuyLogExample);
         if (result == null) {

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>股票操作记录</title>
+    <title id = "title"></title>
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="../../static/css/lib/bootstrap3.4.1.min.css"
           th:href="@{/css/lib/bootstrap3.4.1.min.css}">
@@ -209,6 +209,7 @@
     let $table = $('#table');
     let $id = getQueryString("id");
     changeToolTip();
+    var hearDiv = document.getElementById("headDiv");
 
     // 服务器分页获取数据
     function getServerPaging(node, url, queryParams) {
@@ -299,7 +300,35 @@
         getServerPaging($table, "/bond/operating/list", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC" ,id:$id};
         });
+        loadHeadData("/bond/info");
     }
+
+    function loadHeadData(url){
+       let data = {
+          id:$id
+       };
+      $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            async : false, //同步执行
+            data: JSON.stringify(data),
+            traditional: true,
+            contentType : "application/json",
+            success: function (result) {
+                setName(result);
+            },
+            error: function () {
+                swal("错误", "404", "error");
+            }
+         }
+        );
+    }
+
+    function setName(result){
+         document.getElementById("title").innerHTML=result.module.name;
+    }
+
 
     function getQueryString(name) {
         var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');

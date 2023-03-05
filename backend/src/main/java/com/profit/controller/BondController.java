@@ -101,6 +101,12 @@ public class BondController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 
+    @PostMapping("info")
+    public ResultDO<BondInfo> info(@RequestBody BondInfo bondInfo) {
+        bondInfo = bondInfoMapper.selectByPrimaryKey(bondInfo.getId());
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondInfo);
+    }
+
     @PostMapping("update")
     public ResultDO<Void> update(@RequestBody BondInfo bondInfo) {
         bondInfo.setUpdateTime(new Date());

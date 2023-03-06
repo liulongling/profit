@@ -15,8 +15,8 @@ import com.profit.commons.utils.BeanUtils;
 import com.profit.commons.utils.DateUtils;
 import com.profit.commons.utils.PageUtils;
 import com.profit.dto.BondInfoDTO;
-import com.profit.dto.BondSellRequest;
 import com.profit.dto.ChartData;
+import com.profit.service.BondService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -35,9 +35,11 @@ public class BondController {
     private BondBuyLogMapper bondBuyLogMapper;
     @Resource
     private BondSellLogMapper bondSellLogMapper;
+    @Resource
+    private BondService bondService;
 
     @GetMapping("list")
-    public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) {
+    public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) throws Exception {
         BondInfoExample bondInfoExample = new BondInfoExample();
         if (params.get("isEtf") != null) {
             bondInfoExample.createCriteria().andIsEtfEqualTo(Byte.valueOf(params.get("isEtf").toString()));
@@ -51,18 +53,15 @@ public class BondController {
         List<BondInfoDTO> list = new ArrayList<>(result.size());
 
 
-        BondSellRequest bondSellRequest = new BondSellRequest();
+        //上月出售总收益
+        Map<String, String> lastMonthMap = DateUtils.getLastMonthTime();
+        Map<Object, Object> lastMonthProfitMap = bondService.getProfitByDate(lastMonthMap.get("startDate"), lastMonthMap.get("endDate"));
+
         //本月出售总收益
-        bondSellRequest.setStartTime(DateUtils.getMonthStart());
-        bondSellRequest.setEndTime(DateUtils.getMonthEnd());
-        List<Map<Object, Object>> curMonthProfitList = bondSellLogMapper.listGroupByGpId(bondSellRequest);
-        Map<Object, Object> curMonthProfitMap = BeanUtils.list2Map(curMonthProfitList, "gpId", "income");
+        Map<Object, Object> curMonthProfitMap = bondService.getProfitByDate(DateUtils.getMonthStart(), DateUtils.getMonthEnd());
 
         //今日出售总收益
-        bondSellRequest.setStartTime(DateUtils.getTime(new Date(), 0, 0, 0));
-        bondSellRequest.setEndTime(DateUtils.getTime(new Date(), 23, 59, 59));
-        List<Map<Object, Object>> todayProfitList = bondSellLogMapper.listGroupByGpId(bondSellRequest);
-        Map<Object, Object> todayProfitMap = BeanUtils.list2Map(todayProfitList, "gpId", "income");
+        Map<Object, Object> todayProfitMap = bondService.getProfitByDate(DateUtils.getTimeString(DateUtils.getTime(new Date(), 0, 0, 0)), DateUtils.getTimeString(DateUtils.getTime(new Date(), 23, 59, 59)));
 
 
         for (BondInfo bondInfo : result) {
@@ -94,6 +93,7 @@ public class BondController {
                 bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
             }
 
+            bondInfoDTO.setLastMonthProfit(lastMonthProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", lastMonthProfitMap.get(bondInfo.getId()))));
             bondInfoDTO.setCurMonthProfit(curMonthProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", curMonthProfitMap.get(bondInfo.getId()))));
             bondInfoDTO.setTodayTProfit(todayProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", todayProfitMap.get(bondInfo.getId()))));
 

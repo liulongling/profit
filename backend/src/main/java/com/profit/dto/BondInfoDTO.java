@@ -34,6 +34,11 @@ public class BondInfoDTO extends BondInfo {
      */
     public Double profit;
     /**
+     * 上月总收益
+     */
+    public Double lastMonthProfit;
+
+    /**
      * 本月总收益
      */
     public Double curMonthProfit;

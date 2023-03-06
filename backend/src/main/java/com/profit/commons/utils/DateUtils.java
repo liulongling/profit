@@ -319,43 +319,15 @@ public class DateUtils {
 
 
     /**
-     * 获取本周的第一天
-     *
-     * @return String
-     **/
-    public static Date getWeekStart() {
-        Calendar cal = Calendar.getInstance();
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.setTime(new java.util.Date());
-        // Monday
-        cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
-        return cal.getTime();
-    }
-
-    /**
-     * 获取本周的最后一天
-     *
-     * @return String
-     **/
-    public static Date getWeekEnd() {
-        Calendar cal = Calendar.getInstance();
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.setTime(new java.util.Date());
-        // Sunday
-        cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek() + 6);
-        return cal.getTime();
-    }
-
-    /**
      * 获取本月的第一天
      *
      * @return String
      **/
-    public static Date getMonthStart() {
+    public static String getMonthStart() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MONTH, 0);
         cal.set(Calendar.DAY_OF_MONTH, 1);
-        return cal.getTime();
+        return getDateString(cal.getTime());
     }
 
     /**
@@ -363,9 +335,62 @@ public class DateUtils {
      *
      * @return String
      **/
-    public static Date getMonthEnd() {
+    public static String getMonthEnd() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-        return cal.getTime();
+        return getDateString(cal.getTime());
+    }
+
+    /**
+     * 获取上个月月开始时间和结束时间
+     *
+     * @return
+     */
+    public static Map<String,String> getLastMonthTime() throws Exception {
+        Long startTime = getLastMonthStartTime();
+        Long endTime = getLastMonthEndTime();
+        DateTimeFormatter ftf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String startTimeStr = ftf.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneId.systemDefault()));
+        String endTimeStr = ftf.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(endTime), ZoneId.systemDefault()));
+        Map map = new HashMap();
+        map.put("startDate", startTimeStr);
+        map.put("endDate", endTimeStr);
+        return map;
+    }
+
+    public static Long getLastMonthStartTime() throws Exception {
+        Long currentTime = System.currentTimeMillis();
+
+        String timeZone = "GMT+8:00";
+        Calendar calendar = Calendar.getInstance();// 获取当前日期
+        calendar.setTimeZone(TimeZone.getTimeZone(timeZone));
+        calendar.setTimeInMillis(currentTime);
+        calendar.add(Calendar.YEAR, 0);
+        calendar.add(Calendar.MONTH, -1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getLastMonthEndTime() {
+        Long currentTime = System.currentTimeMillis();
+
+        String timeZone = "GMT+8:00";
+        Calendar calendar = Calendar.getInstance();// 获取当前日期
+        calendar.setTimeZone(TimeZone.getTimeZone(timeZone));
+        calendar.setTimeInMillis(currentTime);
+        calendar.add(Calendar.YEAR, 0);
+        calendar.add(Calendar.MONTH, -1);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));// 获取当前月最后一天
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+
+        return calendar.getTimeInMillis();
     }
 }

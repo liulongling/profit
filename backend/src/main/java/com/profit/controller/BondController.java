@@ -50,13 +50,20 @@ public class BondController {
         }
         List<BondInfoDTO> list = new ArrayList<>(result.size());
 
-        //本月卖出收益
+
         BondSellRequest bondSellRequest = new BondSellRequest();
+        //本月出售总收益
         bondSellRequest.setStartTime(DateUtils.getMonthStart());
         bondSellRequest.setEndTime(DateUtils.getMonthEnd());
+        List<Map<Object, Object>> curMonthProfitList = bondSellLogMapper.listGroupByGpId(bondSellRequest);
+        Map<Object, Object> curMonthProfitMap = BeanUtils.list2Map(curMonthProfitList, "gpId", "income");
 
-        List<Map<Object, Object>> listGroup = bondSellLogMapper.listGroupByGpId(bondSellRequest);
-        Map<Object, Object> map = BeanUtils.list2Map(listGroup, "gpId", "income");
+        //今日出售总收益
+        bondSellRequest.setStartTime(DateUtils.getTime(new Date(), 0, 0, 0));
+        bondSellRequest.setEndTime(DateUtils.getTime(new Date(), 23, 59, 59));
+        List<Map<Object, Object>> todayProfitList = bondSellLogMapper.listGroupByGpId(bondSellRequest);
+        Map<Object, Object> todayProfitMap = BeanUtils.list2Map(todayProfitList, "gpId", "income");
+
 
         for (BondInfo bondInfo : result) {
             BondInfoDTO bondInfoDTO = BeanUtils.copyBean(new BondInfoDTO(), bondInfo);
@@ -87,8 +94,9 @@ public class BondController {
                 bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
             }
 
-            Object object = map.get(bondInfo.getId());
-            bondInfoDTO.setCurMonthProfit(object == null ? 0 : Double.parseDouble(String.format("%.2f", object)));
+            bondInfoDTO.setCurMonthProfit(curMonthProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", curMonthProfitMap.get(bondInfo.getId()))));
+            bondInfoDTO.setTodayTProfit(todayProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", todayProfitMap.get(bondInfo.getId()))));
+
             list.add(bondInfoDTO);
         }
 

@@ -11,6 +11,11 @@ public class BondSellLog {
     /**
      *
      */
+    private String gpId;
+
+    /**
+     *
+     */
     private Long buyId;
 
     /**
@@ -44,6 +49,14 @@ public class BondSellLog {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getGpId() {
+        return gpId;
+    }
+
+    public void setGpId(String gpId) {
+        this.gpId = gpId == null ? null : gpId.trim();
     }
 
     public Long getBuyId() {

@@ -37,6 +37,10 @@ public class BondInfoDTO extends BondInfo {
      * 本月总收益
      */
     public Double curMonthProfit;
+    /**
+     * 今日T收益
+     */
+    public Double todayTProfit;
 
     public Double getCurProfit() {
         return Double.parseDouble(String.format("%.2f", stubProfit + gridProfit + gpProfit));

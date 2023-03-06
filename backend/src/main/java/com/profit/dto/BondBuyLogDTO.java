@@ -9,6 +9,7 @@ public class BondBuyLogDTO extends BondBuyLog {
     public String sellAvgPrice;
     public String curIncome;
     public String typeName;
+    public String girdSpacing;
 
     public String getTypeName() {
         return getType() == 1 ? "短线" : "网格";

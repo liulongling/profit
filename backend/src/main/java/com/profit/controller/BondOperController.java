@@ -46,13 +46,14 @@ public class BondOperController {
         bondBuyLogExample.setOrderByClause("buy_date desc");
         if (params.get("type") != null) {
             criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
-            if(params.get("type").equals("0")){
+            if (params.get("type").equals("0")) {
                 bondBuyLogExample.setOrderByClause("price desc");
             }
         }
         if (params.get("status") != null) {
             byte status = Byte.valueOf(params.get("status").toString());
             criteria.andStatusEqualTo(status);
+            bondBuyLogExample.setOrderByClause("price desc");
         }
 
         Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()));
@@ -61,7 +62,8 @@ public class BondOperController {
             return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
         }
         List<BondBuyLogDTO> list = new ArrayList<>(result.size());
-        for (BondBuyLog bondBuyLog : result) {
+        for (int i = 0; i < result.size(); i++) {
+            BondBuyLog bondBuyLog = result.get(i);
             //查看是否股票是否全部售出
             if (bondBuyLog.getCount().intValue() == bondBuyLog.getSellCount().intValue()) {
                 if (bondBuyLog.getStatus() == 0) {
@@ -71,6 +73,14 @@ public class BondOperController {
             }
             BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
             buyLogDTO.setName(bondInfo.getName());
+
+            //与上一个买点的格差
+            String girdSpacing = "0";
+            if (i > 0) {
+                girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
+            }
+            buyLogDTO.setGirdSpacing(girdSpacing);
+
             if (bondBuyLog.getSellCount() > 0) {
                 //卖出均价= (卖出数量*买入价格+ 收益) / 卖出数量
                 double sellAvgPrice = (bondBuyLog.getPrice() * bondBuyLog.getSellCount() + bondBuyLog.getSellIncome() + bondBuyLog.getCost()) / bondBuyLog.getSellCount();
@@ -99,7 +109,7 @@ public class BondOperController {
         bondBuyLog.setSellIncome(0.00);
         bondBuyLog.setStatus((byte) 0);
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
-        bondBuyLog.setCost(BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
+        bondBuyLog.setCost(BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
         bondBuyLogMapper.insert(bondBuyLog);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
@@ -111,20 +121,20 @@ public class BondOperController {
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
 
         //卖出税费计算
-        double sellTaxation = BondUtils.getTaxation(bondInfo, bondSellLog.getPrice() * bondSellLog.getCount(), true);
+        double sellTaxation = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
         LogUtil.info(bondSellLog.getId() + "sellTaxation" + sellTaxation);
         bondSellLog.setCost(sellTaxation);
         bondBuyLog.setCost(Double.parseDouble(String.format("%.3f", bondBuyLog.getCost() + bondSellLog.getCost())));
 
         //买入税费计算
-        double buyTaxation = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondSellLog.getCount(), false);
+        double buyTaxation = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondSellLog.getCount(), false);
         //计算收益 出售总价 - 买入总价 - 买卖费用
         double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
 
         bondSellLog.setIncome(Double.parseDouble(String.format("%.3f", income)));
         bondBuyLog.setSellIncome(bondBuyLog.getSellIncome() + bondSellLog.getIncome());
         bondBuyLog.setSellCount(bondBuyLog.getSellCount() + bondSellLog.getCount());
-
+        bondSellLog.setGpId(bondInfo.getId());
         //查看是否股票是否全部售出
         if (bondBuyLog.getCount() == bondBuyLog.getSellCount()) {
             bondBuyLog.setStatus((byte) 1);
@@ -146,7 +156,7 @@ public class BondOperController {
 
         //未出售的状态下才能修改税费
         if (bondBuyLog1.getSellCount() == 0) {
-            Double buyCost = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+            Double buyCost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(buyCost);
         }
 

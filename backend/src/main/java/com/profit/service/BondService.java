@@ -30,7 +30,7 @@ public class BondService {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int dayOfWeek = Calendar.DAY_OF_WEEK - 1;
-        if (dayOfWeek >= 1 && dayOfWeek <= 5 && hour > 9 && hour < 15) {
+        if ( hour >= 9 && hour < 15) {
             List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
             for (BondInfo bondInfo : list) {
                 Map<String, String> uriMap = new HashMap<>();

@@ -18,7 +18,16 @@
 </head>
 
 <body onload="init();">
-
+<div class="panel-body" style="padding-bottom:0;">
+    <div class="panel panel-default" style="text-align:center">
+        <tr>
+            <td>当前价格</td>
+        </tr>
+        <tr>
+            <h2 id = "curPrice"></h2>
+        </tr>
+    </div>
+</div>
 <div class="panel-body" style="padding-bottom:0;">
     <div class="panel panel-default">
         <ul id="myTab" class="nav nav-tabs">
@@ -327,6 +336,7 @@
 
     function setName(result){
          document.getElementById("title").innerHTML=result.module.name;
+         document.getElementById("curPrice").innerHTML=result.module.price;
     }
 
 

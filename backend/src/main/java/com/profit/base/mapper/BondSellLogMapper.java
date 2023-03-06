@@ -3,6 +3,9 @@ package com.profit.base.mapper;
 import com.profit.base.domain.BondSellLog;
 import com.profit.base.domain.BondSellLogExample;
 import java.util.List;
+import java.util.Map;
+
+import com.profit.dto.BondSellRequest;
 import org.apache.ibatis.annotations.Param;
 
 public interface BondSellLogMapper {
@@ -27,4 +30,6 @@ public interface BondSellLogMapper {
     int updateByPrimaryKeySelective(BondSellLog record);
 
     int updateByPrimaryKey(BondSellLog record);
+
+    List<Map<Object, Object>> listGroupByGpId(@Param("request") BondSellRequest request);
 }

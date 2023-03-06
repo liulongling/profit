@@ -200,8 +200,8 @@
             formatter: stringFormatter
         }, {
             field: 'plate',
-            title: '所属板块',
-            width: '70px',
+            title: '板块',
+            width: '20px',
             align: "center",
             formatter: stringFormatter
         }, {
@@ -245,12 +245,65 @@
             width: "70px",
             formatter: stringFormatter
         }, {
+            field: 'curMonthProfit',
+            title: '本月总收益',
+            width: "70px",
+            formatter: stringFormatter
+        }, {
             field: 'operation',
             title: '操作',
             width: '170px',
             formatter: operateFormatter // 自定义方法，添加操作按钮
         }]);
     }
+
+  function loadProfitData() {
+    let datePicker = datePickerStruct($("#reservation").val());
+    let startDate = datePicker.startDate;
+    let endDate = datePicker.endDate;
+    $.ajax({
+      type: "POST",
+      url: "/bond/analyse",
+      dataType: "json",
+      data: {
+        "startDate": startDate,
+        "endDate": endDate
+      },
+      success: function (chartData) {
+        if (window.onlineRealtimeChart != null) {
+          window.onlineRealtimeChart.destroy();
+        }
+        window.onlineRealtimeChart = new Chart(document.getElementById('areaChart'), {
+          type: type,
+          data: chartData,
+          options: {
+            responsive: true,
+            responsiveAnimationDuration: 3,
+            aspectRatio: 3,
+            tooltips: {
+              mode: 'index',
+              intersect: false,
+            },
+            hover: {
+              mode: 'nearest',
+              intersect: true
+            }
+          }
+        });
+      }
+    });
+  }
+
+  $(function () {
+      window.scrollTo(0,0);
+      let nowDate = new Date();
+      let today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
+      $('#reservation').daterangepicker({
+          timePickerIncrement: 30
+          , "locale": datePickerLocale,
+          "maxDate": today
+      });
+  });
 
     function operateFormatter(value, row, index) {  // 赋予的参数
         return [

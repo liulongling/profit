@@ -9,10 +9,14 @@ import com.profit.base.domain.BondInfo;
 import com.profit.base.domain.BondInfoExample;
 import com.profit.base.mapper.BondBuyLogMapper;
 import com.profit.base.mapper.BondInfoMapper;
+import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.BeanUtils;
+import com.profit.commons.utils.DateUtils;
 import com.profit.commons.utils.PageUtils;
 import com.profit.dto.BondInfoDTO;
+import com.profit.dto.BondSellRequest;
+import com.profit.dto.ChartData;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -29,6 +33,8 @@ public class BondController {
     private BondInfoMapper bondInfoMapper;
     @Resource
     private BondBuyLogMapper bondBuyLogMapper;
+    @Resource
+    private BondSellLogMapper bondSellLogMapper;
 
     @GetMapping("list")
     public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) {
@@ -43,6 +49,15 @@ public class BondController {
             return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
         }
         List<BondInfoDTO> list = new ArrayList<>(result.size());
+
+        //本月卖出收益
+        BondSellRequest bondSellRequest = new BondSellRequest();
+        bondSellRequest.setStartTime(DateUtils.getMonthStart());
+        bondSellRequest.setEndTime(DateUtils.getMonthEnd());
+
+        List<Map<Object, Object>> listGroup = bondSellLogMapper.listGroupByGpId(bondSellRequest);
+        Map<Object, Object> map = BeanUtils.list2Map(listGroup, "gpId", "income");
+
         for (BondInfo bondInfo : result) {
             BondInfoDTO bondInfoDTO = BeanUtils.copyBean(new BondInfoDTO(), bondInfo);
             Double stubProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 1);
@@ -71,6 +86,9 @@ public class BondController {
                 }
                 bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
             }
+
+            Object object = map.get(bondInfo.getId());
+            bondInfoDTO.setCurMonthProfit(object == null ? 0 : Double.parseDouble(String.format("%.2f", object)));
             list.add(bondInfoDTO);
         }
 
@@ -111,6 +129,15 @@ public class BondController {
     public ResultDO<Void> update(@RequestBody BondInfo bondInfo) {
         bondInfo.setUpdateTime(new Date());
         bondInfoMapper.updateByPrimaryKeySelective(bondInfo);
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
+    }
+
+    @PostMapping("analyse")
+    public ResultDO<Void> analyse(@RequestParam String startDate,
+                                  @RequestParam String endDate) {
+        ChartData chartData = new ChartData();
+        chartData.getLabels().addAll(DateUtils.getDateList(startDate, endDate));
+
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 

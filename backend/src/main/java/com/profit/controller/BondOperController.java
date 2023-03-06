@@ -118,7 +118,7 @@ public class BondOperController {
 
         //买入税费计算
         double buyTaxation = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondSellLog.getCount(), false);
-        //计算收益
+        //计算收益 出售总价 - 买入总价 - 买卖费用
         double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
 
         bondSellLog.setIncome(Double.parseDouble(String.format("%.3f", income)));

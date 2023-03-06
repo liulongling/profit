@@ -34,6 +34,7 @@ ENGINE=InnoDB
 ;
 CREATE TABLE `bond_sell_log` (
 	`id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '唯一ID',
+	`gp_id` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`buy_id` BIGINT(20) NULL DEFAULT NULL,
 	`price` DOUBLE NULL DEFAULT NULL COMMENT '出售价格',
 	`count` INT(10) NULL DEFAULT NULL COMMENT '出售数量',
@@ -47,6 +48,7 @@ COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
 AUTO_INCREMENT=1
 ;
+
 CREATE TABLE `operating_log` (
 	`id` VARCHAR(50) NOT NULL COMMENT '唯一ID' COLLATE 'utf8mb4_general_ci',
 	`oper_method` VARCHAR(500) NULL DEFAULT NULL COMMENT '操作方法' COLLATE 'utf8mb4_general_ci',

@@ -1,6 +1,5 @@
 package com.profit.base.domain;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -166,6 +165,76 @@ public class BondSellLogExample {
             return (Criteria) this;
         }
 
+        public Criteria andGpIdIsNull() {
+            addCriterion("gp_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdIsNotNull() {
+            addCriterion("gp_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdEqualTo(String value) {
+            addCriterion("gp_id =", value, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdNotEqualTo(String value) {
+            addCriterion("gp_id <>", value, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdGreaterThan(String value) {
+            addCriterion("gp_id >", value, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdGreaterThanOrEqualTo(String value) {
+            addCriterion("gp_id >=", value, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdLessThan(String value) {
+            addCriterion("gp_id <", value, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdLessThanOrEqualTo(String value) {
+            addCriterion("gp_id <=", value, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdLike(String value) {
+            addCriterion("gp_id like", value, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdNotLike(String value) {
+            addCriterion("gp_id not like", value, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdIn(List<String> values) {
+            addCriterion("gp_id in", values, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdNotIn(List<String> values) {
+            addCriterion("gp_id not in", values, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdBetween(String value1, String value2) {
+            addCriterion("gp_id between", value1, value2, "gpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGpIdNotBetween(String value1, String value2) {
+            addCriterion("gp_id not between", value1, value2, "gpId");
+            return (Criteria) this;
+        }
+
         public Criteria andBuyIdIsNull() {
             addCriterion("buy_id is null");
             return (Criteria) this;
@@ -176,62 +245,52 @@ public class BondSellLogExample {
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdEqualTo(String value) {
+        public Criteria andBuyIdEqualTo(Long value) {
             addCriterion("buy_id =", value, "buyId");
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdNotEqualTo(String value) {
+        public Criteria andBuyIdNotEqualTo(Long value) {
             addCriterion("buy_id <>", value, "buyId");
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdGreaterThan(String value) {
+        public Criteria andBuyIdGreaterThan(Long value) {
             addCriterion("buy_id >", value, "buyId");
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdGreaterThanOrEqualTo(String value) {
+        public Criteria andBuyIdGreaterThanOrEqualTo(Long value) {
             addCriterion("buy_id >=", value, "buyId");
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdLessThan(String value) {
+        public Criteria andBuyIdLessThan(Long value) {
             addCriterion("buy_id <", value, "buyId");
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdLessThanOrEqualTo(String value) {
+        public Criteria andBuyIdLessThanOrEqualTo(Long value) {
             addCriterion("buy_id <=", value, "buyId");
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdLike(String value) {
-            addCriterion("buy_id like", value, "buyId");
-            return (Criteria) this;
-        }
-
-        public Criteria andBuyIdNotLike(String value) {
-            addCriterion("buy_id not like", value, "buyId");
-            return (Criteria) this;
-        }
-
-        public Criteria andBuyIdIn(List<String> values) {
+        public Criteria andBuyIdIn(List<Long> values) {
             addCriterion("buy_id in", values, "buyId");
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdNotIn(List<String> values) {
+        public Criteria andBuyIdNotIn(List<Long> values) {
             addCriterion("buy_id not in", values, "buyId");
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdBetween(String value1, String value2) {
+        public Criteria andBuyIdBetween(Long value1, Long value2) {
             addCriterion("buy_id between", value1, value2, "buyId");
             return (Criteria) this;
         }
 
-        public Criteria andBuyIdNotBetween(String value1, String value2) {
+        public Criteria andBuyIdNotBetween(Long value1, Long value2) {
             addCriterion("buy_id not between", value1, value2, "buyId");
             return (Criteria) this;
         }
@@ -246,52 +305,52 @@ public class BondSellLogExample {
             return (Criteria) this;
         }
 
-        public Criteria andPriceEqualTo(BigDecimal value) {
+        public Criteria andPriceEqualTo(Double value) {
             addCriterion("price =", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceNotEqualTo(BigDecimal value) {
+        public Criteria andPriceNotEqualTo(Double value) {
             addCriterion("price <>", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceGreaterThan(BigDecimal value) {
+        public Criteria andPriceGreaterThan(Double value) {
             addCriterion("price >", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceGreaterThanOrEqualTo(BigDecimal value) {
+        public Criteria andPriceGreaterThanOrEqualTo(Double value) {
             addCriterion("price >=", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceLessThan(BigDecimal value) {
+        public Criteria andPriceLessThan(Double value) {
             addCriterion("price <", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceLessThanOrEqualTo(BigDecimal value) {
+        public Criteria andPriceLessThanOrEqualTo(Double value) {
             addCriterion("price <=", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceIn(List<BigDecimal> values) {
+        public Criteria andPriceIn(List<Double> values) {
             addCriterion("price in", values, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceNotIn(List<BigDecimal> values) {
+        public Criteria andPriceNotIn(List<Double> values) {
             addCriterion("price not in", values, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andPriceBetween(Double value1, Double value2) {
             addCriterion("price between", value1, value2, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceNotBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andPriceNotBetween(Double value1, Double value2) {
             addCriterion("price not between", value1, value2, "price");
             return (Criteria) this;
         }
@@ -366,52 +425,52 @@ public class BondSellLogExample {
             return (Criteria) this;
         }
 
-        public Criteria andCostEqualTo(BigDecimal value) {
+        public Criteria andCostEqualTo(Double value) {
             addCriterion("cost =", value, "cost");
             return (Criteria) this;
         }
 
-        public Criteria andCostNotEqualTo(BigDecimal value) {
+        public Criteria andCostNotEqualTo(Double value) {
             addCriterion("cost <>", value, "cost");
             return (Criteria) this;
         }
 
-        public Criteria andCostGreaterThan(BigDecimal value) {
+        public Criteria andCostGreaterThan(Double value) {
             addCriterion("cost >", value, "cost");
             return (Criteria) this;
         }
 
-        public Criteria andCostGreaterThanOrEqualTo(BigDecimal value) {
+        public Criteria andCostGreaterThanOrEqualTo(Double value) {
             addCriterion("cost >=", value, "cost");
             return (Criteria) this;
         }
 
-        public Criteria andCostLessThan(BigDecimal value) {
+        public Criteria andCostLessThan(Double value) {
             addCriterion("cost <", value, "cost");
             return (Criteria) this;
         }
 
-        public Criteria andCostLessThanOrEqualTo(BigDecimal value) {
+        public Criteria andCostLessThanOrEqualTo(Double value) {
             addCriterion("cost <=", value, "cost");
             return (Criteria) this;
         }
 
-        public Criteria andCostIn(List<BigDecimal> values) {
+        public Criteria andCostIn(List<Double> values) {
             addCriterion("cost in", values, "cost");
             return (Criteria) this;
         }
 
-        public Criteria andCostNotIn(List<BigDecimal> values) {
+        public Criteria andCostNotIn(List<Double> values) {
             addCriterion("cost not in", values, "cost");
             return (Criteria) this;
         }
 
-        public Criteria andCostBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andCostBetween(Double value1, Double value2) {
             addCriterion("cost between", value1, value2, "cost");
             return (Criteria) this;
         }
 
-        public Criteria andCostNotBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andCostNotBetween(Double value1, Double value2) {
             addCriterion("cost not between", value1, value2, "cost");
             return (Criteria) this;
         }
@@ -426,52 +485,52 @@ public class BondSellLogExample {
             return (Criteria) this;
         }
 
-        public Criteria andIncomeEqualTo(BigDecimal value) {
+        public Criteria andIncomeEqualTo(Double value) {
             addCriterion("income =", value, "income");
             return (Criteria) this;
         }
 
-        public Criteria andIncomeNotEqualTo(BigDecimal value) {
+        public Criteria andIncomeNotEqualTo(Double value) {
             addCriterion("income <>", value, "income");
             return (Criteria) this;
         }
 
-        public Criteria andIncomeGreaterThan(BigDecimal value) {
+        public Criteria andIncomeGreaterThan(Double value) {
             addCriterion("income >", value, "income");
             return (Criteria) this;
         }
 
-        public Criteria andIncomeGreaterThanOrEqualTo(BigDecimal value) {
+        public Criteria andIncomeGreaterThanOrEqualTo(Double value) {
             addCriterion("income >=", value, "income");
             return (Criteria) this;
         }
 
-        public Criteria andIncomeLessThan(BigDecimal value) {
+        public Criteria andIncomeLessThan(Double value) {
             addCriterion("income <", value, "income");
             return (Criteria) this;
         }
 
-        public Criteria andIncomeLessThanOrEqualTo(BigDecimal value) {
+        public Criteria andIncomeLessThanOrEqualTo(Double value) {
             addCriterion("income <=", value, "income");
             return (Criteria) this;
         }
 
-        public Criteria andIncomeIn(List<BigDecimal> values) {
+        public Criteria andIncomeIn(List<Double> values) {
             addCriterion("income in", values, "income");
             return (Criteria) this;
         }
 
-        public Criteria andIncomeNotIn(List<BigDecimal> values) {
+        public Criteria andIncomeNotIn(List<Double> values) {
             addCriterion("income not in", values, "income");
             return (Criteria) this;
         }
 
-        public Criteria andIncomeBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andIncomeBetween(Double value1, Double value2) {
             addCriterion("income between", value1, value2, "income");
             return (Criteria) this;
         }
 
-        public Criteria andIncomeNotBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andIncomeNotBetween(Double value1, Double value2) {
             addCriterion("income not between", value1, value2, "income");
             return (Criteria) this;
         }

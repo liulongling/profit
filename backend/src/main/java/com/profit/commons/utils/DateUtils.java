@@ -5,8 +5,8 @@ import cn.hutool.core.date.DateUtil;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * 时间工具类
@@ -17,6 +17,20 @@ import java.util.Date;
 public class DateUtils {
     public static final String DATE_PATTERM = "yyyy-MM-dd";
     public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final String PATTERN_DATE = "yyyyMMdd";
+    private static final String PATTERN_MONTH_DATE = "yyyyMM";
+    private static final String PATTERN_TIME = "HH:mm:ss";
+    private static final String PATTERN_DATE_TIME = "yyyyMMdd HH:mm:ss";
+    private static final String PATTERN_DATE_TIME_DURATION = "%时间1% 至 %时间2%";
+    private static final String PATTERN_DURATION = "%02d天%02d时%02d分%02d秒";
+    private static final String PATTERN_DATE_ES_INDEX_SUFFIX = "yyyy.MM.dd";
+    public static final int ONE_DAY_SEC = 24 * 60 * 60;//一天(秒)
+    public static final int ONE_HOUR_TO_SEL = 60 * 60;//一小时秒数
+    private static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern(DateUtils.PATTERN_DATE).withLocale(Locale.getDefault());
+    private static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern(DateUtils.PATTERN_TIME).withLocale(Locale.getDefault());
+    public static final DateTimeFormatter FORMATTER_DATE_TIME = DateTimeFormatter.ofPattern(DateUtils.PATTERN_DATE_TIME).withLocale(Locale.getDefault());
+    private static final DateTimeFormatter FORMATTER_MONTH_DATE = DateTimeFormatter.ofPattern(DateUtils.PATTERN_MONTH_DATE).withLocale(Locale.SIMPLIFIED_CHINESE);
+    private static final DateTimeFormatter FORMATTER_DATE_ES_INDEX_SUFFIX = DateTimeFormatter.ofPattern(DateUtils.PATTERN_DATE_ES_INDEX_SUFFIX).withLocale(Locale.getDefault());
 
     public static Date string2Date(String date, String patterm) {
         try {
@@ -25,6 +39,97 @@ public class DateUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static LocalDateTime parse(int unixTimeStamp) {
+        return LocalDateTime.ofInstant(Instant.ofEpochSecond(unixTimeStamp), ZoneId.systemDefault());
+    }
+
+    public static LocalDateTime parse(String dateTime) {
+        return LocalDateTime.from(DateUtils.FORMATTER_DATE_TIME.parse(dateTime));
+    }
+
+    public static LocalDate parseDate(String dateTime) {
+        return LocalDate.from(DateUtils.FORMATTER_DATE.parse(dateTime));
+    }
+
+    public static LocalDate parseTime(String dateTime) {
+        return LocalDate.from(DateUtils.FORMATTER_TIME.parse(dateTime));
+    }
+
+    public static int parseUnixTime(String string) {
+        return DateUtils.parseUnixTime(DateUtils.parse(string));
+    }
+
+    public static int parseUnixTime(LocalDateTime localDateTime) {
+        return Math.toIntExact(localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond());
+    }
+
+    public static int parseUnixTimeFromDate(String string) {
+        return DateUtils.parseUnixTimeFromDate(DateUtils.parseDate(string));
+    }
+
+    public static int parseUnixTimeFromDate(LocalDate localDateTime) {
+        return Math.toIntExact(localDateTime.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
+    }
+
+
+    public static List<String> getDateList(LocalDateTime startTime, LocalDateTime endTime) {
+        return DateUtils.getDateList(DateUtils.parseUnixTime(startTime), DateUtils.parseUnixTime(endTime));
+    }
+
+    public static List<String> getDateList(String startDate, String endDate) {
+        return DateUtils.getDateList(DateUtils.parseUnixTimeFromDate(startDate), DateUtils.parseUnixTimeFromDate(endDate));
+    }
+
+    public static String format(LocalDateTime dateTime) {
+        return DateUtils.FORMATTER_DATE_TIME.format(dateTime);
+    }
+
+    public static String format(LocalDateTime dateTime, DateTimeFormatter formatter) {
+        return formatter.format(dateTime);
+    }
+
+    public static String format(LocalDateTime dateTime, String format) {
+        return DateTimeFormatter.ofPattern(format).format(dateTime);
+    }
+
+
+    public static String formatTime(LocalDateTime dateTime) {
+        return DateUtils.FORMATTER_TIME.format(dateTime);
+    }
+
+    public static String formatDate(int dateTime) {
+        return DateUtils.formatDate(DateUtils.parse(dateTime));
+    }
+
+    public static String formatDate(LocalDateTime dateTime) {
+        return DateUtils.FORMATTER_DATE.format(dateTime);
+    }
+
+    public static List<String> getDateList(final int startTime, int endTime) {
+        if (startTime == endTime) {
+            return new ArrayList<String>() {{
+                this.add(DateUtils.formatDate(startTime));
+            }};
+        }
+        Set<String> set = new HashSet<>();
+        List<String> list = new ArrayList<>();
+        int time = startTime;
+        while (time < endTime) {
+            String date = DateUtils.formatDate(time);
+            if (!set.contains(date)) {
+                set.add(DateUtils.formatDate(time));
+                list.add(date);
+            }
+            time += ONE_DAY_SEC;
+        }
+        String date = DateUtils.formatDate(time);
+        if (!set.contains(date)) {
+            set.add(DateUtils.formatDate(time));
+            list.add(date);
+        }
+        return list;
     }
 
     public static boolean compTime(Date nowDate, Date date1, Date date2) {

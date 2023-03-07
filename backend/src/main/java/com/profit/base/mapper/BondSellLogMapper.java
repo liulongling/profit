@@ -32,4 +32,6 @@ public interface BondSellLogMapper {
     int updateByPrimaryKey(BondSellLog record);
 
     List<Map<Object, Object>> listGroupByGpId(@Param("request") BondSellRequest request);
+
+    List<Map<Object, Object>> listGroupByDate(@Param("type") byte type);
 }

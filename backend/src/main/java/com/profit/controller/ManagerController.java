@@ -17,5 +17,9 @@ public class ManagerController {
     public String showBond() {
         return TemplatePath.BOND_HTML;
     }
-    
+
+    @GetMapping("analyse")
+    public String showAnalyse() {
+        return TemplatePath.PROFIT_HTML;
+    }
 }

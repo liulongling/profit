@@ -5,9 +5,9 @@ import com.profit.base.domain.BondInfoExample;
 import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.utils.BeanUtils;
-import com.profit.commons.utils.DateUtils;
 import com.profit.commons.utils.HttpUtil;
 import com.profit.dto.BondSellRequest;
+import com.profit.dto.ProfitDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,27 @@ public class BondService {
     private BondInfoMapper bondInfoMapper;
     @Resource
     private BondSellLogMapper bondSellLogMapper;
+
+    public void loadProfitDTOData(Map<String, ProfitDTO> map, byte type) {
+        List<Map<Object, Object>> profitList = bondSellLogMapper.listGroupByDate(type);
+        Map<Object, Object> profitMap = BeanUtils.list2Map(profitList, "date", "income");
+        for (Object object : profitMap.keySet()) {
+            ProfitDTO profitDTO = map.get(object);
+            if (profitDTO == null || !map.containsKey(object)) {
+                profitDTO = new ProfitDTO();
+                profitDTO.setDate(object.toString());
+            }
+            Double profit = Double.parseDouble(String.format("%.3f", profitMap.get(object)));
+            if (type == 0) {
+                profitDTO.setGridProfit(profit);
+            } else if (type == 1) {
+                profitDTO.setStubProfit(profit);
+            }
+            profitDTO.setTotalProfit(Double.parseDouble(String.format("%.3f", profitDTO.getGridProfit() + profitDTO.getStubProfit())));
+            map.put(object.toString(), profitDTO);
+        }
+    }
+
 
     /**
      * 查询指定范围内收益

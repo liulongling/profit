@@ -9,4 +9,5 @@ import lombok.Setter;
 public class BondSellRequest {
     private String startTime;
     private String endTime;
+    private Byte type;
 }

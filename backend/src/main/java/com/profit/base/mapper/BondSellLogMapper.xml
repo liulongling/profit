@@ -244,6 +244,7 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <update id="updateByPrimaryKey" parameterType="com.profit.base.domain.BondSellLog">
     update bond_sell_log
     set gp_id = #{gpId,jdbcType=VARCHAR},
@@ -264,5 +265,17 @@
       </if>
     </where>
     GROUP BY gp_id
+  </select>
+
+  <select id="listGroupByDate" parameterType="java.lang.Byte" resultType="map">
+    SELECT
+       DATE_FORMAT(a.create_time, '%Y%m') as date,sum(a.income) as income
+    FROM
+       bond_sell_log as a,bond_buy_log as b
+    WHERE
+       a.buy_id = b.id
+    AND
+       b.type = #{type,jdbcType=TINYINT}
+    GROUP BY DATE_FORMAT(a.create_time, '%Y%m') desc;
   </select>
 </mapper>

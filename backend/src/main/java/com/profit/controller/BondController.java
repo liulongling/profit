@@ -15,15 +15,13 @@ import com.profit.commons.utils.BeanUtils;
 import com.profit.commons.utils.DateUtils;
 import com.profit.commons.utils.PageUtils;
 import com.profit.dto.BondInfoDTO;
-import com.profit.dto.ChartData;
+import com.profit.dto.BondSellRequest;
+import com.profit.dto.ProfitDTO;
 import com.profit.service.BondService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @RestController
@@ -141,12 +139,12 @@ public class BondController {
     }
 
     @PostMapping("analyse")
-    public ResultDO<Void> analyse(@RequestParam String startDate,
-                                  @RequestParam String endDate) {
-        ChartData chartData = new ChartData();
-        chartData.getLabels().addAll(DateUtils.getDateList(startDate, endDate));
+    public ResultDO<List<ProfitDTO>> analyse(@RequestBody BondSellRequest bondSellRequest) {
+        Map<String, ProfitDTO> map = new HashMap<>();
+        bondService.loadProfitDTOData(map, (byte) 0);
+        bondService.loadProfitDTOData(map, (byte) 1);
 
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new ArrayList<>(map.values()));
     }
 
 }

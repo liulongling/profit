@@ -43,7 +43,7 @@ public class BondOperController {
         BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
         BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
         criteria.andGpIdEqualTo(id);
-        bondBuyLogExample.setOrderByClause("buy_date desc");
+        bondBuyLogExample.setOrderByClause("oper_time desc");
         if (params.get("type") != null) {
             criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
             if (params.get("type").equals("0")) {
@@ -91,8 +91,12 @@ public class BondOperController {
             if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
                 int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
                 Double curIncome = bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
+                curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondInfo.getPrice(), true);
+                curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondBuyLog.getPrice(), false);
                 //涨跌幅
                 Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
+
+
                 buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.3f", curIncome)) + "(" + zdf + "%)");
             }
             list.add(buyLogDTO);
@@ -132,8 +136,9 @@ public class BondOperController {
         double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
 
         bondSellLog.setIncome(Double.parseDouble(String.format("%.3f", income)));
-        bondBuyLog.setSellIncome(bondBuyLog.getSellIncome() + bondSellLog.getIncome());
+        bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.3f", bondBuyLog.getSellIncome() + bondSellLog.getIncome())));
         bondBuyLog.setSellCount(bondBuyLog.getSellCount() + bondSellLog.getCount());
+        bondBuyLog.setOperTime(new Date());
         bondSellLog.setGpId(bondInfo.getId());
         //查看是否股票是否全部售出
         if (bondBuyLog.getCount() == bondBuyLog.getSellCount()) {

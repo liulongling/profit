@@ -33,8 +33,11 @@
         <ul id="myTab" class="nav nav-tabs">
             <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter();">短线</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell();">未出售</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_wg();">网格</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell();">未出售(全部)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_gird();">未出售(网格)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_stu();">未出售(短线)</a></li>
+
         </ul>
     </div>
 
@@ -284,6 +287,11 @@
             title: '购买日期',
             width: "70px",
             formatter: stringFormatter
+        },{
+            field: 'sellDate',
+            title: '出售日期',
+            width: "70px",
+            formatter: stringFormatter
         }, {
             field: 'cost',
             title: '税费佣金',
@@ -364,6 +372,26 @@
         };
         getServerPaging($table, "/bond/operating/list", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status};
+        });
+    }
+
+     function filter_no_sell_gird() {
+        let data = {
+            status:'0',
+            type:'0'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status,type:data.type};
+        });
+    }
+
+     function filter_no_sell_stu() {
+        let data = {
+            status:'0',
+            type:'1'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status,type:data.type};
         });
     }
 

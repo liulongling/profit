@@ -29,8 +29,8 @@ public class BondService {
     @Resource
     private BondSellLogMapper bondSellLogMapper;
 
-    public void loadProfitDTOData(Map<String, ProfitDTO> map, byte type) {
-        List<Map<Object, Object>> profitList = bondSellLogMapper.listGroupByDate(type);
+    public void loadProfitDTOData(Map<String, ProfitDTO> map, BondSellRequest bondSellRequest) {
+        List<Map<Object, Object>> profitList = bondSellLogMapper.listGroupByDate(bondSellRequest);
         Map<Object, Object> profitMap = BeanUtils.list2Map(profitList, "date", "income");
         for (Object object : profitMap.keySet()) {
             ProfitDTO profitDTO = map.get(object);
@@ -39,9 +39,9 @@ public class BondService {
                 profitDTO.setDate(object.toString());
             }
             Double profit = Double.parseDouble(String.format("%.3f", profitMap.get(object)));
-            if (type == 0) {
+            if (bondSellRequest.getType() == 0) {
                 profitDTO.setGridProfit(profit);
-            } else if (type == 1) {
+            } else if (bondSellRequest.getType() == 1) {
                 profitDTO.setStubProfit(profit);
             }
             profitDTO.setTotalProfit(Double.parseDouble(String.format("%.3f", profitDTO.getGridProfit() + profitDTO.getStubProfit())));
@@ -68,7 +68,6 @@ public class BondService {
     public void refurbish() {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int dayOfWeek = Calendar.DAY_OF_WEEK - 1;
         if (hour >= 9 && hour < 15) {
             List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
             for (BondInfo bondInfo : list) {

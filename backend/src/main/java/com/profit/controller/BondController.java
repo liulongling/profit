@@ -140,9 +140,20 @@ public class BondController {
 
     @PostMapping("analyse")
     public ResultDO<List<ProfitDTO>> analyse(@RequestBody BondSellRequest bondSellRequest) {
+        bondSellRequest = new BondSellRequest();
+        bondSellRequest.setType(0);
+
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+
+        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getBeginTime(year,1)));
+        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getBeginTime(year,12)));
+
         Map<String, ProfitDTO> map = new HashMap<>();
-        bondService.loadProfitDTOData(map, (byte) 0);
-        bondService.loadProfitDTOData(map, (byte) 1);
+
+        bondService.loadProfitDTOData(map, bondSellRequest);
+        bondSellRequest.setType(1);
+        bondService.loadProfitDTOData(map, bondSellRequest);
 
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new ArrayList<>(map.values()));
     }

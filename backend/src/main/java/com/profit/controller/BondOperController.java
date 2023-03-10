@@ -8,10 +8,7 @@ import com.profit.base.mapper.BondBuyLogMapper;
 import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.constants.ResultCode;
-import com.profit.commons.utils.BeanUtils;
-import com.profit.commons.utils.BondUtils;
-import com.profit.commons.utils.LogUtil;
-import com.profit.commons.utils.PageUtils;
+import com.profit.commons.utils.*;
 import com.profit.dto.BondBuyLogDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,6 +83,13 @@ public class BondOperController {
                 double sellAvgPrice = (bondBuyLog.getPrice() * bondBuyLog.getSellCount() + bondBuyLog.getSellIncome() + bondBuyLog.getCost()) / bondBuyLog.getSellCount();
                 Double avg = Double.parseDouble(String.format("%.3f", sellAvgPrice));
                 buyLogDTO.setSellAvgPrice(avg + "(" + String.format("%.2f", ((avg - bondBuyLog.getPrice()) / avg) * 100) + "%)");
+                BondSellLogExample bondSellLogExample = new BondSellLogExample();
+                bondSellLogExample.createCriteria().andBuyIdEqualTo(buyLogDTO.getId());
+                bondSellLogExample.setOrderByClause("create_time desc limit 0,1");
+                List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
+                if (bondSellLogs != null) {
+                    buyLogDTO.setSellDate(DateUtils.getDateString(bondSellLogs.get(0).getCreateTime()));
+                }
             }
             //当前持股盈亏
             if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {

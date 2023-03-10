@@ -267,15 +267,22 @@
     GROUP BY gp_id
   </select>
 
-  <select id="listGroupByDate" parameterType="java.lang.Byte" resultType="map">
+  <select id="listGroupByDate"  resultType="map">
     SELECT
        DATE_FORMAT(a.create_time, '%Y%m') as date,sum(a.income) as income
     FROM
        bond_sell_log as a,bond_buy_log as b
-    WHERE
-       a.buy_id = b.id
-    AND
-       b.type = #{type,jdbcType=TINYINT}
+    <where>
+      a.buy_id = b.id
+      AND
+      <if test="request.startTime != null and request.endTime != null">
+        a.create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+      AND
+      <if test="request.type != null ">
+        b.type = #{request.type}
+      </if>
+    </where>
     GROUP BY DATE_FORMAT(a.create_time, '%Y%m') desc;
   </select>
 </mapper>

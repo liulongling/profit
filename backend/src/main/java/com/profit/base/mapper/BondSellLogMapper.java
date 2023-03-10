@@ -33,5 +33,5 @@ public interface BondSellLogMapper {
 
     List<Map<Object, Object>> listGroupByGpId(@Param("request") BondSellRequest request);
 
-    List<Map<Object, Object>> listGroupByDate(@Param("type") byte type);
+    List<Map<Object, Object>> listGroupByDate(@Param("request") BondSellRequest request);
 }

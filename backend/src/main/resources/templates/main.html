@@ -20,11 +20,18 @@
 <body onload="init();">
 
 <div class="panel-body" style="padding-bottom:0;">
+    <div class="panel panel-default" style="text-align:center">
+        <table id="tableProfit" border="1" width="600" align="center">
+        </table>
+    </div>
+</div>
+
+<div class="panel-body" style="padding-bottom:0;">
     <div class="panel panel-default">
         <ul id="myTab" class="nav nav-tabs">
-            <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter();">股票</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filterEtf();">ETF</a></li>
+            <li><a href="#全部" data-toggle="tab" onclick="init();">全部</a></li>
+            <li><a href="#股票" data-toggle="tab" onclick="filter();">股票</a></li>
+            <li><a href="#ETF" data-toggle="tab" onclick="filterEtf();">ETF</a></li>
         </ul>
     </div>
 
@@ -196,23 +203,17 @@
         }, {
             field: 'price',
             title: '当前股价',
-            width: '70px',
+            width: '50px',
             formatter: stringFormatter
         }, {
             field: 'plate',
             title: '板块',
-            width: '20px',
+            width: '30px',
             align: "center",
             formatter: stringFormatter
         }, {
             field: 'stubProfit',
             title: '短线收益',
-            width: '70px',
-            align: "center",
-            formatter: stringFormatter
-        }, {
-            field: 'stubCount',
-            title: '短线持股数量',
             width: '70px',
             align: "center",
             formatter: stringFormatter
@@ -223,8 +224,20 @@
             align: "center",
             formatter: stringFormatter
         }, {
+            field: 'stubCount',
+            title: '短线持股数量',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
             field: 'gridCount',
             title: '网格持股数量',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'gpCount',
+            title: '持股总数量',
             width: '70px',
             align: "center",
             formatter: stringFormatter
@@ -333,8 +346,52 @@
         getServerPaging($table, "/bond/list", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC" };
         });
+        loadProfitData("/bond/analyse");
     }
 
+    function loadProfitData(url){
+       let data = {
+          startTime:'2020',
+          endTime:'2020'
+       };
+      $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            async : false, //同步执行
+            data: JSON.stringify(data),
+            traditional: true,
+            contentType : "application/json",
+            success: function (result) {
+                loadPageData(result);
+            },
+            error: function () {
+                swal("错误", "404", "error");
+            }
+         }
+        );
+    }
+
+
+    function loadPageData(result){
+         let list = result.module;
+         var textHTML = '<tr>';
+         textHTML+='<td>日期(月份)</td>';
+         textHTML+='<td>短线收益</td>';
+         textHTML+='<td>网格收益</td>';
+         textHTML+='<td>总收益</td></tr>';
+
+         for(let i in list){
+              textHTML +=('<tr>');
+              textHTML+='<td>'+list[i].date+'</td>';
+              textHTML+='<td>'+list[i].stubProfit+'</td>';
+              textHTML+='<td>'+list[i].gridProfit+'</td>';
+              textHTML+='<td>'+list[i].totalProfit+'</td>';
+              textHTML+='</tr>';
+              console.log(i,list[i]);
+         }
+         document.getElementById("tableProfit").innerHTML = textHTML;
+    }
 
 
     function filter() {

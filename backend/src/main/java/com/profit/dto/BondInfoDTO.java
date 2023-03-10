@@ -14,6 +14,10 @@ public class BondInfoDTO extends BondInfo {
      */
     public Double gridProfit;
     /**
+     * 持股数量
+     */
+    public long gpCount;
+    /**
      * 短线持股数量
      */
     public long stubCount;
@@ -22,7 +26,7 @@ public class BondInfoDTO extends BondInfo {
      */
     public long gridCount;
     /**
-     * 持股盈亏
+     * 持股数量盈亏
      */
     public Double gpProfit;
     /**
@@ -50,6 +54,11 @@ public class BondInfoDTO extends BondInfo {
     public Double getCurProfit() {
         return Double.parseDouble(String.format("%.2f", stubProfit + gridProfit + gpProfit));
     }
+
+    public long getGpCount() {
+        return stubCount + gridCount;
+    }
+
 
     public Double getProfit() {
         return Double.parseDouble(String.format("%.2f", stubProfit + gridProfit));

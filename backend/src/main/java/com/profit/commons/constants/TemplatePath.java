@@ -24,5 +24,9 @@ public class TemplatePath {
      * 收益界面
      */
     public static final String PROFIT_HTML = "profit";
+    /**
+     * 收益界面
+     */
+    public static final String ALL_BOND_HTML = "allBond";
 
 }

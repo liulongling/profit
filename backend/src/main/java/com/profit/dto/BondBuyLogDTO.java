@@ -11,8 +11,9 @@ public class BondBuyLogDTO extends BondBuyLog {
     public String typeName;
     public String girdSpacing;
     public String sellDate;
+    public Double income;
 
     public String getTypeName() {
-        return getType() == 1 ? "短线" : "网格";
+        return getType() == 1 ? "短线" : "长线";
     }
 }

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title id = "title">盈利股票</title>
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap3.4.1.min.css"
+          th:href="@{/css/lib/bootstrap3.4.1.min.css}">
+    <!-- Bootstrap-table CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap-table.min.css"
+          th:href="@{/css/lib/bootstrap-table.min.css}">
+    <!-- jquery-ui CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/jquery-ui.min.css" th:href="@{/css/lib/jquery-ui.min.css}">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="../../static/css/table.css" th:href="@{/css/table.css}">
+</head>
+
+<body onload="init();">
+
+<div class="panel-body" style="padding-bottom:0;">
+    <div class="panel panel-default">
+        <ul id="myTab" class="nav nav-tabs">
+            <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter();">短线</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_gird();">长线</a></li>
+
+        </ul>
+    </div>
+
+    <table id="table"></table>
+</div>
+
+<!-- JavaScript files-->
+<!-- jquery.js -->
+<script src="../../static/js/lib/jquery.min.js" th:src="@{/js/lib/jquery.min.js}"></script>
+<!-- Bootstrap.js -->
+<script src="../../static/js/lib/bootstrap3.4.1.min.js" th:src="@{/js/lib/bootstrap3.4.1.min.js}"></script>
+<!-- Bootstrap-table.js -->
+<script src="../../static/js/lib/bootstrap-table.min.js" th:src="@{/js/lib/bootstrap-table.min.js}"></script>
+<script src="../../static/js/lib/bootstrap-table-zh-CN.min.js"
+        th:src="@{/js/lib/bootstrap-table-zh-CN.min.js}"></script>
+<!-- sweetalert2.js -->
+<script src="../../static/js/lib/sweetalert.min.js" th:src="@{/js/lib/sweetalert.min.js}"></script>
+<script src="../../static/js/lib/es6-promise.auto.min.js" th:src="@{/js/lib/es6-promise.auto.min.js}"></script>
+<!-- jquery-ui.js -->
+<script src="../../static/js/lib/jquery-ui.min.js" th:src="@{/js/lib/jquery-ui.min.js}"></script>
+<script src="../../static/js/common.js" th:src="@{/js/common.js}"></script>
+<script src="../../static/js/dragModel.js" th:src="@{/js/dragModel.js}"></script>
+<script>
+    /** 初始化 */
+    let $table = $('#table');
+    changeToolTip();
+
+    // 服务器分页获取数据
+    function getServerPaging(node, url, queryParams) {
+        initTable(node, url, [10, 25, 50, 100, "All"], queryParams, [{
+            checkbox: true
+        }, {
+            field: 'id',
+            title: '序号',
+            width: "35px",
+            formatter: stringFormatter
+        }, {
+            field: 'name',
+            title: '股票',
+            width: '50px',
+            formatter: stringFormatter
+        }, {
+            field: 'typeName',
+            title: '类型',
+            width: '30px',
+            formatter: stringFormatter
+        }, {
+            field: 'girdSpacing',
+            title: '格差',
+            width: '30px',
+            formatter: stringFormatter
+        }, {
+            field: 'price',
+            title: '购买价格',
+            width: '70px',
+            formatter: stringFormatter
+        }, {
+            field: 'count',
+            title: '购买数量',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'sellCount',
+            title: '出售数量',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'sellAvgPrice',
+            title: '出售均价',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'sellIncome',
+            title: '出售盈亏',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'curIncome',
+            title: '持股盈亏',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        },{
+            field: 'buyDate',
+            title: '购买日期',
+            width: "70px",
+            formatter: stringFormatter
+        },{
+            field: 'sellDate',
+            title: '出售日期',
+            width: "70px",
+            formatter: stringFormatter
+        }, {
+            field: 'cost',
+            title: '税费佣金',
+            width: "70px",
+            formatter: stringFormatter
+        }]);
+    }
+
+
+    function filter() {
+        let data = {
+            type: '1'
+        };
+        getServerPaging($table, "/bond/all", params => {
+            return { limit: params.limit, offset: params.offset, type: data.type};
+        });
+    }
+
+    function filter_gird() {
+        let data = {
+            type: '0'
+        };
+        getServerPaging($table, "/bond/all", params => {
+            return { limit: params.limit, offset: params.offset, type: data.type};
+        });
+    }
+
+    function init() {
+        getServerPaging($table, "/bond/all", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC"};
+        });
+    }
+
+
+</script>
+</body>
+</html>

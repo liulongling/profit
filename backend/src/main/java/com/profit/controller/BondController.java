@@ -3,17 +3,17 @@ package com.profit.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.profit.base.ResultDO;
-import com.profit.base.domain.BondBuyLog;
-import com.profit.base.domain.BondBuyLogExample;
-import com.profit.base.domain.BondInfo;
-import com.profit.base.domain.BondInfoExample;
+import com.profit.base.domain.*;
 import com.profit.base.mapper.BondBuyLogMapper;
 import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.BeanUtils;
+import com.profit.commons.utils.BondUtils;
 import com.profit.commons.utils.DateUtils;
 import com.profit.commons.utils.PageUtils;
+import com.profit.comparator.ComparatorIncome;
+import com.profit.dto.BondBuyLogDTO;
 import com.profit.dto.BondInfoDTO;
 import com.profit.dto.BondSellRequest;
 import com.profit.dto.ProfitDTO;
@@ -35,6 +35,84 @@ public class BondController {
     private BondSellLogMapper bondSellLogMapper;
     @Resource
     private BondService bondService;
+
+    @GetMapping("all")
+    public ResultDO<PageUtils<BondBuyLogDTO>> allBondInfos(@RequestParam Map<String, Object> params) throws Exception {
+
+        List<BondInfo> bondInfos = bondInfoMapper.selectByExample(new BondInfoExample());
+        List<BondBuyLogDTO> list = new ArrayList<>();
+        for (BondInfo bondInfo : bondInfos) {
+            String id = bondInfo.getId();
+            BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+            BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
+            criteria.andGpIdEqualTo(id);
+            criteria.andStatusEqualTo((byte)0);
+            if(params.get("type") != null){
+                criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
+            }
+
+            bondBuyLogExample.setOrderByClause("price desc");
+
+            List<BondBuyLog> result = bondBuyLogMapper.selectByExample(bondBuyLogExample);
+            if (result == null) {
+                return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
+            }
+
+            for (int i = 0; i < result.size(); i++) {
+                BondBuyLog bondBuyLog = result.get(i);
+                //查看是否股票是否全部售出
+                if (bondBuyLog.getCount().intValue() == bondBuyLog.getSellCount().intValue()) {
+                    if (bondBuyLog.getStatus() == 0) {
+                        bondBuyLog.setStatus((byte) 1);
+                        bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
+                    }
+                }
+                BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
+                buyLogDTO.setName(bondInfo.getName());
+
+                //与上一个买点的格差
+                String girdSpacing = "0";
+                if (i > 0) {
+                    girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
+                }
+                buyLogDTO.setGirdSpacing(girdSpacing);
+
+                if (bondBuyLog.getSellCount() > 0) {
+                    //卖出均价= (卖出数量*买入价格+ 收益) / 卖出数量
+                    double sellAvgPrice = (bondBuyLog.getPrice() * bondBuyLog.getSellCount() + bondBuyLog.getSellIncome() + bondBuyLog.getCost()) / bondBuyLog.getSellCount();
+                    Double avg = Double.parseDouble(String.format("%.3f", sellAvgPrice));
+                    buyLogDTO.setSellAvgPrice(avg + "(" + String.format("%.2f", ((avg - bondBuyLog.getPrice()) / avg) * 100) + "%)");
+                    BondSellLogExample bondSellLogExample = new BondSellLogExample();
+                    bondSellLogExample.createCriteria().andBuyIdEqualTo(buyLogDTO.getId());
+                    bondSellLogExample.setOrderByClause("create_time desc limit 0,1");
+                    List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
+                    if (bondSellLogs != null) {
+                        buyLogDTO.setSellDate(DateUtils.getDateString(bondSellLogs.get(0).getCreateTime()));
+                    }
+                }
+                //当前持股盈亏
+                if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
+                    int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
+                    Double curIncome = bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
+                    curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondInfo.getPrice(), true);
+                    curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondBuyLog.getPrice(), false);
+
+                    //涨跌幅
+                    Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
+                    buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.3f", curIncome)) + "(" + zdf + "%)");
+                    buyLogDTO.setIncome(curIncome);
+                    if (curIncome > 0) {
+                        list.add(buyLogDTO);
+                        ComparatorIncome comparator = new ComparatorIncome();
+                        Collections.sort(list, comparator);
+                    }
+                }
+            }
+        }
+
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(list.size(), list));
+
+    }
 
     @GetMapping("list")
     public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) throws Exception {
@@ -146,8 +224,8 @@ public class BondController {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
 
-        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getBeginTime(year,1)));
-        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getBeginTime(year,12)));
+        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getBeginTime(year, 1)));
+        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getBeginTime(year, 12)));
 
         Map<String, ProfitDTO> map = new HashMap<>();
 

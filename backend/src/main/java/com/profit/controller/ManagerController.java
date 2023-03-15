@@ -22,4 +22,9 @@ public class ManagerController {
     public String showAnalyse() {
         return TemplatePath.PROFIT_HTML;
     }
+
+    @GetMapping("allbond")
+    public String allbond() {
+        return TemplatePath.ALL_BOND_HTML;
+    }
 }

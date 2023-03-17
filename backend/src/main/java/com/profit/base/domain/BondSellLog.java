@@ -39,6 +39,11 @@ public class BondSellLog {
     private Double income;
 
     /**
+     * 出售后当前剩余数量
+     */
+    private Integer surplusCount;
+
+    /**
      * 操作时间
      */
     private Date createTime;
@@ -97,6 +102,14 @@ public class BondSellLog {
 
     public void setIncome(Double income) {
         this.income = income;
+    }
+
+    public Integer getSurplusCount() {
+        return surplusCount;
+    }
+
+    public void setSurplusCount(Integer surplusCount) {
+        this.surplusCount = surplusCount;
     }
 
     public Date getCreateTime() {

@@ -149,8 +149,8 @@ public class BondController {
             if (gridProfit == null) gridProfit = 0.00;
             bondInfoDTO.setGridProfit(Double.parseDouble(String.format("%.2f", gridProfit)));
 
-            bondInfoDTO.setStubCount(count(bondInfo, (byte) 1));
-            bondInfoDTO.setGridCount(count(bondInfo, (byte) 0));
+            bondInfoDTO.setStubCount(bondService.getBondNumber(bondInfo, (byte) 1));
+            bondInfoDTO.setGridCount(bondService.getBondNumber(bondInfo, (byte) 0));
 
             //当前持股盈亏
             BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
@@ -180,20 +180,7 @@ public class BondController {
     }
 
 
-    public long count(BondInfo bondInfo, byte type) {
-        long buyCount = 0, sellCount = 0;
-        Map<Object, Object> map = bondBuyLogMapper.sumBuySellCount(bondInfo.getId(), type);
-        if (map != null) {
-            for (Object o : map.keySet()) {
-                if (o.equals("buyCount")) {
-                    buyCount = Long.valueOf(map.get(o).toString());
-                } else if (o.equals("sellCount")) {
-                    sellCount = Long.valueOf(map.get(o).toString());
-                }
-            }
-        }
-        return buyCount - sellCount;
-    }
+
 
     @PostMapping("insert")
     public ResultDO<Void> insert(@RequestBody BondInfo bondInfo) {

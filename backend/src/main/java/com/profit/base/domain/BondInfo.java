@@ -1,7 +1,10 @@
 package com.profit.base.domain;
 
+import lombok.Data;
+
 import java.util.Date;
 
+@Data
 public class BondInfo {
     /**
      * 主键
@@ -24,9 +27,14 @@ public class BondInfo {
     private String plate;
 
     /**
-     * 是否ETF
+     * 是否ETF 1：etf
      */
     private Byte isEtf;
+
+    /**
+     * 仓位占比
+     */
+    private Double position;
 
     /**
      *
@@ -37,60 +45,4 @@ public class BondInfo {
      *
      */
     private Date updateTime;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id == null ? null : id.trim();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public String getPlate() {
-        return plate;
-    }
-
-    public void setPlate(String plate) {
-        this.plate = plate == null ? null : plate.trim();
-    }
-
-    public Byte getIsEtf() {
-        return isEtf;
-    }
-
-    public void setIsEtf(Byte isEtf) {
-        this.isEtf = isEtf;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

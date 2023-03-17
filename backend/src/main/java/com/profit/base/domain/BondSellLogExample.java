@@ -535,6 +535,66 @@ public class BondSellLogExample {
             return (Criteria) this;
         }
 
+        public Criteria andSurplusCountIsNull() {
+            addCriterion("surplus_count is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountIsNotNull() {
+            addCriterion("surplus_count is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountEqualTo(Integer value) {
+            addCriterion("surplus_count =", value, "surplusCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountNotEqualTo(Integer value) {
+            addCriterion("surplus_count <>", value, "surplusCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountGreaterThan(Integer value) {
+            addCriterion("surplus_count >", value, "surplusCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountGreaterThanOrEqualTo(Integer value) {
+            addCriterion("surplus_count >=", value, "surplusCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountLessThan(Integer value) {
+            addCriterion("surplus_count <", value, "surplusCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountLessThanOrEqualTo(Integer value) {
+            addCriterion("surplus_count <=", value, "surplusCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountIn(List<Integer> values) {
+            addCriterion("surplus_count in", values, "surplusCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountNotIn(List<Integer> values) {
+            addCriterion("surplus_count not in", values, "surplusCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountBetween(Integer value1, Integer value2) {
+            addCriterion("surplus_count between", value1, value2, "surplusCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSurplusCountNotBetween(Integer value1, Integer value2) {
+            addCriterion("surplus_count not between", value1, value2, "surplusCount");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

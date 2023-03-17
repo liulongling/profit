@@ -2,6 +2,7 @@ package com.profit.service;
 
 import com.profit.base.domain.BondInfo;
 import com.profit.base.domain.BondInfoExample;
+import com.profit.base.mapper.BondBuyLogMapper;
 import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.utils.BeanUtils;
@@ -28,6 +29,8 @@ public class BondService {
     private BondInfoMapper bondInfoMapper;
     @Resource
     private BondSellLogMapper bondSellLogMapper;
+    @Resource
+    private BondBuyLogMapper bondBuyLogMapper;
 
     public void loadProfitDTOData(Map<String, ProfitDTO> map, BondSellRequest bondSellRequest) {
         List<Map<Object, Object>> profitList = bondSellLogMapper.listGroupByDate(bondSellRequest);
@@ -49,6 +52,27 @@ public class BondService {
         }
     }
 
+    /**
+     * 查询股票数量
+     *
+     * @param bondInfo
+     * @param type     0：网格 1：短线
+     * @return
+     */
+    public Long getBondNumber(BondInfo bondInfo, byte type) {
+        long buyCount = 0, sellCount = 0;
+        Map<Object, Object> map = bondBuyLogMapper.sumBuySellCount(bondInfo.getId(), type);
+        if (map != null) {
+            for (Object o : map.keySet()) {
+                if (o.equals("buyCount")) {
+                    buyCount = Long.valueOf(map.get(o).toString());
+                } else if (o.equals("sellCount")) {
+                    sellCount = Long.valueOf(map.get(o).toString());
+                }
+            }
+        }
+        return buyCount - sellCount;
+    }
 
     /**
      * 查询指定范围内收益
@@ -72,6 +96,9 @@ public class BondService {
             List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
             for (BondInfo bondInfo : list) {
                 Map<String, String> uriMap = new HashMap<>();
+                if (bondInfo.getId().equals("131810")) {
+                    continue;
+                }
                 uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
                 ResponseEntity responseEntity = restTemplate.getForEntity
                         (

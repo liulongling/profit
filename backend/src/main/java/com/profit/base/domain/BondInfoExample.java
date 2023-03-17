@@ -435,6 +435,66 @@ public class BondInfoExample {
             return (Criteria) this;
         }
 
+        public Criteria andPositionIsNull() {
+            addCriterion("`position` is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionIsNotNull() {
+            addCriterion("`position` is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionEqualTo(Double value) {
+            addCriterion("`position` =", value, "position");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionNotEqualTo(Double value) {
+            addCriterion("`position` <>", value, "position");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionGreaterThan(Double value) {
+            addCriterion("`position` >", value, "position");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionGreaterThanOrEqualTo(Double value) {
+            addCriterion("`position` >=", value, "position");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionLessThan(Double value) {
+            addCriterion("`position` <", value, "position");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionLessThanOrEqualTo(Double value) {
+            addCriterion("`position` <=", value, "position");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionIn(List<Double> values) {
+            addCriterion("`position` in", values, "position");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionNotIn(List<Double> values) {
+            addCriterion("`position` not in", values, "position");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionBetween(Double value1, Double value2) {
+            addCriterion("`position` between", value1, value2, "position");
+            return (Criteria) this;
+        }
+
+        public Criteria andPositionNotBetween(Double value1, Double value2) {
+            addCriterion("`position` not between", value1, value2, "position");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

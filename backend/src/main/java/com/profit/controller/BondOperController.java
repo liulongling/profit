@@ -10,6 +10,7 @@ import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.*;
 import com.profit.dto.BondBuyLogDTO;
+import com.profit.service.BondService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -28,6 +29,8 @@ public class BondOperController {
     private BondInfoMapper bondInfoMapper;
     @Resource
     private BondSellLogMapper bondSellLogMapper;
+    @Resource
+    private BondService bondService;
 
 
     @GetMapping("list")
@@ -51,7 +54,11 @@ public class BondOperController {
         if (params.get("status") != null) {
             byte status = Byte.valueOf(params.get("status").toString());
             criteria.andStatusEqualTo(status);
-            bondBuyLogExample.setOrderByClause("price desc");
+            if (status == 1) {
+                bondBuyLogExample.setOrderByClause("oper_time desc");
+            } else {
+                bondBuyLogExample.setOrderByClause("price desc");
+            }
         }
 
         Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()));
@@ -101,7 +108,6 @@ public class BondOperController {
                 //涨跌幅
                 Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
 
-
                 buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.3f", curIncome)) + "(" + zdf + "%)");
             }
             list.add(buyLogDTO);
@@ -149,6 +155,8 @@ public class BondOperController {
         if (bondBuyLog.getCount() == bondBuyLog.getSellCount()) {
             bondBuyLog.setStatus((byte) 1);
         }
+        int surplusCount = bondService.getBondNumber(bondInfo, bondBuyLog.getType()).intValue();
+        bondSellLog.setSurplusCount(surplusCount);
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 

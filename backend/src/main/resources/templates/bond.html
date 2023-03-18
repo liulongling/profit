@@ -20,12 +20,9 @@
 <body onload="init();">
 <div class="panel-body" style="padding-bottom:0;">
     <div class="panel panel-default" style="text-align:center">
-        <tr>
-            <td>当前价格</td>
-        </tr>
-        <tr>
-            <h2 id = "curPrice"></h2>
-        </tr>
+        <table style="text-align:center">
+            <h2 id = "curPrice">当前价格</h2>
+        </table>
     </div>
 </div>
 <div class="panel-body" style="padding-bottom:0;">
@@ -33,9 +30,10 @@
         <ul id="myTab" class="nav nav-tabs">
             <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter();">短线</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_wg();">网格</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_wg();">长线</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_sell();">已出售(全部)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell();">未出售(全部)</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_gird();">未出售(网格)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_gird();">未出售(长线)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_stu();">未出售(短线)</a></li>
 
         </ul>
@@ -86,8 +84,14 @@
                         <div class="col-sm-10">
                             <select class="form-control" id="insert_input_type">
                                 <option value="1">短线</option>
-                                <option value="0">网格</option>
+                                <option value="0">长线</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_count">备注</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="insert_input_remarks" title="不能为空">
                         </div>
                     </div>
                 </form>
@@ -250,18 +254,18 @@
         }, {
             field: 'price',
             title: '购买价格',
-            width: '70px',
+            width: '30px',
             formatter: stringFormatter
         }, {
             field: 'count',
             title: '购买数量',
-            width: '70px',
+            width: '30px',
             align: "center",
             formatter: stringFormatter
         }, {
             field: 'sellCount',
             title: '出售数量',
-            width: '70px',
+            width: '30px',
             align: "center",
             formatter: stringFormatter
         }, {
@@ -285,19 +289,24 @@
         },{
             field: 'buyDate',
             title: '购买日期',
-            width: "70px",
+            width: "50px",
             formatter: stringFormatter
         },{
             field: 'sellDate',
             title: '出售日期',
-            width: "70px",
+            width: "50px",
             formatter: stringFormatter
         }, {
             field: 'cost',
             title: '税费佣金',
-            width: "70px",
+            width: "30px",
             formatter: stringFormatter
         }, {
+            field: 'remarks',
+            title: '备注',
+            width: "70px",
+            formatter: stringFormatter
+        },{
             field: 'operation',
             title: '出售',
             width: '170px',
@@ -366,6 +375,16 @@
         });
     }
 
+
+    function filter_sell() {
+        let data = {
+            status:'1'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status};
+        });
+    }
+
     function filter_no_sell() {
         let data = {
             status:'0'
@@ -414,6 +433,7 @@
             gpId: $id,
             price: $('#insert_input_price').val(),
             buyDate: $('#insert_input_buy_date').val(),
+            remarks: $('#insert_input_remarks').val(),
             type: $('#insert_input_type').val()
         };
          if (data.id <= 0) {

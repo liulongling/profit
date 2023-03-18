@@ -219,7 +219,7 @@
             formatter: stringFormatter
         }, {
             field: 'gridProfit',
-            title: '网格收益',
+            title: '长线收益',
             width: '70px',
             align: "center",
             formatter: stringFormatter
@@ -231,7 +231,7 @@
             formatter: stringFormatter
         }, {
             field: 'gridCount',
-            title: '网格持股数量',
+            title: '长线持股数量',
             width: '70px',
             align: "center",
             formatter: stringFormatter
@@ -242,6 +242,11 @@
             align: "center",
             formatter: stringFormatter
         }, {
+            field: 'profit',
+            title: '到手收益',
+            width: "70px",
+            formatter: stringFormatter
+        }, {
             field: 'gpProfit',
             title: '持股盈亏',
             width: '70px',
@@ -250,11 +255,6 @@
         }, {
             field: 'curProfit',
             title: '当前总盈亏',
-            width: "70px",
-            formatter: stringFormatter
-        }, {
-            field: 'profit',
-            title: '到手总收益',
             width: "70px",
             formatter: stringFormatter
         },{
@@ -378,7 +378,7 @@
          var textHTML = '<tr>';
          textHTML+='<td>日期(月份)</td>';
          textHTML+='<td>短线收益</td>';
-         textHTML+='<td>网格收益</td>';
+         textHTML+='<td>长线收益</td>';
          textHTML+='<td>总收益</td></tr>';
 
          for(let i in list){

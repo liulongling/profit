@@ -317,7 +317,6 @@
     function operateFormatter(value, row, index) {  // 赋予的参数
         return [
             '<button class="btn btn-primary view" data-toggle="modal" data-target="#alterModal" onclick="initUpdate('+ index +');">编辑</button>&nbsp;&nbsp;'+
-            '<button class="btn btn-primary view" data-toggle="modal" data-target="#searchModal" onclick="sellLogs('+ index +');">出售日志记录</button>&nbsp;&nbsp;'+
             '<button class="btn btn-primary view" data-toggle="modal" data-target="#sellModal" onclick="sell('+ index +');">出售</button>&nbsp;&nbsp;'
         ].join('');
     }

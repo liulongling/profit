@@ -9,14 +9,10 @@ import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.BeanUtils;
-import com.profit.commons.utils.BondUtils;
 import com.profit.commons.utils.DateUtils;
 import com.profit.commons.utils.PageUtils;
 import com.profit.comparator.ComparatorIncome;
-import com.profit.dto.BondBuyLogDTO;
-import com.profit.dto.BondInfoDTO;
-import com.profit.dto.BondSellRequest;
-import com.profit.dto.ProfitDTO;
+import com.profit.dto.*;
 import com.profit.service.BondService;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +32,22 @@ public class BondController {
     @Resource
     private BondService bondService;
 
+    @PostMapping("sell/log")
+    public ResultDO<List<BondSellDTO>> getSellLogs(@RequestBody BondSellRequest bondSellRequest) throws Exception {
+        BondSellLogExample bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andBuyIdEqualTo(bondSellRequest.getBuyId());
+        List<BondSellLog> list = bondSellLogMapper.selectByExample(bondSellLogExample);
+        List<BondSellDTO> bondSellDTOS = new ArrayList<>();
+        for (BondSellLog bondSellLog : list) {
+            BondSellDTO bondSellDTO = BeanUtils.copyBean(new BondSellDTO(), bondSellLog);
+            bondSellDTO.setTotalPrice((long) (bondSellDTO.getPrice() * bondSellDTO.getCount()));
+            bondSellDTOS.add(bondSellDTO);
+        }
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondSellDTOS);
+    }
+
     @GetMapping("all")
     public ResultDO<PageUtils<BondBuyLogDTO>> allBondInfos(@RequestParam Map<String, Object> params) throws Exception {
-
         List<BondInfo> bondInfos = bondInfoMapper.selectByExample(new BondInfoExample());
         List<BondBuyLogDTO> list = new ArrayList<>();
         for (BondInfo bondInfo : bondInfos) {
@@ -46,8 +55,8 @@ public class BondController {
             BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
             BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
             criteria.andGpIdEqualTo(id);
-            criteria.andStatusEqualTo((byte)0);
-            if(params.get("type") != null){
+            criteria.andStatusEqualTo((byte) 0);
+            if (params.get("type") != null) {
                 criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
             }
 
@@ -60,13 +69,6 @@ public class BondController {
 
             for (int i = 0; i < result.size(); i++) {
                 BondBuyLog bondBuyLog = result.get(i);
-                //查看是否股票是否全部售出
-                if (bondBuyLog.getCount().intValue() == bondBuyLog.getSellCount().intValue()) {
-                    if (bondBuyLog.getStatus() == 0) {
-                        bondBuyLog.setStatus((byte) 1);
-                        bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
-                    }
-                }
                 BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
                 buyLogDTO.setName(bondInfo.getName());
 
@@ -76,32 +78,12 @@ public class BondController {
                     girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
                 }
                 buyLogDTO.setGirdSpacing(girdSpacing);
+                bondService.loadSellAvgPrice(bondBuyLog, buyLogDTO);
 
-                if (bondBuyLog.getSellCount() > 0) {
-                    //卖出均价= (卖出数量*买入价格+ 收益) / 卖出数量
-                    double sellAvgPrice = (bondBuyLog.getPrice() * bondBuyLog.getSellCount() + bondBuyLog.getSellIncome() + bondBuyLog.getCost()) / bondBuyLog.getSellCount();
-                    Double avg = Double.parseDouble(String.format("%.3f", sellAvgPrice));
-                    buyLogDTO.setSellAvgPrice(avg + "(" + String.format("%.2f", ((avg - bondBuyLog.getPrice()) / avg) * 100) + "%)");
-                    BondSellLogExample bondSellLogExample = new BondSellLogExample();
-                    bondSellLogExample.createCriteria().andBuyIdEqualTo(buyLogDTO.getId());
-                    bondSellLogExample.setOrderByClause("create_time desc limit 0,1");
-                    List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
-                    if (bondSellLogs != null) {
-                        buyLogDTO.setSellDate(DateUtils.getDateString(bondSellLogs.get(0).getCreateTime()));
-                    }
-                }
                 //当前持股盈亏
                 if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
-                    int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
-                    Double curIncome = bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
-                    curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondInfo.getPrice(), true);
-                    curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondBuyLog.getPrice(), false);
-
-                    //涨跌幅
-                    Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
-                    buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.3f", curIncome)) + "(" + zdf + "%)");
-                    buyLogDTO.setIncome(curIncome);
-                    if (curIncome > 0) {
+                    bondService.loadCurBondIncome(bondInfo, bondBuyLog, buyLogDTO);
+                    if (buyLogDTO.getIncome() > 0) {
                         list.add(buyLogDTO);
                         ComparatorIncome comparator = new ComparatorIncome();
                         Collections.sort(list, comparator);
@@ -109,9 +91,7 @@ public class BondController {
                 }
             }
         }
-
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(list.size(), list));
-
     }
 
     @GetMapping("list")
@@ -178,8 +158,6 @@ public class BondController {
 
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
-
-
 
 
     @PostMapping("insert")

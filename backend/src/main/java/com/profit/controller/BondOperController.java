@@ -40,7 +40,6 @@ public class BondOperController {
             return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
         }
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(id);
-
         BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
         BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
         criteria.andGpIdEqualTo(id);
@@ -78,38 +77,16 @@ public class BondOperController {
             }
             BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
             buyLogDTO.setName(bondInfo.getName());
-
+            //卖出均价
+            bondService.loadSellAvgPrice(bondBuyLog, buyLogDTO);
+            //当前持股盈亏
+            bondService.loadCurBondIncome(bondInfo, bondBuyLog, buyLogDTO);
             //与上一个买点的格差
             String girdSpacing = "0";
             if (i > 0) {
                 girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
             }
             buyLogDTO.setGirdSpacing(girdSpacing);
-
-            if (bondBuyLog.getSellCount() > 0) {
-                //卖出均价= (卖出数量*买入价格+ 收益) / 卖出数量
-                double sellAvgPrice = (bondBuyLog.getPrice() * bondBuyLog.getSellCount() + bondBuyLog.getSellIncome() + bondBuyLog.getCost()) / bondBuyLog.getSellCount();
-                Double avg = Double.parseDouble(String.format("%.3f", sellAvgPrice));
-                buyLogDTO.setSellAvgPrice(avg + "(" + String.format("%.2f", ((avg - bondBuyLog.getPrice()) / avg) * 100) + "%)");
-                BondSellLogExample bondSellLogExample = new BondSellLogExample();
-                bondSellLogExample.createCriteria().andBuyIdEqualTo(buyLogDTO.getId());
-                bondSellLogExample.setOrderByClause("create_time desc limit 0,1");
-                List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
-                if (bondSellLogs != null) {
-                    buyLogDTO.setSellDate(DateUtils.getDateString(bondSellLogs.get(0).getCreateTime()));
-                }
-            }
-            //当前持股盈亏
-            if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
-                int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
-                Double curIncome = bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
-                curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondInfo.getPrice(), true);
-                curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondBuyLog.getPrice(), false);
-                //涨跌幅
-                Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
-
-                buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.3f", curIncome)) + "(" + zdf + "%)");
-            }
             list.add(buyLogDTO);
         }
 

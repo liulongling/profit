@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title id = "title"></title>
+    <title id="title"></title>
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="../../static/css/lib/bootstrap3.4.1.min.css"
           th:href="@{/css/lib/bootstrap3.4.1.min.css}">
@@ -21,7 +21,7 @@
 <div class="panel-body" style="padding-bottom:0;">
     <div class="panel panel-default" style="text-align:center">
         <table style="text-align:center">
-            <h2 id = "curPrice">当前价格</h2>
+            <h2 id="curPrice">当前价格</h2>
         </table>
     </div>
 </div>
@@ -229,9 +229,7 @@
 
     // 服务器分页获取数据
     function getServerPaging(node, url, queryParams) {
-        initTable(node, url, [10, 25, 50, 100, "All"], queryParams, [{
-            checkbox: true
-        }, {
+        initBondTable(node, url, [10, 25, 50, 100, "All"], queryParams, [{
             field: 'id',
             title: '序号',
             width: "35px",
@@ -312,6 +310,137 @@
             width: '170px',
             formatter: operateFormatter // 自定义方法，添加操作按钮
         }]);
+    }
+
+    // 初始化表格
+    function initBondTable(node, url, pageList, queryParams, columns, toolbar = '#toolbar') {
+        node.bootstrapTable("destroy");         // 先销毁用来的表格再构造新的表格
+        node.bootstrapTable({
+            toolbar: toolbar,                   // 工具按钮用哪个容器
+            method: 'get',                      // 请求方式
+            url: url,                           // 请求路径
+            dataType: "json",                   // 服务器返回的数据类型
+            contentType: "application/json",    // 发送到服务器的数据编码类型
+            striped: true,                     // 是否显示行间隔色
+            cache: false,                      // 是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: true,                  // 是否显示分页（*）
+            sortable: false,                   // 是否启用排序
+            sortOrder: "asc",                   // 排序方式
+            sidePagination: "server",           // 分页方式：client客户端分页，server服务端分页（*）
+            queryParamsType: "limit",           // 设置为 ‘limit’ 则会发送符合 RESTFul 格式的参数
+            pageNumber: 1,                      // 初始化加载第一页，默认第一页
+            pageSize: 15,                       // 每页的记录行数（*）
+            pageList: pageList,                 // 可供选择的每页的行数（*）
+            showColumns: true,                 // 是否显示所有的列
+            showRefresh: true,                 // 是否显示刷新按钮
+            minimumCountColumns: 2,             // 最少允许的列数
+            clickToSelect: false,               // 是否启用点击选中行
+            showToggle:true,                   // 是否显示详细视图和列表视图的切换按钮
+            cardView: false,                   // 是否显示详细视图
+            detailView: true,                 // 是否显示父子表
+            detailFormatter :function(index, row, element){
+                       var str = "";
+                       let data = {
+                          buyId:row.id
+                       };
+                       let list;
+                      $.ajax({
+                            type: "POST",
+                            url: "/bond/sell/log",
+                            dataType: "json",
+                            async : false, //同步执行
+                            data: JSON.stringify(data),
+                            traditional: true,
+                            contentType : "application/json",
+                            success: function (result) {
+                                 list = result.module;
+                            },
+                            error: function () {
+                                swal("错误", "404", "error");
+                            }
+                          }
+                        );
+
+                            if(list.length > 0){
+                                str += "<div class='panel panel-default'>";
+                                str += "<table id='tableSell' border='1' width=1000 align='center'>";
+                                str += "<br>";
+                                str +="<tr>";
+                                str +="<td>序号</td>";
+                                str +="<td>出售价格</td>";
+                                str +="<td>出售数量</td>";
+                                str +="<td>成交总价</td>";
+                                str +="<td>佣金</td>";
+                                str +="<td>收益</td>";
+                                str +="<td>出售时间</td>";
+                                str +="</tr>";
+                            for(let i in list){
+                                console.log("得到的结果是：" + JSON.stringify(list[i]))
+                                str += "<tr>";
+                                str += "<td>";
+                                str += list[i].id;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].price;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].count;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].totalPrice;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].cost;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].income;
+                                str += "</td>";
+                                str += "<td>";
+                                str += dateFormatter(list[i].createTime);
+                                str += "</td>";
+                                str += "</tr>";
+                            }
+                            str += "</table>";
+                            str += "</div>";
+                        }
+
+                    return str;
+            },
+            uniqueId: "id",                     // 每一行的唯一标识，一般为主键列
+            dataField: "rows",                  // 这是返回的json数组的key.默认好像是"rows".这里只要前后端约定好就行
+            queryParams: queryParams,
+            responseHandler: result => {
+                if (result.success === false) {
+                    switch (result.code) {
+                        case 9001: swal("错误", "数据库错误", "error");   break;
+                        case 9002: swal("错误", "参数错误", "error");     break;
+                        case 9999: swal("错误", "系统错误", "error");     break;
+                    }
+                    return null;
+                } else {
+                    return { total: result.module.total, rows: result.module.rows, };
+                }
+            },
+            columns: columns,
+            rowStyle: function (row, index) {
+                let classesArr = ['info', '#ffffff'];
+                let strClass = "";
+                if (index % 2 === 0) {  // 偶数行
+                    strClass = classesArr[0];
+                } else {    // 奇数行
+                    strClass = classesArr[1];
+                }
+                return { classes: strClass };
+            }
+        });
+    }
+
+
+    function operateFormatter(value, row, index) {  // 赋予的参数
+        return [
+            '<button class="btn btn-primary view" data-toggle="modal" data-target="#alterModal" onclick="initUpdate('+ index +');">编辑</button>&nbsp;&nbsp;'+
+            '<button class="btn btn-primary view" data-toggle="modal" data-target="#sellModal" onclick="sell('+ index +');">出售</button>&nbsp;&nbsp;'
+        ].join('');
     }
 
     function operateFormatter(value, row, index) {  // 赋予的参数
@@ -512,6 +641,8 @@
             });
         }
     }
+
+
 
 
 

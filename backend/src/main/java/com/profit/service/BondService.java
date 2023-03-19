@@ -1,12 +1,14 @@
 package com.profit.service;
 
-import com.profit.base.domain.BondInfo;
-import com.profit.base.domain.BondInfoExample;
+import com.profit.base.domain.*;
 import com.profit.base.mapper.BondBuyLogMapper;
 import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.utils.BeanUtils;
+import com.profit.commons.utils.BondUtils;
+import com.profit.commons.utils.DateUtils;
 import com.profit.commons.utils.HttpUtil;
+import com.profit.dto.BondBuyLogDTO;
 import com.profit.dto.BondSellRequest;
 import com.profit.dto.ProfitDTO;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +34,56 @@ public class BondService {
     @Resource
     private BondBuyLogMapper bondBuyLogMapper;
 
+
+    /**
+     * 卖出均价 = (卖出数量*买入价格+ 收益) / 卖出数量
+     * @return
+     */
+    public void loadSellAvgPrice(BondBuyLog bondBuyLog, BondBuyLogDTO buyLogDTO ){
+        if(bondBuyLog.getSellCount() <= 0){
+            return ;
+        }
+        //卖出均价= (卖出数量*买入价格+ 收益) / 卖出数量
+        double sellAvgPrice = (bondBuyLog.getPrice() * bondBuyLog.getSellCount() + bondBuyLog.getSellIncome() + bondBuyLog.getCost()) / bondBuyLog.getSellCount();
+        Double avg = Double.parseDouble(String.format("%.3f", sellAvgPrice));
+        buyLogDTO.setSellAvgPrice(avg + "(" + String.format("%.2f", ((avg - bondBuyLog.getPrice()) / avg) * 100) + "%)");
+        BondSellLogExample bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andBuyIdEqualTo(buyLogDTO.getId());
+        bondSellLogExample.setOrderByClause("create_time desc limit 0,1");
+        List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
+        if (bondSellLogs != null) {
+            try {
+                buyLogDTO.setSellDate(DateUtils.getDateString(bondSellLogs.get(0).getCreateTime()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 当前持股盈亏
+     * @return
+     */
+    public void loadCurBondIncome(BondInfo bondInfo,BondBuyLog bondBuyLog, BondBuyLogDTO buyLogDTO ){
+        //当前持股盈亏
+        if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
+            int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
+            Double curIncome = bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
+            curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondInfo.getPrice(), true);
+            curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondBuyLog.getPrice(), false);
+            //涨跌幅
+            Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
+            buyLogDTO.setIncome(curIncome);
+            buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.3f", curIncome)) + "(" + zdf + "%)");
+        }
+    }
+
+
+    /**
+     * 加载收益数据
+     * @param map
+     * @param bondSellRequest
+     */
     public void loadProfitDTOData(Map<String, ProfitDTO> map, BondSellRequest bondSellRequest) {
         List<Map<Object, Object>> profitList = bondSellLogMapper.listGroupByDate(bondSellRequest);
         Map<Object, Object> profitMap = BeanUtils.list2Map(profitList, "date", "income");

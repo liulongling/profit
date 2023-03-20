@@ -203,4 +203,64 @@ public class BondController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new ArrayList<>(map.values()));
     }
 
+    @PostMapping("today/analyse")
+    public ResultDO<BondProfitDTO> todayAnalyse(@RequestBody BondSellRequest bondSellRequest) {
+        bondSellRequest = new BondSellRequest();
+        BondProfitDTO bondProfitDTO = new BondProfitDTO();
+
+        //今日出售总收益
+        Map<Object, Object> todayProfitMap = bondService.getProfitByDate(DateUtils.getTimeString(DateUtils.getTime(new Date(), 0, 0, 0)), DateUtils.getTimeString(DateUtils.getTime(new Date(), 23, 59, 59)));
+        Double profit = 0.00;
+        if (todayProfitMap != null) {
+            for (Object key : todayProfitMap.keySet()) {
+                profit += Double.parseDouble(String.format("%.2f", todayProfitMap.get(key)));
+            }
+        }
+        bondProfitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", profit)));
+
+        List<BondBuyLog> buyLogs = bondService.getBondBuyLogs(DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM));
+        Double buyAmount = 0.0;
+        int transactionNumber = 0;
+        if (buyLogs != null) {
+            for (BondBuyLog bondBuyLog : buyLogs) {
+                buyAmount += bondBuyLog.getPrice() * bondBuyLog.getCount();
+                transactionNumber++;
+            }
+        }
+        bondProfitDTO.setBuyAmount(buyAmount);
+
+        List<BondSellLog> sellLogs = bondService.getBondSellLogs(DateUtils.getTime(new Date(), 0, 0, 0), DateUtils.getTime(new Date(), 23, 59, 59));
+        Double sellAmount = 0.0;
+        Double cost = 0.0;
+        Double maxProfit = 0.0;
+        Double maxLoss = 0.0;
+        if (buyLogs != null) {
+            for (BondSellLog bondSellLog : sellLogs) {
+                if (bondSellLog.getIncome() > 0) {
+                    bondProfitDTO.incrProfitNumber();
+                } else {
+                    bondProfitDTO.incrPlossNumber();
+                }
+                if (bondSellLog.getIncome() > maxProfit) {
+                    maxProfit = bondSellLog.getIncome();
+                }
+                if (bondSellLog.getIncome() < maxLoss) {
+                    maxLoss = bondSellLog.getIncome();
+                }
+                sellAmount += bondSellLog.getPrice() * bondSellLog.getCount();
+                cost += bondSellLog.getCost();
+                transactionNumber++;
+            }
+        }
+        bondProfitDTO.setSellAmount(sellAmount);
+        bondProfitDTO.setCost(Double.parseDouble(String.format("%.2f", cost)));
+        bondProfitDTO.setTransactionNumber(transactionNumber);
+        bondProfitDTO.setMaxProfit(maxProfit);
+        bondProfitDTO.setMaxLoss(maxLoss);
+        bondProfitDTO.setTransactionAmount(Double.parseDouble(String.format("%.2f", buyAmount + sellAmount)));
+        bondProfitDTO.setWinning((100 / bondProfitDTO.getTotalNumber()) * bondProfitDTO.getProfitNumber());
+
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondProfitDTO);
+    }
+
 }

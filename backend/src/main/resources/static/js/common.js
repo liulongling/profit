@@ -19,12 +19,12 @@ function initTable(node, url, pageList, queryParams, columns, toolbar = '#toolba
         sidePagination: "server",           // 分页方式：client客户端分页，server服务端分页（*）
         queryParamsType: "limit",           // 设置为 ‘limit’ 则会发送符合 RESTFul 格式的参数
         pageNumber: 1,                      // 初始化加载第一页，默认第一页
-        pageSize: 10,                       // 每页的记录行数（*）
+        pageSize: 15,                       // 每页的记录行数（*）
         pageList: pageList,                 // 可供选择的每页的行数（*）
         showColumns: true,                 // 是否显示所有的列
         showRefresh: true,                 // 是否显示刷新按钮
         minimumCountColumns: 2,             // 最少允许的列数
-        clickToSelect: true,               // 是否启用点击选中行
+        clickToSelect: false,               // 是否启用点击选中行
         showToggle:true,                   // 是否显示详细视图和列表视图的切换按钮
         cardView: false,                   // 是否显示详细视图
         detailView: false,                 // 是否显示父子表

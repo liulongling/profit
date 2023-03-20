@@ -35,13 +35,27 @@ public class BondService {
     private BondBuyLogMapper bondBuyLogMapper;
 
 
+    public List<BondBuyLog> getBondBuyLogs(String date) {
+        BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+        bondBuyLogExample.createCriteria().andBuyDateEqualTo(date);
+        return bondBuyLogMapper.selectByExample(bondBuyLogExample);
+    }
+
+    public List<BondSellLog> getBondSellLogs(Date startDate, Date endDate) {
+        BondSellLogExample bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andCreateTimeBetween(startDate, endDate);
+        return bondSellLogMapper.selectByExample(bondSellLogExample);
+    }
+
+
     /**
      * 卖出均价 = (卖出数量*买入价格+ 收益) / 卖出数量
+     *
      * @return
      */
-    public void loadSellAvgPrice(BondBuyLog bondBuyLog, BondBuyLogDTO buyLogDTO ){
-        if(bondBuyLog.getSellCount() <= 0){
-            return ;
+    public void loadSellAvgPrice(BondBuyLog bondBuyLog, BondBuyLogDTO buyLogDTO) {
+        if (bondBuyLog.getSellCount() <= 0) {
+            return;
         }
         //卖出均价= (卖出数量*买入价格+ 收益) / 卖出数量
         double sellAvgPrice = (bondBuyLog.getPrice() * bondBuyLog.getSellCount() + bondBuyLog.getSellIncome() + bondBuyLog.getCost()) / bondBuyLog.getSellCount();
@@ -62,9 +76,10 @@ public class BondService {
 
     /**
      * 当前持股盈亏
+     *
      * @return
      */
-    public void loadCurBondIncome(BondInfo bondInfo,BondBuyLog bondBuyLog, BondBuyLogDTO buyLogDTO ){
+    public void loadCurBondIncome(BondInfo bondInfo, BondBuyLog bondBuyLog, BondBuyLogDTO buyLogDTO) {
         //当前持股盈亏
         if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
             int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
@@ -81,6 +96,7 @@ public class BondService {
 
     /**
      * 加载收益数据
+     *
      * @param map
      * @param bondSellRequest
      */

@@ -20,6 +20,18 @@
 <body onload="init();">
 
 <div class="panel-body" style="padding-bottom:0;">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">收益分析</h3>
+        </div>
+        <div class="panel-body" style="width: 500px">
+            <table id="tableProfit" style="width: 500px;"
+                   class="table table-striped table-hover table-bordered"></table>
+        </div>
+    </div>
+</div>
+
+<div class="panel-body" style="padding-bottom:0;">
     <div class="panel panel-default">
         <ul id="myTab" class="nav nav-tabs">
             <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
@@ -150,10 +162,56 @@
     }
 
     function init() {
+        loadProfitData("/bond/analyse");
         getServerPaging($table, "/bond/all", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC"};
         });
     }
+
+ function loadProfitData(url){
+       let data = {
+          startTime:'2020',
+          endTime:'2020'
+       };
+      $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            async : false, //同步执行
+            data: JSON.stringify(data),
+            traditional: true,
+            contentType : "application/json",
+            success: function (result) {
+                loadPageData(result);
+            },
+            error: function () {
+                swal("错误", "404", "error");
+            }
+         }
+        );
+    }
+
+
+    function loadPageData(result){
+         let list = result.module;
+         var textHTML = '<tr>';
+         textHTML+='<td>日期(月份)</td>';
+         textHTML+='<td>短线收益</td>';
+         textHTML+='<td>长线收益</td>';
+         textHTML+='<td>总收益</td></tr>';
+
+         for(let i in list){
+              textHTML +=('<tr>');
+              textHTML+='<td>'+list[i].date+'</td>';
+              textHTML+='<td>'+list[i].stubProfit+'</td>';
+              textHTML+='<td>'+list[i].gridProfit+'</td>';
+              textHTML+='<td>'+list[i].totalProfit+'</td>';
+              textHTML+='</tr>';
+              console.log(i,list[i]);
+         }
+         document.getElementById("tableProfit").innerHTML = textHTML;
+    }
+
 
 
 </script>

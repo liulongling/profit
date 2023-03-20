@@ -9,15 +9,13 @@ import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.*;
+import com.profit.comparator.ComparatorBondSell;
 import com.profit.dto.BondBuyLogDTO;
 import com.profit.service.BondService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @RestController
@@ -50,8 +48,10 @@ public class BondOperController {
                 bondBuyLogExample.setOrderByClause("price desc");
             }
         }
+
+        byte status = 0;
         if (params.get("status") != null) {
-            byte status = Byte.valueOf(params.get("status").toString());
+            status = Byte.valueOf(params.get("status").toString());
             criteria.andStatusEqualTo(status);
             if (status == 1) {
                 bondBuyLogExample.setOrderByClause("oper_time desc");
@@ -88,6 +88,10 @@ public class BondOperController {
             }
             buyLogDTO.setGirdSpacing(girdSpacing);
             list.add(buyLogDTO);
+            if (status == 1) {
+                ComparatorBondSell comparator = new ComparatorBondSell();
+                Collections.sort(list, comparator);
+            }
         }
 
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
@@ -114,7 +118,6 @@ public class BondOperController {
 
         //卖出税费计算
         double sellTaxation = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
-        LogUtil.info(bondSellLog.getId() + "sellTaxation" + sellTaxation);
         bondSellLog.setCost(sellTaxation);
         bondBuyLog.setCost(Double.parseDouble(String.format("%.3f", bondBuyLog.getCost() + bondSellLog.getCost())));
 
@@ -144,7 +147,6 @@ public class BondOperController {
     @PostMapping("update")
     public ResultDO<Void> update(@RequestBody BondBuyLog bondBuyLog) {
         BondBuyLog bondBuyLog1 = bondBuyLogMapper.selectByPrimaryKey(bondBuyLog.getId());
-
 
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
         bondBuyLog.setOperTime(new Date());

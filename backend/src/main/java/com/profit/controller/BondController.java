@@ -39,8 +39,10 @@ public class BondController {
         List<BondSellLog> list = bondSellLogMapper.selectByExample(bondSellLogExample);
         List<BondSellDTO> bondSellDTOS = new ArrayList<>();
         for (BondSellLog bondSellLog : list) {
+            BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondSellLog.getBuyId());
             BondSellDTO bondSellDTO = BeanUtils.copyBean(new BondSellDTO(), bondSellLog);
             bondSellDTO.setTotalPrice((long) (bondSellDTO.getPrice() * bondSellDTO.getCount()));
+            bondSellDTO.setProfitAndLoss(String.format("%.2f", ((bondSellDTO.getPrice() - bondBuyLog.getPrice()) / bondSellDTO.getPrice()) * 100) + "%");
             bondSellDTOS.add(bondSellDTO);
         }
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondSellDTOS);
@@ -143,7 +145,7 @@ public class BondController {
                 for (BondBuyLog bondBuyLog : bondBuyLogs) {
                     if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
                         int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
-                        total += bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
+                        total += (bondInfo.getPrice() * surplusCount) - (bondBuyLog.getPrice() * surplusCount);
                     }
                 }
                 bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));

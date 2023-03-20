@@ -363,11 +363,12 @@
 
                             if(list.length > 0){
                                 str += "<div class='panel panel-default'>";
-                                str += "<table id='tableSell' border='1' width=1000 align='center'>";
+                                str += "<table id='tableSell' border='1' width=1200 align='center'>";
                                 str += "<br>";
                                 str +="<tr>";
                                 str +="<td>序号</td>";
                                 str +="<td>出售价格</td>";
+                                str +="<td>盈亏比</td>";
                                 str +="<td>出售数量</td>";
                                 str +="<td>成交总价</td>";
                                 str +="<td>佣金</td>";
@@ -382,6 +383,9 @@
                                 str += "</td>";
                                 str += "<td>";
                                 str += list[i].price;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].profitAndLoss;
                                 str += "</td>";
                                 str += "<td>";
                                 str += list[i].count;

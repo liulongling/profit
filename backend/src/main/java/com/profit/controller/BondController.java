@@ -258,7 +258,9 @@ public class BondController {
         bondProfitDTO.setMaxProfit(maxProfit);
         bondProfitDTO.setMaxLoss(maxLoss);
         bondProfitDTO.setTransactionAmount(Double.parseDouble(String.format("%.2f", buyAmount + sellAmount)));
-        bondProfitDTO.setWinning((100 / bondProfitDTO.getTotalNumber()) * bondProfitDTO.getProfitNumber());
+        if(bondProfitDTO.getTotalNumber() > 0){
+            bondProfitDTO.setWinning((100 / bondProfitDTO.getTotalNumber()) * bondProfitDTO.getProfitNumber());
+        }
 
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondProfitDTO);
     }

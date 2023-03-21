@@ -40,8 +40,8 @@
     </div>
 
     <div id="toolbar" class="btn-group">
-        <button id="btn_add" type="button" class="btn btn-default" data-toggle="modal" data-target="#addModal">
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>买入股票
+        <button id="btn_add" type="button" class="btn btn-default" data-toggle="modal" data-target="#addModal" onclick="addBond()">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true">买入股票</span>
         </button>
     </div>
     <table id="table"></table>
@@ -483,11 +483,14 @@
         );
     }
 
+    let curPrice;
     function setName(result){
+         curPrice = result.module.price;
+         console.log("curPrice"+curPrice);
          document.getElementById("title").innerHTML=result.module.name;
          document.getElementById("curPrice").innerHTML=result.module.price;
-    }
 
+    }
 
     function getQueryString(name) {
         var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
@@ -558,6 +561,11 @@
 
     dragTheModalDialog();
 
+   function addBond(){
+        loadHeadData("/bond/info");
+        $('#insert_input_price').val(curPrice);
+        $("#insert_input_buy_date").val(new Date().toISOString().substring(0, 10));
+   }
 
     function insert() {
         let data = {

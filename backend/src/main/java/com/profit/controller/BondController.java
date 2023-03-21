@@ -11,6 +11,7 @@ import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.BeanUtils;
 import com.profit.commons.utils.DateUtils;
 import com.profit.commons.utils.PageUtils;
+import com.profit.commons.utils.StringUtil;
 import com.profit.comparator.ComparatorIncome;
 import com.profit.dto.*;
 import com.profit.service.BondService;
@@ -185,27 +186,12 @@ public class BondController {
 
     @PostMapping("analyse")
     public ResultDO<List<ProfitDTO>> analyse(@RequestBody BondSellRequest bondSellRequest) {
-        bondSellRequest = new BondSellRequest();
-        bondSellRequest.setType(0);
-
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-
-        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getBeginTime(year, 1)));
-        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getBeginTime(year, 12)));
-
-        Map<String, ProfitDTO> map = new HashMap<>();
-
-        bondService.loadProfitDTOData(map, bondSellRequest);
-        bondSellRequest.setType(1);
-        bondService.loadProfitDTOData(map, bondSellRequest);
-
+        Map<String, ProfitDTO> map = bondService.totalProfit();
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new ArrayList<>(map.values()));
     }
 
     @PostMapping("today/analyse")
     public ResultDO<BondProfitDTO> todayAnalyse(@RequestBody BondSellRequest bondSellRequest) {
-        bondSellRequest = new BondSellRequest();
         BondProfitDTO bondProfitDTO = new BondProfitDTO();
 
         //今日出售总收益
@@ -216,7 +202,7 @@ public class BondController {
                 profit += Double.parseDouble(String.format("%.2f", todayProfitMap.get(key)));
             }
         }
-        bondProfitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", profit)));
+        bondProfitDTO.setTodayProfit(Double.parseDouble(String.format("%.2f", profit)));
 
         List<BondBuyLog> buyLogs = bondService.getBondBuyLogs(DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM));
         Double buyAmount = 0.0;
@@ -258,10 +244,33 @@ public class BondController {
         bondProfitDTO.setMaxProfit(maxProfit);
         bondProfitDTO.setMaxLoss(maxLoss);
         bondProfitDTO.setTransactionAmount(Double.parseDouble(String.format("%.2f", buyAmount + sellAmount)));
-        if(bondProfitDTO.getTotalNumber() > 0){
-            bondProfitDTO.setWinning((100 / bondProfitDTO.getTotalNumber()) * bondProfitDTO.getProfitNumber());
+        if (bondProfitDTO.getTotalNumber() > 0) {
+            bondProfitDTO.setWinning(StringUtil.pencent(bondProfitDTO.getProfitNumber(), bondProfitDTO.getTotalNumber()));
         }
 
+
+        BondSellLogExample bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andIncomeGreaterThan(0.0);
+        long totalProfitNumber = bondSellLogMapper.countByExample(bondSellLogExample);
+        bondProfitDTO.setTotalProfitNumber(totalProfitNumber);
+
+        bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andIncomeLessThan(0.0);
+        long totalLossNumber = bondSellLogMapper.countByExample(bondSellLogExample);
+        bondProfitDTO.setTotalLossNumber(totalLossNumber);
+        if (totalProfitNumber + totalLossNumber > 0) {
+            //胜率=获胜场次÷总比赛场次x100%
+            bondProfitDTO.setAvgWinning(StringUtil.pencent(totalProfitNumber, totalProfitNumber + totalLossNumber));
+        }
+
+        Map<String, ProfitDTO> map = bondService.totalProfit();
+        Double totalProfit = 0.0;
+        for (String key : map.keySet()) {
+            ProfitDTO profitDTO = map.get(key);
+            totalProfit += profitDTO.getTotalProfit();
+        }
+
+        bondProfitDTO.setTotalProfit(totalProfit);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondProfitDTO);
     }
 

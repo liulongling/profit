@@ -35,6 +35,24 @@ public class BondService {
     private BondBuyLogMapper bondBuyLogMapper;
 
 
+    public Map<String, ProfitDTO> totalProfit() {
+        BondSellRequest bondSellRequest = new BondSellRequest();
+        bondSellRequest.setType(0);
+
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+
+        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getBeginTime(year, 1)));
+        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getBeginTime(year, 12)));
+
+        Map<String, ProfitDTO> map = new HashMap<>();
+
+        loadProfitDTOData(map, bondSellRequest);
+        bondSellRequest.setType(1);
+        loadProfitDTOData(map, bondSellRequest);
+        return map;
+    }
+
     /**
      * 查询指定时间购买记录
      *

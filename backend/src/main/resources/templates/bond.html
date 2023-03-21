@@ -564,6 +564,7 @@
    function addBond(){
         loadHeadData("/bond/info");
         $('#insert_input_price').val(curPrice);
+        $('#insert_input_count').val(100);
         $("#insert_input_buy_date").val(new Date().toISOString().substring(0, 10));
    }
 

@@ -35,12 +35,26 @@ public class BondService {
     private BondBuyLogMapper bondBuyLogMapper;
 
 
+    /**
+     * 查询指定时间购买记录
+     *
+     * @param date
+     * @return
+     */
     public List<BondBuyLog> getBondBuyLogs(String date) {
         BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
         bondBuyLogExample.createCriteria().andBuyDateEqualTo(date);
         return bondBuyLogMapper.selectByExample(bondBuyLogExample);
     }
 
+
+    /**
+     * 查询时间范围内股票出售记录
+     *
+     * @param startDate 开始时间
+     * @param endDate   结束时间
+     * @return
+     */
     public List<BondSellLog> getBondSellLogs(Date startDate, Date endDate) {
         BondSellLogExample bondSellLogExample = new BondSellLogExample();
         bondSellLogExample.createCriteria().andCreateTimeBetween(startDate, endDate);
@@ -51,7 +65,8 @@ public class BondService {
     /**
      * 卖出均价 = (卖出数量*买入价格+ 收益) / 卖出数量
      *
-     * @return
+     * @param bondBuyLog
+     * @param buyLogDTO
      */
     public void loadSellAvgPrice(BondBuyLog bondBuyLog, BondBuyLogDTO buyLogDTO) {
         if (bondBuyLog.getSellCount() <= 0) {
@@ -77,7 +92,9 @@ public class BondService {
     /**
      * 当前持股盈亏
      *
-     * @return
+     * @param bondInfo
+     * @param bondBuyLog
+     * @param buyLogDTO
      */
     public void loadCurBondIncome(BondInfo bondInfo, BondBuyLog bondBuyLog, BondBuyLogDTO buyLogDTO) {
         //当前持股盈亏
@@ -145,8 +162,8 @@ public class BondService {
     /**
      * 查询指定范围内收益
      *
-     * @param startTime
-     * @param endTime
+     * @param startTime 开始时间
+     * @param endTime   结束时间
      * @return
      */
     public Map<Object, Object> getProfitByDate(String startTime, String endTime) {
@@ -157,6 +174,9 @@ public class BondService {
         return BeanUtils.list2Map(profitList, "gpId", "income");
     }
 
+    /**
+     * 更新股价
+     */
     public void refurbish() {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);

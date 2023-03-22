@@ -250,7 +250,7 @@ public class BondController {
 
 
         BondSellLogExample bondSellLogExample = new BondSellLogExample();
-        bondSellLogExample.createCriteria().andIncomeGreaterThan(0.0);
+        bondSellLogExample.createCriteria().andGpIdNotEqualTo("131810").andIncomeGreaterThan(0.0);
         long totalProfitNumber = bondSellLogMapper.countByExample(bondSellLogExample);
         bondProfitDTO.setTotalProfitNumber(totalProfitNumber);
 

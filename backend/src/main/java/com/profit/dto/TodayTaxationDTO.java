@@ -1,10 +1,11 @@
 package com.profit.dto;
 
+import com.profit.base.domain.BondInfo;
 import lombok.Data;
 
-
 @Data
-public class BondProfitDTO {
+public class TodayTaxationDTO extends BondInfo {
+
     /**
      * 今日总收益
      */
@@ -49,23 +50,6 @@ public class BondProfitDTO {
      * 胜率
      */
     private String winning;
-    /**
-     * 总盈利次数
-     */
-    private long totalProfitNumber;
-    /**
-     * 亏损次数
-     */
-    private long totalLossNumber;
-    /**
-     * 胜率
-     */
-    private String avgWinning;
-
-    /**
-     * 总收益
-     */
-    private Double totalProfit;
 
     public void incrProfitNumber() {
         profitNumber++;
@@ -78,5 +62,4 @@ public class BondProfitDTO {
     public int getTotalNumber() {
         return profitNumber + lossNumber;
     }
-
 }

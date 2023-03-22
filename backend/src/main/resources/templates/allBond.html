@@ -37,7 +37,7 @@
             <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter();">短线</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_gird();">长线</a></li>
-
+            <li><a href="#ios" data-toggle="tab" onclick="filter_sell();">已出售</a></li>
         </ul>
     </div>
 
@@ -160,6 +160,17 @@
             return { limit: params.limit, offset: params.offset, type: data.type};
         });
     }
+
+    function  filter_sell() {
+        let data = {
+            status: '1'
+        };
+        getServerPaging($table, "/bond/all", params => {
+            return { limit: params.limit, offset: params.offset, type: data.status};
+        });
+    }
+
+
 
     function init() {
         loadProfitData("/bond/analyse");

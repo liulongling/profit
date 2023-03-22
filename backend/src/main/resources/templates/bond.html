@@ -18,13 +18,13 @@
 </head>
 
 <body onload="init();">
-<div class="panel-body" style="padding-bottom:0;">
-    <div class="panel panel-default" style="text-align:center">
-        <table style="text-align:center">
-            <h2 id="curPrice">当前价格</h2>
-        </table>
+
+<div class="container" style="width: 2000px;" align="center">
+    <div class="panel-body" >
+        <table id="bondInfo"  class="table table-striped table-hover table-bordered"></table>
     </div>
 </div>
+
 <div class="panel-body" style="padding-bottom:0;">
     <div class="panel panel-default">
         <ul id="myTab" class="nav nav-tabs">
@@ -468,10 +468,10 @@
         getServerPaging($table, "/bond/operating/list", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC" ,id:$id};
         });
-        loadHeadData("/bond/info");
+        loadBondInfoData("/bond/info");
     }
 
-    function loadHeadData(url){
+    function loadBondInfoData(url){
        let data = {
           id:$id
        };
@@ -484,7 +484,7 @@
             traditional: true,
             contentType : "application/json",
             success: function (result) {
-                setName(result);
+                loadPageData(result);
             },
             error: function () {
                 swal("错误", "404", "error");
@@ -494,11 +494,39 @@
     }
 
     let curPrice;
-    function setName(result){
+    function loadPageData(result){
          curPrice = result.module.price;
          console.log("curPrice"+curPrice);
          document.getElementById("title").innerHTML=result.module.name;
-         document.getElementById("curPrice").innerHTML=result.module.price;
+         var textHTML = '<tr>';
+         textHTML+='<td>当前价格</td>';
+         textHTML+='<td>今日收益</td>';
+         textHTML+='<td>交易金额(今日)</td>';
+         textHTML+='<td>买入金额(今日)</td>';
+         textHTML+='<td>卖出金额(今日)</td>';
+         textHTML+='<td>佣金费用(今日)</td>';
+         textHTML+='<td>交易次数(今日)</td>';
+         textHTML+='<td>盈利笔数(今日)</td>';
+         textHTML+='<td>亏损笔数(今日)</td>';
+         textHTML+='<td>成功率(今日)</td>';
+         textHTML+='<td>最大亏损(今日)</td>';
+         textHTML+='<td>最大盈利(今日)</td>';
+
+          textHTML+='</tr>';
+          textHTML+='<td>'+result.module.curPrice+'</td>';
+          textHTML+='<td>'+result.module.todayProfit+'</td>';
+          textHTML+='<td>'+result.module.transactionAmount+'</td>';
+          textHTML+='<td>'+result.module.buyAmount+'</td>';
+          textHTML+='<td>'+result.module.sellAmount+'</td>';
+          textHTML+='<td>'+result.module.cost+'</td>';
+          textHTML+='<td>'+result.module.transactionNumber+'</td>';
+          textHTML+='<td>'+result.module.profitNumber+'</td>';
+          textHTML+='<td>'+result.module.lossNumber+'</td>';
+          textHTML+='<td>'+result.module.winning+'</td>';
+          textHTML+='<td>'+result.module.maxLoss+'</td>';
+          textHTML+='<td>'+result.module.maxProfit+'</td>';
+          textHTML+='</tr>';
+          document.getElementById("bondInfo").innerHTML = textHTML;
 
     }
 
@@ -572,7 +600,7 @@
     dragTheModalDialog();
 
    function addBond(){
-        loadHeadData("/bond/info");
+        loadBondInfoData("/bond/info");
         $('#insert_input_price').val(curPrice);
         $('#insert_input_count').val(100);
         $("#insert_input_buy_date").val(new Date().toISOString().substring(0, 10));
@@ -636,7 +664,7 @@
     }
 
   function sell(index) {
-        loadHeadData("/bond/info");
+        loadBondInfoData("/bond/info");
         let rows = $table.bootstrapTable('getData');
         $('#sell_buy_id').val(rows[index].id);
         $('#sell_gp_id').val(rows[index].gpId);

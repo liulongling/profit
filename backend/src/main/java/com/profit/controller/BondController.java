@@ -111,7 +111,6 @@ public class BondController {
         }
         List<BondInfoDTO> list = new ArrayList<>(result.size());
 
-
         //上月出售总收益
         Map<String, String> lastMonthMap = DateUtils.getLastMonthTime();
         Map<Object, Object> lastMonthProfitMap = bondService.getProfitByDate(lastMonthMap.get("startDate"), lastMonthMap.get("endDate"));
@@ -121,41 +120,11 @@ public class BondController {
 
         //今日出售总收益
         Map<Object, Object> todayProfitMap = bondService.getProfitByDate(DateUtils.getTimeString(DateUtils.getTime(new Date(), 0, 0, 0)), DateUtils.getTimeString(DateUtils.getTime(new Date(), 23, 59, 59)));
-
-
         for (BondInfo bondInfo : result) {
-            BondInfoDTO bondInfoDTO = BeanUtils.copyBean(new BondInfoDTO(), bondInfo);
-            Double stubProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 1);
-            if (stubProfit == null) stubProfit = 0.00;
-            bondInfoDTO.setStubProfit(Double.parseDouble(String.format("%.2f", stubProfit)));
-            Double gridProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 0);
-            if (gridProfit == null) gridProfit = 0.00;
-            bondInfoDTO.setGridProfit(Double.parseDouble(String.format("%.2f", gridProfit)));
-
-            bondInfoDTO.setStubCount(bondService.getBondNumber(bondInfo, (byte) 1));
-            bondInfoDTO.setGridCount(bondService.getBondNumber(bondInfo, (byte) 0));
-
-            //当前持股盈亏
-            BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
-            BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
-            criteria.andGpIdEqualTo(bondInfo.getId());
-            criteria.andStatusEqualTo((byte) 0);
-            List<BondBuyLog> bondBuyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
-            if (bondBuyLogs != null) {
-                Double total = 0.00;
-                for (BondBuyLog bondBuyLog : bondBuyLogs) {
-                    if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
-                        int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
-                        total += (bondInfo.getPrice() * surplusCount) - (bondBuyLog.getPrice() * surplusCount);
-                    }
-                }
-                bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
-            }
-
+            BondInfoDTO bondInfoDTO = bondService.loadBondInfoDTO(bondInfo);
             bondInfoDTO.setLastMonthProfit(lastMonthProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", lastMonthProfitMap.get(bondInfo.getId()))));
             bondInfoDTO.setCurMonthProfit(curMonthProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", curMonthProfitMap.get(bondInfo.getId()))));
             bondInfoDTO.setTodayTProfit(todayProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", todayProfitMap.get(bondInfo.getId()))));
-
             list.add(bondInfoDTO);
         }
 
@@ -172,9 +141,12 @@ public class BondController {
     }
 
     @PostMapping("info")
-    public ResultDO<BondInfo> info(@RequestBody BondInfo bondInfo) {
+    public ResultDO<TodayTaxationDTO> info(@RequestBody BondInfo bondInfo) {
         bondInfo = bondInfoMapper.selectByPrimaryKey(bondInfo.getId());
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondInfo);
+        TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(bondInfo.getId());
+        todayTaxationDTO.setPrice(bondInfo.getPrice());
+        todayTaxationDTO.setName(bondInfo.getName());
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, todayTaxationDTO);
     }
 
     @PostMapping("update")
@@ -191,76 +163,22 @@ public class BondController {
     }
 
     @PostMapping("today/analyse")
-    public ResultDO<BondProfitDTO> todayAnalyse(@RequestBody BondSellRequest bondSellRequest) {
-        BondProfitDTO bondProfitDTO = new BondProfitDTO();
-
-        //今日出售总收益
-        Map<Object, Object> todayProfitMap = bondService.getProfitByDate(DateUtils.getTimeString(DateUtils.getTime(new Date(), 0, 0, 0)), DateUtils.getTimeString(DateUtils.getTime(new Date(), 23, 59, 59)));
-        Double profit = 0.00;
-        if (todayProfitMap != null) {
-            for (Object key : todayProfitMap.keySet()) {
-                profit += Double.parseDouble(String.format("%.2f", todayProfitMap.get(key)));
-            }
-        }
-        bondProfitDTO.setTodayProfit(Double.parseDouble(String.format("%.2f", profit)));
-
-        List<BondBuyLog> buyLogs = bondService.getBondBuyLogs(DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM));
-        Double buyAmount = 0.0;
-        int transactionNumber = 0;
-        if (buyLogs != null) {
-            for (BondBuyLog bondBuyLog : buyLogs) {
-                buyAmount += bondBuyLog.getPrice() * bondBuyLog.getCount();
-                transactionNumber++;
-            }
-        }
-        bondProfitDTO.setBuyAmount(buyAmount);
-
-        List<BondSellLog> sellLogs = bondService.getBondSellLogs(DateUtils.getTime(new Date(), 0, 0, 0), DateUtils.getTime(new Date(), 23, 59, 59));
-        Double sellAmount = 0.0;
-        Double cost = 0.0;
-        Double maxProfit = 0.0;
-        Double maxLoss = 0.0;
-        if (buyLogs != null) {
-            for (BondSellLog bondSellLog : sellLogs) {
-                if (bondSellLog.getIncome() > 0) {
-                    bondProfitDTO.incrProfitNumber();
-                } else {
-                    bondProfitDTO.incrPlossNumber();
-                }
-                if (bondSellLog.getIncome() > maxProfit) {
-                    maxProfit = bondSellLog.getIncome();
-                }
-                if (bondSellLog.getIncome() < maxLoss) {
-                    maxLoss = bondSellLog.getIncome();
-                }
-                sellAmount += bondSellLog.getPrice() * bondSellLog.getCount();
-                cost += bondSellLog.getCost();
-                transactionNumber++;
-            }
-        }
-        bondProfitDTO.setSellAmount(sellAmount);
-        bondProfitDTO.setCost(Double.parseDouble(String.format("%.2f", cost)));
-        bondProfitDTO.setTransactionNumber(transactionNumber);
-        bondProfitDTO.setMaxProfit(maxProfit);
-        bondProfitDTO.setMaxLoss(maxLoss);
-        bondProfitDTO.setTransactionAmount(Double.parseDouble(String.format("%.2f", buyAmount + sellAmount)));
-        if (bondProfitDTO.getTotalNumber() > 0) {
-            bondProfitDTO.setWinning(StringUtil.pencent(bondProfitDTO.getProfitNumber(), bondProfitDTO.getTotalNumber()));
-        }
-
+    public ResultDO<TotalProfitDTO> todayAnalyse(@RequestBody BondSellRequest bondSellRequest) {
+        TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(null);
+        TotalProfitDTO totalProfitDTO = BeanUtils.copyBean(new TotalProfitDTO(), todayTaxationDTO);
 
         BondSellLogExample bondSellLogExample = new BondSellLogExample();
         bondSellLogExample.createCriteria().andGpIdNotEqualTo("131810").andIncomeGreaterThan(0.0);
         long totalProfitNumber = bondSellLogMapper.countByExample(bondSellLogExample);
-        bondProfitDTO.setTotalProfitNumber(totalProfitNumber);
+        totalProfitDTO.setTotalProfitNumber(totalProfitNumber);
 
         bondSellLogExample = new BondSellLogExample();
         bondSellLogExample.createCriteria().andIncomeLessThan(0.0);
         long totalLossNumber = bondSellLogMapper.countByExample(bondSellLogExample);
-        bondProfitDTO.setTotalLossNumber(totalLossNumber);
+        totalProfitDTO.setTotalLossNumber(totalLossNumber);
         if (totalProfitNumber + totalLossNumber > 0) {
             //胜率=获胜场次÷总比赛场次x100%
-            bondProfitDTO.setAvgWinning(StringUtil.pencent(totalProfitNumber, totalProfitNumber + totalLossNumber));
+            totalProfitDTO.setAvgWinning(StringUtil.pencent(totalProfitNumber, totalProfitNumber + totalLossNumber));
         }
 
         Map<String, ProfitDTO> map = bondService.totalProfit();
@@ -270,8 +188,8 @@ public class BondController {
             totalProfit += profitDTO.getTotalProfit();
         }
 
-        bondProfitDTO.setTotalProfit(totalProfit);
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondProfitDTO);
+        totalProfitDTO.setTotalProfit(totalProfit);
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, totalProfitDTO);
     }
 
 }

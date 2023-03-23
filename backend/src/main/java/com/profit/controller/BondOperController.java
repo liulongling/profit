@@ -98,13 +98,17 @@ public class BondOperController {
 
     @PostMapping("insert")
     public ResultDO<Void> insert(@RequestBody BondBuyLog bondBuyLog) {
+        BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
         bondBuyLog.setCreateTime(new Date());
         bondBuyLog.setOperTime(new Date());
         bondBuyLog.setSellCount(0);
         bondBuyLog.setSellIncome(0.00);
-        bondBuyLog.setStatus((byte) 0);
-        BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
-        bondBuyLog.setCost(BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
+        bondBuyLog.setStatus(bondBuyLog.getStatus());
+
+        if(bondBuyLog.getStatus() != 3){
+            bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());
+            bondBuyLog.setCost(BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
+        }
         bondBuyLogMapper.insert(bondBuyLog);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }

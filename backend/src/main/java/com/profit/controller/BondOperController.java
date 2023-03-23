@@ -101,13 +101,13 @@ public class BondOperController {
     public ResultDO<Void> buy(@RequestBody BondBuyRequest bondBuyRequest) {
         BondBuyLog bondBuyLog = BeanUtils.copyBean(new BondBuyLog(), bondBuyRequest);
         bondService.buyBond(bondBuyLog);
-        if (bondBuyRequest.getSellPrice() > 0 && bondBuyLog.getId() > 0) {
+        if (bondBuyRequest.getSellPrice() != null && bondBuyRequest.getSellPrice() > 0 && bondBuyLog.getId() > 0) {
             BondSellLog bondSellLog = new BondSellLog();
             bondSellLog.setBuyId(bondBuyLog.getId());
             bondSellLog.setGpId(bondBuyLog.getGpId());
             bondSellLog.setPrice(bondBuyRequest.getSellPrice());
             bondSellLog.setCount(bondBuyRequest.getCount());
-            bondSellLog.setCreateTime(DateUtils.string2Date(bondBuyRequest.getBuyDate(),DateUtils.DATE_PATTERM));
+            bondSellLog.setCreateTime(DateUtils.string2Date(bondBuyRequest.getBuyDate(), DateUtils.DATE_PATTERM));
             bondService.sellBond(bondSellLog);
         }
 
@@ -127,6 +127,10 @@ public class BondOperController {
 
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
         bondBuyLog.setOperTime(new Date());
+
+        if (bondBuyLogRequest.getType() != null) {
+            bondBuyLog.setType(bondBuyLogRequest.getType());
+        }
 
         //未出售的状态下才能修改税费
         if (bondBuyLog.getSellCount() == 0) {

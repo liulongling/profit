@@ -188,7 +188,7 @@ public class BondController {
             totalProfit += profitDTO.getTotalProfit();
         }
 
-        totalProfitDTO.setTotalProfit(totalProfit);
+        totalProfitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", totalProfit)));
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, totalProfitDTO);
     }
 

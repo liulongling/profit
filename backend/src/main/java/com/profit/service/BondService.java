@@ -64,7 +64,7 @@ public class BondService {
                 transactionNumber++;
             }
         }
-        todayTaxationDTO.setBuyAmount(buyAmount);
+        todayTaxationDTO.setBuyAmount(Double.parseDouble(String.format("%.2f", buyAmount)));
 
         List<BondSellLog> sellLogs = getBondSellLogs(gpId, DateUtils.getTime(new Date(), 0, 0, 0), DateUtils.getTime(new Date(), 23, 59, 59));
         Double sellAmount = 0.0;
@@ -89,7 +89,7 @@ public class BondService {
                 transactionNumber++;
             }
         }
-        todayTaxationDTO.setSellAmount(sellAmount);
+        todayTaxationDTO.setSellAmount(Double.parseDouble(String.format("%.2f", sellAmount)));
         todayTaxationDTO.setCost(Double.parseDouble(String.format("%.2f", cost)));
         todayTaxationDTO.setTransactionNumber(transactionNumber);
         todayTaxationDTO.setMaxProfit(maxProfit);
@@ -355,7 +355,7 @@ public class BondService {
             bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());
             bondBuyLog.setCost(BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
         }
-        bondBuyLogMapper.insert(bondBuyLog);
+        bondBuyLogMapper.insertSelective(bondBuyLog);
     }
 
     /**

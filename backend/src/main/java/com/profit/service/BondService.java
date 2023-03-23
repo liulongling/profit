@@ -4,6 +4,7 @@ import com.profit.base.domain.*;
 import com.profit.base.mapper.BondBuyLogMapper;
 import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
+import com.profit.commons.constants.BondConstants;
 import com.profit.commons.utils.*;
 import com.profit.dto.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,6 @@ public class BondService {
     private BondSellLogMapper bondSellLogMapper;
     @Resource
     private BondBuyLogMapper bondBuyLogMapper;
-
 
     /**
      * 股票今天数据
@@ -96,7 +96,7 @@ public class BondService {
         todayTaxationDTO.setMaxLoss(maxLoss);
         todayTaxationDTO.setTransactionAmount(Double.parseDouble(String.format("%.2f", buyAmount + sellAmount)));
         if (todayTaxationDTO.getTotalNumber() > 0) {
-            todayTaxationDTO.setWinning(StringUtil.pencent(todayTaxationDTO.getProfitNumber(), todayTaxationDTO.getTotalNumber()));
+            todayTaxationDTO.setWinning(StringUtil.pencentWin(todayTaxationDTO.getProfitNumber(), todayTaxationDTO.getTotalNumber()));
         }
         return todayTaxationDTO;
     }
@@ -135,10 +135,24 @@ public class BondService {
             }
             bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
         }
+
+        //计算胜率
+        BondSellLogExample bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andGpIdEqualTo(bondInfo.getId()).andIncomeGreaterThan(0.0);
+        long winCount = bondSellLogMapper.countByExample(bondSellLogExample);
+        bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andGpIdEqualTo(bondInfo.getId());
+        long totalCount = bondSellLogMapper.countByExample(bondSellLogExample);
+        bondInfoDTO.setWinning(StringUtil.pencentWin(winCount, totalCount));
         return bondInfoDTO;
     }
 
 
+    /**
+     * 总收益
+     *
+     * @return
+     */
     public Map<String, ProfitDTO> totalProfit() {
         BondSellRequest bondSellRequest = new BondSellRequest();
         bondSellRequest.setType(0);
@@ -393,5 +407,15 @@ public class BondService {
         bondSellLog.setSurplusCount(surplusCount);
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
+
+        //长线股票出售完后 添加到待购买池中
+        if (bondBuyLog.getType() == BondConstants.LONG_LINE) {
+            BondBuyLog buyLog = new BondBuyLog();
+            buyLog.setStatus(BondConstants.WAIT_BUY);
+            buyLog.setCount(bondSellLog.getCount());
+            buyLog.setType(BondConstants.LONG_LINE);
+            buyLog.setGpId(bondSellLog.getGpId());
+            buyBond(buyLog);
+        }
     }
 }

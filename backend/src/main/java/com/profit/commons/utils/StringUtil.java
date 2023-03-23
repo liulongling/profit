@@ -179,7 +179,7 @@ public class StringUtil {
         return matcher.replaceAll("").trim();
     }
 
-    public static String pencent(float win, float all) {
+    public static String pencentWin(float win, float all) {
         // 创建一个数值格式化对象
         NumberFormat numberFormat = NumberFormat.getInstance();
         // 设置精确到小数点后2位

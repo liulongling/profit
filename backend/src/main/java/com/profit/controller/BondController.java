@@ -178,7 +178,7 @@ public class BondController {
         totalProfitDTO.setTotalLossNumber(totalLossNumber);
         if (totalProfitNumber + totalLossNumber > 0) {
             //胜率=获胜场次÷总比赛场次x100%
-            totalProfitDTO.setAvgWinning(StringUtil.pencent(totalProfitNumber, totalProfitNumber + totalLossNumber));
+            totalProfitDTO.setAvgWinning(StringUtil.pencentWin(totalProfitNumber, totalProfitNumber + totalLossNumber));
         }
 
         Map<String, ProfitDTO> map = bondService.totalProfit();

@@ -49,6 +49,10 @@ public class BondInfoDTO extends BondInfo {
      * 今日T收益
      */
     public Double todayTProfit;
+    /**
+     * 胜率
+     */
+    public String winning;
 
     public Double getCurProfit() {
         return Double.parseDouble(String.format("%.2f", stubProfit + gridProfit + gpProfit));

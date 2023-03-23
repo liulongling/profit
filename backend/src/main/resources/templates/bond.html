@@ -35,7 +35,7 @@
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell();">未出售(全部)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_gird();">未出售(长线)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_stu();">未出售(短线)</a></li>
-
+            <li><a href="#ios" data-toggle="tab" onclick="filter_wait_buy();">待买入</a></li>
         </ul>
     </div>
 
@@ -513,7 +513,7 @@
          textHTML+='<td>最大盈利(今日)</td>';
 
           textHTML+='</tr>';
-          textHTML+='<td>'+result.module.curPrice+'</td>';
+          textHTML+='<td>'+curPrice+'</td>';
           textHTML+='<td>'+result.module.todayProfit+'</td>';
           textHTML+='<td>'+result.module.transactionAmount+'</td>';
           textHTML+='<td>'+result.module.buyAmount+'</td>';
@@ -586,6 +586,15 @@
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status,type:data.type};
         });
     }
+
+   function filter_wait_buy(){
+        let data = {
+            status:'3'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status};
+        });
+   }
 
 
     function filter_wg() {

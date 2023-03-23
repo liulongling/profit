@@ -30,7 +30,6 @@ public class BondOperController {
     @Resource
     private BondService bondService;
 
-
     @GetMapping("list")
     public ResultDO<PageUtils<BondBuyLogDTO>> getBonds(@RequestParam Map<String, Object> params) {
         String id = params.get("id").toString();
@@ -145,16 +144,20 @@ public class BondOperController {
 
 
     @PostMapping("update")
-    public ResultDO<Void> update(@RequestBody BondBuyLog bondBuyLog) {
-        BondBuyLog bondBuyLog1 = bondBuyLogMapper.selectByPrimaryKey(bondBuyLog.getId());
+    public ResultDO<Void> update(@RequestBody BondBuyLog bondBuyLogRequest) {
+        BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondBuyLogRequest.getId());
 
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
         bondBuyLog.setOperTime(new Date());
 
         //未出售的状态下才能修改税费
-        if (bondBuyLog1.getSellCount() == 0) {
+        if (bondBuyLog.getSellCount() == 0) {
             Double buyCost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(buyCost);
+        }
+        if (bondBuyLog.getStatus() == 3 && bondBuyLogRequest.getBuyDate() != null) {
+            bondBuyLog.setStatus((byte) 0);
+            bondBuyLog.setBuyDate(bondBuyLogRequest.getBuyDate());
         }
 
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);

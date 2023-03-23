@@ -344,6 +344,8 @@
     gp_id = #{gp_id,jdbcType=VARCHAR}
     AND
     type = #{type,jdbcType=TINYINT}
+    AND
+    status in(0,1)
   </select>
   <select id="sumBuySellCount" resultType="map">
     SELECT
@@ -353,5 +355,7 @@
     WHERE gp_id = #{gp_id,jdbcType=VARCHAR}
     AND
     type = #{type,jdbcType=TINYINT}
+    AND
+    status in(0,1)
   </select>
 </mapper>

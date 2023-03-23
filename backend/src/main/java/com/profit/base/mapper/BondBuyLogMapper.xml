@@ -108,7 +108,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.profit.base.domain.BondBuyLog">
+  <insert id="insert" parameterType="com.profit.base.domain.BondBuyLog" keyProperty="id" useGeneratedKeys="true">
     insert into bond_buy_log (id, gp_id, price,
     `count`, cost, `type`, sell_count,
     sell_income, buy_date, `status`,

@@ -336,6 +336,62 @@ public class BondService {
 
             }
         }
+    }
 
+    /**
+     * 购买股票
+     *
+     * @param bondBuyLog
+     */
+    public void buyBond(BondBuyLog bondBuyLog) {
+        BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+        bondBuyLog.setCreateTime(new Date());
+        bondBuyLog.setOperTime(new Date());
+        bondBuyLog.setSellCount(0);
+        bondBuyLog.setSellIncome(0.00);
+        bondBuyLog.setStatus(bondBuyLog.getStatus());
+
+        if (bondBuyLog.getStatus() != null && bondBuyLog.getStatus() != 3) {
+            bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());
+            bondBuyLog.setCost(BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
+        }
+        bondBuyLogMapper.insert(bondBuyLog);
+    }
+
+    /**
+     * 出售股票
+     *
+     * @param bondSellLog
+     */
+    public void sellBond(BondSellLog bondSellLog) {
+        BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondSellLog.getBuyId());
+
+        BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+
+        //卖出税费计算
+        double sellTaxation = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
+        bondSellLog.setCost(sellTaxation);
+        bondBuyLog.setCost(Double.parseDouble(String.format("%.3f", bondBuyLog.getCost() + bondSellLog.getCost())));
+
+        //买入税费计算
+        double buyTaxation = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondSellLog.getCount(), false);
+        //计算收益 出售总价 - 买入总价 - 买卖费用
+        double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
+
+        bondSellLog.setIncome(Double.parseDouble(String.format("%.3f", income)));
+        bondSellLog.setGpId(bondInfo.getId());
+        bondSellLog.setCreateTime(bondSellLog.getCreateTime());
+
+        bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.3f", bondBuyLog.getSellIncome() + bondSellLog.getIncome())));
+        bondBuyLog.setSellCount(bondBuyLog.getSellCount() + bondSellLog.getCount());
+        bondBuyLog.setOperTime(new Date());
+        //查看是否股票是否全部售出
+        if (bondBuyLog.getCount() == bondBuyLog.getSellCount()) {
+            bondBuyLog.setStatus((byte) 1);
+        }
+        int surplusCount = getBondNumber(bondInfo, bondBuyLog.getType()).intValue();
+        bondSellLog.setSurplusCount(surplusCount);
+        bondSellLogMapper.insert(bondSellLog);
+        bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
     }
 }

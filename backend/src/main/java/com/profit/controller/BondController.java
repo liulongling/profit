@@ -7,6 +7,7 @@ import com.profit.base.domain.*;
 import com.profit.base.mapper.BondBuyLogMapper;
 import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
+import com.profit.commons.constants.BondConstants;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.BeanUtils;
 import com.profit.commons.utils.DateUtils;
@@ -51,50 +52,49 @@ public class BondController {
 
     @GetMapping("all")
     public ResultDO<PageUtils<BondBuyLogDTO>> allBondInfos(@RequestParam Map<String, Object> params) throws Exception {
-        List<BondInfo> bondInfos = bondInfoMapper.selectByExample(new BondInfoExample());
         List<BondBuyLogDTO> list = new ArrayList<>();
-        for (BondInfo bondInfo : bondInfos) {
-            String id = bondInfo.getId();
-            BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
-            BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
-            criteria.andGpIdEqualTo(id);
-            criteria.andStatusEqualTo((byte) 0);
-            if (params.get("type") != null) {
-                criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
-            }
-
-            bondBuyLogExample.setOrderByClause("price desc");
-
-            List<BondBuyLog> result = bondBuyLogMapper.selectByExample(bondBuyLogExample);
-            if (result == null) {
-                return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
-            }
-
-            for (int i = 0; i < result.size(); i++) {
-                BondBuyLog bondBuyLog = result.get(i);
-                BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
-                buyLogDTO.setName(bondInfo.getName());
-
-                //与上一个买点的格差
-                String girdSpacing = "0";
-                if (i > 0) {
-                    girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
-                }
-                buyLogDTO.setGirdSpacing(girdSpacing);
-                bondService.loadSellAvgPrice(bondBuyLog, buyLogDTO);
-
-                //当前持股盈亏
-                if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
-                    bondService.loadCurBondIncome(bondInfo, bondBuyLog, buyLogDTO);
-                    if (buyLogDTO.getIncome() > 0) {
-                        list.add(buyLogDTO);
-                        ComparatorIncome comparator = new ComparatorIncome();
-                        Collections.sort(list, comparator);
-                    }
-                }
-            }
+        BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+        BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
+        byte status = -1;
+        if (params.get("status") != null) {
+            status = Byte.valueOf(params.get("status").toString());
+            criteria.andStatusEqualTo(status);
         }
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(list.size(), list));
+
+        if (params.get("type") != null) {
+            criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
+        }
+        bondBuyLogExample.setOrderByClause(params.get("sort").toString() + " " + params.get("order").toString());
+        Page<Object> page = PageHelper.startPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
+        List<BondBuyLog> result = bondBuyLogMapper.selectByExample(bondBuyLogExample);
+        if (result == null) {
+            return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
+        }
+
+        for (int i = 0; i < result.size(); i++) {
+            BondBuyLog bondBuyLog = result.get(i);
+            BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
+            BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(buyLogDTO.getGpId());
+            buyLogDTO.setName(bondInfo.getName());
+            buyLogDTO.setCurPrice(bondInfo.getPrice());
+            //与上一个买点的格差
+            String girdSpacing = "0";
+            if (i > 0) {
+                girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
+            }
+            buyLogDTO.setGirdSpacing(girdSpacing);
+            bondService.loadSellAvgPrice(bondBuyLog, buyLogDTO);
+
+            //当前持股盈亏
+            bondService.loadCurBondIncome(bondInfo, bondBuyLog, buyLogDTO);
+            list.add(buyLogDTO);
+        }
+        if (status == BondConstants.NOT_SELL) {
+            ComparatorIncome comparator = new ComparatorIncome();
+            Collections.sort(list, comparator);
+        }
+
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
 
     @GetMapping("list")
@@ -146,6 +146,7 @@ public class BondController {
         TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(bondInfo.getId());
         todayTaxationDTO.setPrice(bondInfo.getPrice());
         todayTaxationDTO.setName(bondInfo.getName());
+        bondService.getBondNumber(bondInfo,BondConstants.LONG_LINE);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, todayTaxationDTO);
     }
 

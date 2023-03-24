@@ -35,9 +35,10 @@
     <div class="panel panel-default">
         <ul id="myTab" class="nav nav-tabs">
             <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter();">短线</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_gird();">长线</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_sell();">已出售</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_short_not_sell();">短线(未出售)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_long_not_sell();">长线(未出售)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_sold();">已出售</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_wait_buy();">待买入</a></li>
         </ul>
     </div>
 
@@ -88,6 +89,11 @@
             field: 'girdSpacing',
             title: '格差',
             width: '30px',
+            formatter: stringFormatter
+        }, {
+            field: 'curPrice',
+            title: '当前价格',
+            width: '70px',
             formatter: stringFormatter
         }, {
             field: 'price',
@@ -143,33 +149,44 @@
     }
 
 
-    function filter() {
+    function filter_short_not_sell() {
         let data = {
-            type: '1'
+            type: '1',
+            status: '0'
         };
         getServerPaging($table, "/bond/all", params => {
-            return { limit: params.limit, offset: params.offset, type: data.type};
+            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", type: data.type,status:data.status};
         });
     }
 
-    function filter_gird() {
+    function filter_long_not_sell() {
         let data = {
-            type: '0'
+            type: '0',
+            status: '0'
         };
         getServerPaging($table, "/bond/all", params => {
-            return { limit: params.limit, offset: params.offset, type: data.type};
+            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", type: data.type,status:data.status};
         });
     }
 
-    function  filter_sell() {
+    function  filter_sold() {
         let data = {
             status: '1'
         };
         getServerPaging($table, "/bond/all", params => {
-            return { limit: params.limit, offset: params.offset, type: data.status};
+            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", status: data.status};
         });
     }
 
+
+    function  filter_wait_buy() {
+        let data = {
+            status: '3'
+        };
+        getServerPaging($table, "/bond/all", params => {
+            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", status: data.status};
+        });
+    }
 
 
     function init() {

@@ -223,6 +223,17 @@
                             <input type="number" class="form-control" id="alert_input_price">
                         </div>
                     </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_status">状态</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="alert_input_status">
+                                <option value="0">未出售</option>
+                                <option value="1">已出售</option>
+                                <option value="3">待买入</option>
+                            </select>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -572,6 +583,9 @@
          document.getElementById("title").innerHTML=result.module.name;
          var textHTML = '<tr>';
          textHTML+='<td>当前价格</td>';
+         textHTML+='<td>短线持股</td>';
+         textHTML+='<td>长线持股</td>';
+         textHTML+='<td>持股数量</td>';
          textHTML+='<td>今日收益</td>';
          textHTML+='<td>交易金额(今日)</td>';
          textHTML+='<td>买入金额(今日)</td>';
@@ -752,6 +766,7 @@
         $('#alert_input_price').val(rows[index].price);
         $('#alert_input_count').val(rows[index].count);
         $('#alert_input_buy_date').val(rows[index].buyDate);
+        $('#alert_input_status').val(rows[index].status);
         alterId = rows[index].id;
     }
 
@@ -765,6 +780,7 @@
             sellIncome: $('#alert_input_sell_income').val(),
             price: $('#alert_input_price').val(),
             buyDate: $('#alert_input_buy_date').val(),
+            status: $('#alert_input_status').val(),
         };
         if ("" === data.id) {
             swal("操作提示", "用户不存在", "info");

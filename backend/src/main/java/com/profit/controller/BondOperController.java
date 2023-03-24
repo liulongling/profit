@@ -132,15 +132,16 @@ public class BondOperController {
             bondBuyLog.setType(bondBuyLogRequest.getType());
         }
 
+        if (bondBuyLogRequest.getStatus() != null) {
+            bondBuyLog.setStatus(bondBuyLogRequest.getStatus());
+        }
+
         //未出售的状态下才能修改税费
         if (bondBuyLog.getSellCount() == 0) {
             Double buyCost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(buyCost);
         }
-        if (bondBuyLog.getStatus() == 3 && bondBuyLogRequest.getBuyDate() != null) {
-            bondBuyLog.setStatus((byte) 0);
-            bondBuyLog.setBuyDate(bondBuyLogRequest.getBuyDate());
-        }
+
 
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);

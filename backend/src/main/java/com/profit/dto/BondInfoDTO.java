@@ -57,6 +57,11 @@ public class BondInfoDTO extends BondInfo {
      * 是否有可购买
      */
     public boolean waitBuy;
+    /**
+     * 持仓市值
+     */
+    public Double market;
+
 
     public Double getCurProfit() {
         return Double.parseDouble(String.format("%.2f", stubProfit + gridProfit + gpProfit));

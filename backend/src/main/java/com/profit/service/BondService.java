@@ -158,6 +158,8 @@ public class BondService {
                 break;
             }
         }
+
+        bondInfoDTO.setMarket(Double.parseDouble(String.format("%.0f", bondInfo.getPrice() * bondInfoDTO.getGpCount())));
         return bondInfoDTO;
     }
 
@@ -195,6 +197,7 @@ public class BondService {
         BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
         BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
         criteria.andBuyDateEqualTo(date);
+        criteria.andStatusBetween(BondConstants.NOT_SELL,BondConstants.SOLD);
         if (gpId != null) {
             criteria.andGpIdEqualTo(gpId);
         }

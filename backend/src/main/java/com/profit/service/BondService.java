@@ -136,6 +136,10 @@ public class BondService {
             bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
         }
 
+        //计算成本价 = (当前价格 * 股票数量 - 总盈亏) /数量
+        Double costPrice = (bondInfo.getPrice() * bondInfoDTO.getGpCount() - bondInfoDTO.getCurProfit()) / bondInfoDTO.getGpCount();
+        bondInfoDTO.setCostPrice(Double.parseDouble(String.format("%.3f", costPrice)));
+
         //计算胜率
         BondSellLogExample bondSellLogExample = new BondSellLogExample();
         bondSellLogExample.createCriteria().andGpIdEqualTo(bondInfo.getId()).andIncomeGreaterThan(0.0);

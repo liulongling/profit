@@ -567,7 +567,7 @@
             traditional: true,
             contentType : "application/json",
             success: function (result) {
-                loadPageData(result);
+                loadTodayPageData(result);
             },
             error: function () {
                 swal("错误", "404", "error");
@@ -577,15 +577,12 @@
     }
 
     let curPrice;
-    function loadPageData(result){
+    function loadTodayPageData(result){
          curPrice = result.module.price;
          console.log("curPrice"+curPrice);
          document.getElementById("title").innerHTML=result.module.name;
          var textHTML = '<tr>';
          textHTML+='<td>当前价格</td>';
-         textHTML+='<td>短线持股</td>';
-         textHTML+='<td>长线持股</td>';
-         textHTML+='<td>持股数量</td>';
          textHTML+='<td>今日收益</td>';
          textHTML+='<td>交易金额(今日)</td>';
          textHTML+='<td>买入金额(今日)</td>';
@@ -613,7 +610,6 @@
           textHTML+='<td>'+result.module.maxProfit+'</td>';
           textHTML+='</tr>';
           document.getElementById("bondInfo").innerHTML = textHTML;
-
     }
 
     function getQueryString(name) {

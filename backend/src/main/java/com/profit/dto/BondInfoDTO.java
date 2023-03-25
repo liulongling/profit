@@ -26,6 +26,10 @@ public class BondInfoDTO extends BondInfo {
      */
     public long gridCount;
     /**
+     * 成本价
+     */
+    public Double costPrice;
+    /**
      * 持股数量盈亏
      */
     public Double gpProfit;
@@ -33,10 +37,6 @@ public class BondInfoDTO extends BondInfo {
      * 当前总盈亏
      */
     public Double curProfit;
-    /**
-     * 总盈亏
-     */
-    public Double profit;
     /**
      * 上月总收益
      */

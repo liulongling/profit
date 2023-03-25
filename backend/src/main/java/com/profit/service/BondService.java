@@ -148,6 +148,16 @@ public class BondService {
         bondSellLogExample.createCriteria().andGpIdEqualTo(bondInfo.getId());
         long totalCount = bondSellLogMapper.countByExample(bondSellLogExample);
         bondInfoDTO.setWinning(StringUtil.pencentWin(winCount, totalCount));
+
+        bondBuyLogExample = new BondBuyLogExample();
+        bondBuyLogExample.createCriteria().andGpIdEqualTo(bondInfo.getId()).andStatusEqualTo(BondConstants.WAIT_BUY);
+        List<BondBuyLog> waitBuyBondBuyLogS = bondBuyLogMapper.selectByExample(bondBuyLogExample);
+        for (BondBuyLog bondBuyLog : waitBuyBondBuyLogS) {
+            if (bondBuyLog.getPrice() >= bondInfo.getPrice()) {
+                bondInfoDTO.setWaitBuy(true);
+                break;
+            }
+        }
         return bondInfoDTO;
     }
 

@@ -53,6 +53,10 @@ public class BondInfoDTO extends BondInfo {
      * 胜率
      */
     public String winning;
+    /**
+     * 是否有可购买
+     */
+    public boolean waitBuy;
 
     public Double getCurProfit() {
         return Double.parseDouble(String.format("%.2f", stubProfit + gridProfit + gpProfit));

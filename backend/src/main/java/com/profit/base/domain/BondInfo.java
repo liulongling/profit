@@ -37,6 +37,11 @@ public class BondInfo {
     private Double position;
 
     /**
+     * 0:上架 -1：下架
+     */
+    private Byte status;
+
+    /**
      *
      */
     private Date createTime;

@@ -8,6 +8,7 @@
     <result column="plate" jdbcType="VARCHAR" property="plate" />
     <result column="is_etf" jdbcType="TINYINT" property="isEtf" />
     <result column="position" jdbcType="DOUBLE" property="position" />
+    <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -70,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, `name`, price, plate, is_etf, `position`, create_time, update_time
+    id, `name`, price, plate, is_etf, `position`, `status`, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondInfoExample" resultMap="BaseResultMap">
     select
@@ -105,10 +106,12 @@
   <insert id="insert" parameterType="com.profit.base.domain.BondInfo">
     insert into bond_info (id, `name`, price,
     plate, is_etf, `position`,
-    create_time, update_time)
+    `status`, create_time, update_time
+    )
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE},
     #{plate,jdbcType=VARCHAR}, #{isEtf,jdbcType=TINYINT}, #{position,jdbcType=DOUBLE},
-    #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.profit.base.domain.BondInfo">
     insert into bond_info
@@ -130,6 +133,9 @@
       </if>
       <if test="position != null">
         `position`,
+      </if>
+      <if test="status != null">
+        `status`,
       </if>
       <if test="createTime != null">
         create_time,
@@ -156,6 +162,9 @@
       </if>
       <if test="position != null">
         #{position,jdbcType=DOUBLE},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -192,6 +201,9 @@
       <if test="record.position != null">
         `position` = #{record.position,jdbcType=DOUBLE},
       </if>
+      <if test="record.status != null">
+        `status` = #{record.status,jdbcType=TINYINT},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -211,6 +223,7 @@
     plate = #{record.plate,jdbcType=VARCHAR},
     is_etf = #{record.isEtf,jdbcType=TINYINT},
     `position` = #{record.position,jdbcType=DOUBLE},
+    `status` = #{record.status,jdbcType=TINYINT},
     create_time = #{record.createTime,jdbcType=TIMESTAMP},
     update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -235,6 +248,9 @@
       <if test="position != null">
         `position` = #{position,jdbcType=DOUBLE},
       </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=TINYINT},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -251,6 +267,7 @@
     plate = #{plate,jdbcType=VARCHAR},
     is_etf = #{isEtf,jdbcType=TINYINT},
     `position` = #{position,jdbcType=DOUBLE},
+    `status` = #{status,jdbcType=TINYINT},
     create_time = #{createTime,jdbcType=TIMESTAMP},
     update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=VARCHAR}

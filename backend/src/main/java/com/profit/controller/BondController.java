@@ -9,10 +9,7 @@ import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
 import com.profit.commons.constants.BondConstants;
 import com.profit.commons.constants.ResultCode;
-import com.profit.commons.utils.BeanUtils;
-import com.profit.commons.utils.DateUtils;
-import com.profit.commons.utils.PageUtils;
-import com.profit.commons.utils.StringUtil;
+import com.profit.commons.utils.*;
 import com.profit.comparator.ComparatorIncome;
 import com.profit.dto.*;
 import com.profit.service.BondService;
@@ -75,19 +72,24 @@ public class BondController {
             BondBuyLog bondBuyLog = result.get(i);
             BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
             BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(buyLogDTO.getGpId());
-            buyLogDTO.setName(bondInfo.getName());
-            buyLogDTO.setCurPrice(bondInfo.getPrice());
-            //与上一个买点的格差
-            String girdSpacing = "0";
-            if (i > 0) {
-                girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
-            }
-            buyLogDTO.setGirdSpacing(girdSpacing);
-            bondService.loadSellAvgPrice(bondBuyLog, buyLogDTO);
+            if (bondInfo != null) {
+                buyLogDTO.setName(bondInfo.getName());
+                buyLogDTO.setCurPrice(bondInfo.getPrice());
+                //与上一个买点的格差
+                String girdSpacing = "0";
+                if (i > 0) {
+                    girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
+                }
+                buyLogDTO.setGirdSpacing(girdSpacing);
+                bondService.loadSellAvgPrice(bondBuyLog, buyLogDTO);
 
-            //当前持股盈亏
-            bondService.loadCurBondIncome(bondInfo, bondBuyLog, buyLogDTO);
-            list.add(buyLogDTO);
+                //当前持股盈亏
+                bondService.loadCurBondIncome(bondInfo, bondBuyLog, buyLogDTO);
+                list.add(buyLogDTO);
+            } else {
+                LogUtil.error("allBondInfos error gpId:" + buyLogDTO.getGpId());
+            }
+
         }
         if (status == BondConstants.NOT_SELL) {
             ComparatorIncome comparator = new ComparatorIncome();
@@ -103,6 +105,7 @@ public class BondController {
         if (params.get("isEtf") != null) {
             bondInfoExample.createCriteria().andIsEtfEqualTo(Byte.valueOf(params.get("isEtf").toString()));
         }
+        bondInfoExample.createCriteria().andStatusEqualTo((byte) 0);
         bondInfoExample.setOrderByClause(" id " + params.get("order"));
         Page<Object> page = PageHelper.startPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
         List<BondInfo> result = bondInfoMapper.selectByExample(bondInfoExample);
@@ -127,7 +130,7 @@ public class BondController {
             bondInfoDTO.setTodayTProfit(todayProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", todayProfitMap.get(bondInfo.getId()))));
             list.add(bondInfoDTO);
         }
-        
+
 
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
@@ -147,7 +150,7 @@ public class BondController {
         TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(bondInfo.getId());
         todayTaxationDTO.setPrice(bondInfo.getPrice());
         todayTaxationDTO.setName(bondInfo.getName());
-        bondService.getBondNumber(bondInfo,BondConstants.LONG_LINE);
+        bondService.getBondNumber(bondInfo, BondConstants.LONG_LINE);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, todayTaxationDTO);
     }
 

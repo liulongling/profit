@@ -141,6 +141,7 @@ public class BondController {
     public ResultDO<Void> insert(@RequestBody BondInfo bondInfo) {
         bondInfo.setCreateTime(new Date());
         bondInfo.setUpdateTime(new Date());
+        bondInfo.setStatus((byte)0);
         bondInfoMapper.insert(bondInfo);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }

@@ -26,6 +26,10 @@ public class BondInfoDTO extends BondInfo {
      */
     public long gridCount;
     /**
+     * 超短持股数量
+     */
+    public long superStubCount;
+    /**
      * 成本价
      */
     public Double costPrice;
@@ -68,7 +72,7 @@ public class BondInfoDTO extends BondInfo {
     }
 
     public long getGpCount() {
-        return stubCount + gridCount;
+        return stubCount + gridCount+superStubCount;
     }
 
 

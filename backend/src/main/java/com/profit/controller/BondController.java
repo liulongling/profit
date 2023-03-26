@@ -102,10 +102,11 @@ public class BondController {
     @GetMapping("list")
     public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) throws Exception {
         BondInfoExample bondInfoExample = new BondInfoExample();
+        BondInfoExample.Criteria criteria= bondInfoExample.createCriteria();
         if (params.get("isEtf") != null) {
-            bondInfoExample.createCriteria().andIsEtfEqualTo(Byte.valueOf(params.get("isEtf").toString()));
+            criteria.andIsEtfEqualTo(Byte.valueOf(params.get("isEtf").toString()));
         }
-        bondInfoExample.createCriteria().andStatusEqualTo((byte) 0);
+        criteria.andStatusEqualTo((byte) 0);
         bondInfoExample.setOrderByClause(" id " + params.get("order"));
         Page<Object> page = PageHelper.startPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
         List<BondInfo> result = bondInfoMapper.selectByExample(bondInfoExample);

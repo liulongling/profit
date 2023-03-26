@@ -22,4 +22,8 @@ public class BondConstants {
      * 短线
      */
     public static final Byte SHORT_LINE = 1;
+    /**
+     * 超短线
+     */
+    public static final Byte SUPER_SHORT_LINE = 2;
 }

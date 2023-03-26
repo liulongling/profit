@@ -116,8 +116,9 @@ public class BondService {
         if (gridProfit == null) gridProfit = 0.00;
         bondInfoDTO.setGridProfit(Double.parseDouble(String.format("%.2f", gridProfit)));
 
-        bondInfoDTO.setStubCount(getBondNumber(bondInfo, (byte) 1));
-        bondInfoDTO.setGridCount(getBondNumber(bondInfo, (byte) 0));
+        bondInfoDTO.setStubCount(getBondNumber(bondInfo, BondConstants.LONG_LINE));
+        bondInfoDTO.setGridCount(getBondNumber(bondInfo, BondConstants.SHORT_LINE));
+        bondInfoDTO.setSuperStubCount(getBondNumber(bondInfo, BondConstants.SUPER_SHORT_LINE));
 
         //当前持股盈亏
         BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
@@ -197,7 +198,7 @@ public class BondService {
         BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
         BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
         criteria.andBuyDateEqualTo(date);
-        criteria.andStatusBetween(BondConstants.NOT_SELL,BondConstants.SOLD);
+        criteria.andStatusBetween(BondConstants.NOT_SELL, BondConstants.SOLD);
         if (gpId != null) {
             criteria.andGpIdEqualTo(gpId);
         }

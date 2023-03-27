@@ -154,9 +154,11 @@ public class BondService {
         bondBuyLogExample.createCriteria().andGpIdEqualTo(bondInfo.getId()).andStatusEqualTo(BondConstants.WAIT_BUY);
         List<BondBuyLog> waitBuyBondBuyLogS = bondBuyLogMapper.selectByExample(bondBuyLogExample);
         for (BondBuyLog bondBuyLog : waitBuyBondBuyLogS) {
-            if (bondBuyLog.getPrice() >= bondInfo.getPrice()) {
-                bondInfoDTO.setWaitBuy(true);
-                break;
+            if (bondBuyLog != null) {
+                if (bondBuyLog.getPrice() >= bondInfo.getPrice()) {
+                    bondInfoDTO.setWaitBuy(true);
+                    break;
+                }
             }
         }
 
@@ -343,31 +345,31 @@ public class BondService {
     public void refurbish() {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        if (hour >= 9 && hour < 15) {
-            List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
-            for (BondInfo bondInfo : list) {
-                Map<String, String> uriMap = new HashMap<>();
-                if (bondInfo.getId().equals("131810")) {
-                    continue;
-                }
-                uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
-                ResponseEntity responseEntity = restTemplate.getForEntity
-                        (
-                                HttpUtil.generateRequestParameters(serverUrl, uriMap),
-                                String.class
-                        );
-
-                if (responseEntity != null) {
-                    String reslut = (String) responseEntity.getBody();
-                    String[] str = reslut.split("~");
-                    if (str != null) {
-                        bondInfo.setPrice(Double.valueOf(str[3]));
-                        bondInfoMapper.updateByPrimaryKey(bondInfo);
-                    }
-                }
-
+//        if (hour >= 9 && hour < 15) {
+        List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
+        for (BondInfo bondInfo : list) {
+            Map<String, String> uriMap = new HashMap<>();
+            if (bondInfo.getId().equals("131810")) {
+                continue;
             }
+            uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
+            ResponseEntity responseEntity = restTemplate.getForEntity
+                    (
+                            HttpUtil.generateRequestParameters(serverUrl, uriMap),
+                            String.class
+                    );
+
+            if (responseEntity != null) {
+                String reslut = (String) responseEntity.getBody();
+                String[] str = reslut.split("~");
+                if (str != null) {
+                    bondInfo.setPrice(Double.valueOf(str[3]));
+                    bondInfoMapper.updateByPrimaryKey(bondInfo);
+                }
+            }
+
         }
+//        }
     }
 
     /**
@@ -429,6 +431,7 @@ public class BondService {
         //长线股票出售完后 添加到待购买池中
         if (bondBuyLog.getType() == BondConstants.LONG_LINE) {
             BondBuyLog buyLog = new BondBuyLog();
+            buyLog.setPrice(bondBuyLog.getPrice());
             buyLog.setStatus(BondConstants.WAIT_BUY);
             buyLog.setCount(bondSellLog.getCount());
             buyLog.setType(BondConstants.LONG_LINE);

@@ -127,6 +127,8 @@ public class BondOperController {
 
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
         bondBuyLog.setOperTime(new Date());
+        bondBuyLog.setPrice(bondBuyLogRequest.getPrice());
+        bondBuyLog.setBuyDate(bondBuyLogRequest.getBuyDate());
 
         if (bondBuyLogRequest.getType() != null) {
             bondBuyLog.setType(bondBuyLogRequest.getType());

@@ -1,12 +1,14 @@
 package com.profit.listener;
 
 import com.profit.commons.utils.LogUtil;
+import com.profit.service.BondService;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.annotation.Resource;
 import java.util.TimeZone;
 
 
@@ -18,9 +20,12 @@ import java.util.TimeZone;
  */
 @Component
 public class ApplicationStartListener implements ApplicationListener<ApplicationReadyEvent>, WebMvcConfigurer {
+    @Resource
+    private BondService bondService;
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         try {
+            bondService.initTask();
         } catch (Exception e) {
             LogUtil.error("加载天气数据失败！", e);
         }

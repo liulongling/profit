@@ -8,11 +8,11 @@ public class TotalProfitDTO extends TodayTaxationDTO {
     /**
      * 总盈利次数
      */
-    private long totalProfitNumber;
+    private int totalProfitNumber;
     /**
      * 亏损次数
      */
-    private long totalLossNumber;
+    private Long totalLossNumber;
     /**
      * 胜率
      */

@@ -23,6 +23,12 @@
 
 <div class="container" style="width: 2000px;" align="center">
     <div class="panel-body">
+        <table id="tableTodayProfit" class="table table-striped table-hover table-bordered"></table>
+    </div>
+</div>
+
+<div class="container" style="width: 2000px;" align="center">
+    <div class="panel-body">
         <table id="tableProfit" class="table table-striped table-hover table-bordered"></table>
     </div>
 </div>
@@ -377,6 +383,60 @@
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC" };
         });
         loadTodayProfitData("/bond/today/analyse");
+        loadTotalProfitData("/bond/total/analyse");
+    }
+
+     function loadTotalProfitData(url){
+       let data = {
+          startTime:'2020',
+          endTime:'2020'
+       };
+      $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            async : false, //同步执行
+            data: JSON.stringify(data),
+            traditional: true,
+            contentType : "application/json",
+            success: function (result) {
+                loadStatisticsPageData(result);
+            },
+            error: function () {
+                swal("错误", "404", "error");
+            }
+         }
+        );
+    }
+
+
+    function loadStatisticsPageData(result){
+         var textHTML = '<tr>';
+         textHTML+='<td>持股市值</td>';
+         textHTML+='<td>现金</td>';
+         textHTML+='<td>仓位</td>';
+         textHTML+='<td>购买总额</td>';
+         textHTML+='<td>出售总额</td>';
+         textHTML+='<td>总佣金(税费)</td>';
+         textHTML+='<td>今年总收益</td>';
+         textHTML+='<td>总盈利笔数</td>';
+         textHTML+='<td>总亏损笔数</td>';
+         textHTML+='<td>平均成功率</td>';
+         textHTML+='</tr>';
+
+          textHTML +=('<tr>');
+          textHTML+='<td>'+result.module.stock+'</td>';
+          textHTML+='<td>'+result.module.ready+'</td>';
+          textHTML+='<td>'+result.module.position+'</td>';
+          textHTML+='<td>开发中...</td>';
+          textHTML+='<td>开发中...</td>';
+          textHTML+='<td>开发中...</td>';
+          textHTML+='<td>'+result.module.profit+'</td>';
+          textHTML+='<td>'+result.module.profitNumber+'</td>';
+          textHTML+='<td>'+result.module.lossNumber+'</td>';
+          textHTML+='<td>'+result.module.winning+'</td>';
+          textHTML+='</tr>';
+          document.getElementById("tableProfit").innerHTML = textHTML;
     }
 
     function loadTodayProfitData(url){
@@ -432,7 +492,7 @@
           textHTML+='<td>'+result.module.maxLoss+'</td>';
           textHTML+='<td>'+result.module.maxProfit+'</td>';
           textHTML+='</tr>';
-          document.getElementById("tableProfit").innerHTML = textHTML;
+          document.getElementById("tableTodayProfit").innerHTML = textHTML;
     }
 
     function filter() {

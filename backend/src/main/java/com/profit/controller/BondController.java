@@ -1,12 +1,11 @@
 package com.profit.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.profit.base.ResultDO;
 import com.profit.base.domain.*;
-import com.profit.base.mapper.BondBuyLogMapper;
-import com.profit.base.mapper.BondInfoMapper;
-import com.profit.base.mapper.BondSellLogMapper;
+import com.profit.base.mapper.*;
 import com.profit.commons.constants.BondConstants;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.*;
@@ -30,6 +29,10 @@ public class BondController {
     private BondSellLogMapper bondSellLogMapper;
     @Resource
     private BondService bondService;
+    @Resource
+    private BondStatisticsMapper bondStatisticsMapper;
+    @Resource
+    private BaseDataMapper baseDataMapper;
 
     @PostMapping("sell/log")
     public ResultDO<List<BondSellDTO>> getSellLogs(@RequestBody BondSellRequest bondSellRequest) throws Exception {
@@ -171,42 +174,18 @@ public class BondController {
 
     @PostMapping("today/analyse")
     public ResultDO<TotalProfitDTO> todayAnalyse(@RequestBody BondSellRequest bondSellRequest) {
+        TotalProfitDTO totalProfitDTO = bondService.loadTotalProfitDTO();
         TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(null);
-        TotalProfitDTO totalProfitDTO = BeanUtils.copyBean(new TotalProfitDTO(), todayTaxationDTO);
-
-        BondSellLogExample bondSellLogExample = new BondSellLogExample();
-        bondSellLogExample.createCriteria().andGpIdNotEqualTo("131810").andIncomeGreaterThan(0.0);
-        long totalProfitNumber = bondSellLogMapper.countByExample(bondSellLogExample);
-        totalProfitDTO.setTotalProfitNumber(totalProfitNumber);
-
-        bondSellLogExample = new BondSellLogExample();
-        bondSellLogExample.createCriteria().andIncomeLessThan(0.0);
-        long totalLossNumber = bondSellLogMapper.countByExample(bondSellLogExample);
-        totalProfitDTO.setTotalLossNumber(totalLossNumber);
-        if (totalProfitNumber + totalLossNumber > 0) {
-            //胜率=获胜场次÷总比赛场次x100%
-            totalProfitDTO.setAvgWinning(StringUtil.pencentWin(totalProfitNumber, totalProfitNumber + totalLossNumber));
-        }
-
-        Map<String, ProfitDTO> map = bondService.totalProfit();
-        Double totalProfit = 0.0;
-        for (String key : map.keySet()) {
-            ProfitDTO profitDTO = map.get(key);
-            totalProfit += profitDTO.getTotalProfit();
-        }
-
-        totalProfitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", totalProfit)));
-
-        List<BondInfo> bondInfos = bondInfoMapper.selectByExample(new BondInfoExample());
-        Double stockValue = 0.0;
-        for (BondInfo bondInfo : bondInfos) {
-            BondInfoDTO bondInfoDTO = bondService.loadBondInfoDTO(bondInfo);
-            stockValue += bondInfoDTO.getMarket();
-        }
-
-        totalProfitDTO.setStockValue(stockValue);
-
+        BeanUtils.copyBean(totalProfitDTO, todayTaxationDTO);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, totalProfitDTO);
+    }
+
+    @PostMapping("total/analyse")
+    public ResultDO<BondStatistics> totalAnalyse(@RequestBody BondSellRequest bondSellRequest) {
+        BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
+        double p = (bondStatistics.getStock() / (bondStatistics.getStock() + bondStatistics.getReady())) * 100;
+        bondStatistics.setPosition(Double.parseDouble(String.format("%.2f", p)));
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondStatistics);
     }
 
 }

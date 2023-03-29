@@ -7,6 +7,7 @@ import com.profit.base.domain.*;
 import com.profit.base.mapper.BondBuyLogMapper;
 import com.profit.base.mapper.BondInfoMapper;
 import com.profit.base.mapper.BondSellLogMapper;
+import com.profit.commons.constants.BondConstants;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.*;
 import com.profit.comparator.ComparatorBondSell;
@@ -107,7 +108,7 @@ public class BondOperController {
             bondSellLog.setGpId(bondBuyLog.getGpId());
             bondSellLog.setPrice(bondBuyRequest.getSellPrice());
             bondSellLog.setCount(bondBuyRequest.getCount());
-            Date date =  DateUtils.string2Date(bondBuyRequest.getBuyDate(), DateUtils.DATE_PATTERM);
+            Date date = DateUtils.string2Date(bondBuyRequest.getBuyDate(), DateUtils.DATE_PATTERM);
             date.setHours(8);
             bondSellLog.setCreateTime(date);
             bondService.sellBond(bondSellLog);
@@ -126,8 +127,19 @@ public class BondOperController {
     @PostMapping("update")
     public ResultDO<Void> update(@RequestBody BondBuyLog bondBuyLogRequest) {
         BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondBuyLogRequest.getId());
-
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+
+        boolean isBuy = false;
+        if (bondBuyLog != null && bondBuyLog.getStatus() == BondConstants.WAIT_BUY && bondBuyLogRequest.getStatus() == BondConstants.NOT_SELL) {
+            isBuy = true;
+        }
+
+        //未出售的状态下才能修改税费
+        if (bondBuyLog.getStatus() == BondConstants.NOT_SELL) {
+            Double buyCost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+            bondBuyLog.setCost(buyCost);
+        }
+
         bondBuyLog.setOperTime(new Date());
         bondBuyLog.setPrice(bondBuyLogRequest.getPrice());
         bondBuyLog.setBuyDate(bondBuyLogRequest.getBuyDate());
@@ -140,14 +152,11 @@ public class BondOperController {
             bondBuyLog.setStatus(bondBuyLogRequest.getStatus());
         }
 
-        //未出售的状态下才能修改税费
-        if (bondBuyLog.getSellCount() == 0) {
-            Double buyCost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
-            bondBuyLog.setCost(buyCost);
-        }
-
-
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
+
+        if (isBuy) {
+            bondService.refeshBondStatistics(bondBuyLog.getCount() * bondBuyLog.getPrice(), bondBuyLog.getCost());
+        }
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 

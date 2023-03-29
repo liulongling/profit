@@ -114,13 +114,14 @@
     sell_income, buy_date, `status`,
     oper_time, remarks, create_time
     )
+
     values (#{id,jdbcType=BIGINT}, #{gpId,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE},
     #{count,jdbcType=INTEGER}, #{cost,jdbcType=DOUBLE}, #{type,jdbcType=TINYINT}, #{sellCount,jdbcType=INTEGER},
     #{sellIncome,jdbcType=DOUBLE}, #{buyDate,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT},
     #{operTime,jdbcType=TIMESTAMP}, #{remarks,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
     )
   </insert>
-  <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog">
+  <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog" keyProperty="id" useGeneratedKeys="true">
     insert into bond_buy_log
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">

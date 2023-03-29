@@ -1,9 +1,7 @@
 package com.profit.service;
 
 import com.profit.base.domain.*;
-import com.profit.base.mapper.BondBuyLogMapper;
-import com.profit.base.mapper.BondInfoMapper;
-import com.profit.base.mapper.BondSellLogMapper;
+import com.profit.base.mapper.*;
 import com.profit.commons.constants.BondConstants;
 import com.profit.commons.utils.*;
 import com.profit.dto.*;
@@ -29,6 +27,10 @@ public class BondService {
     private BondSellLogMapper bondSellLogMapper;
     @Resource
     private BondBuyLogMapper bondBuyLogMapper;
+    @Resource
+    private BondStatisticsMapper bondStatisticsMapper;
+    @Resource
+    private BaseDataMapper baseDataMapper;
 
     /**
      * 股票今天数据
@@ -99,6 +101,46 @@ public class BondService {
         }
         return todayTaxationDTO;
     }
+
+
+    public TotalProfitDTO loadTotalProfitDTO() {
+        TotalProfitDTO totalProfitDTO = new TotalProfitDTO();
+        BondSellLogExample bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andGpIdNotEqualTo("131810").andIncomeGreaterThan(0.0);
+        Long totalProfitNumber = bondSellLogMapper.countByExample(bondSellLogExample);
+        totalProfitDTO.setTotalProfitNumber(totalProfitNumber.intValue());
+
+        bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andIncomeLessThan(0.0);
+        long totalLossNumber = bondSellLogMapper.countByExample(bondSellLogExample);
+        totalProfitDTO.setTotalLossNumber(totalLossNumber);
+        if (totalProfitNumber + totalLossNumber > 0) {
+            //胜率=获胜场次÷总比赛场次x100%
+            totalProfitDTO.setAvgWinning(StringUtil.pencentWin(totalProfitNumber, totalProfitNumber + totalLossNumber));
+        }
+
+        Map<String, ProfitDTO> map = totalProfit();
+        Double totalProfit = 0.0;
+        for (String key : map.keySet()) {
+            ProfitDTO profitDTO = map.get(key);
+            totalProfit += profitDTO.getTotalProfit();
+        }
+
+        totalProfitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", totalProfit)));
+
+        BondInfoExample bondInfoExample = new BondInfoExample();
+        bondInfoExample.createCriteria().andStatusEqualTo((byte) 0);
+        List<BondInfo> bondInfos = bondInfoMapper.selectByExample(bondInfoExample);
+        Double stockValue = 0.0;
+        for (BondInfo bondInfo : bondInfos) {
+            BondInfoDTO bondInfoDTO = loadBondInfoDTO(bondInfo);
+            stockValue += bondInfoDTO.getMarket();
+        }
+
+        totalProfitDTO.setStockValue(stockValue);
+        return totalProfitDTO;
+    }
+
 
     /**
      * 加载股票信息
@@ -387,8 +429,17 @@ public class BondService {
         if (bondBuyLog.getStatus() != null && bondBuyLog.getStatus() != 3) {
             bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());
             bondBuyLog.setCost(BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
+            refeshBondStatistics(bondBuyLog.getCount() * bondBuyLog.getPrice(), bondBuyLog.getCost());
         }
         bondBuyLogMapper.insertSelective(bondBuyLog);
+    }
+
+
+    public void refeshBondStatistics(Double value, Double cost) {
+        BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
+        bondStatistics.setStock(bondStatistics.getStock() + value);
+        bondStatistics.setReady(bondStatistics.getReady() - value - cost);
+        bondStatisticsMapper.updateByPrimaryKey(bondStatistics);
     }
 
     /**
@@ -427,6 +478,8 @@ public class BondService {
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 
+        refeshBondStatistics(-(bondSellLog.getCount() * bondSellLog.getPrice()), bondSellLog.getCost());
+
         //长线股票出售完后 添加到待购买池中
         if (bondBuyLog.getType() == BondConstants.LONG_LINE) {
             BondBuyLog buyLog = new BondBuyLog();
@@ -438,4 +491,23 @@ public class BondService {
             buyBond(buyLog);
         }
     }
+
+    public void initTask() {
+        initBondStatisticsTask();
+    }
+
+    public void initBondStatisticsTask() {
+        TotalProfitDTO totalProfitDTO = loadTotalProfitDTO();
+        BondStatistics.BondStatisticsBuilder bondStatistics = BondStatistics.builder()
+                .id(1L)
+                .profitNumber(totalProfitDTO.getTotalProfitNumber())
+                .lossNumber(totalProfitDTO.getTotalLossNumber().intValue())
+                .stock(totalProfitDTO.getStockValue())
+                .winning(totalProfitDTO.getAvgWinning())
+                .profit(totalProfitDTO.getTotalProfit())
+                .updateTime(new Date());
+        bondStatisticsMapper.updateByPrimaryKeySelective(bondStatistics.build());
+
+    }
+
 }

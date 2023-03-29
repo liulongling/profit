@@ -15,13 +15,16 @@ public class BondUtils {
     public static Double getTaxation(boolean isETF, String plate, Double total, boolean isSell) {
         Double taxation = 0.000;
         if (plate.equals("hk")) {
-            if(isSell){
+            //佣金万一
+            taxation += total * 0.0001;
+            if (isSell) {
+                //过户费成交金额0.002%
+                taxation += total * 0.00002;
+            } else {
 
-            }else {
-                taxation += total * 0.001;
             }
 
-        } else if (plate.equals("sh") || plate.equals("sz")) {
+        } else if ((plate.equals("sh") || plate.equals("sz")) && !isETF) {
             if (plate.equals("sh")) {
                 //上海过户费成交金额0.002%
                 taxation += total * 0.00002;

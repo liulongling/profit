@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.profit.base.mapper.BondStatisticsMapper">
+  <resultMap id="BaseResultMap" type="com.profit.base.domain.BondStatistics">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="stock" jdbcType="DOUBLE" property="stock" />
+    <result column="ready" jdbcType="DOUBLE" property="ready" />
+    <result column="position" jdbcType="DOUBLE" property="position" />
+    <result column="profit_number" jdbcType="INTEGER" property="profitNumber" />
+    <result column="loss_number" jdbcType="INTEGER" property="lossNumber" />
+    <result column="winning" jdbcType="VARCHAR" property="winning" />
+    <result column="profit" jdbcType="DOUBLE" property="profit" />
+    <result column="buy_money" jdbcType="DOUBLE" property="buyMoney" />
+    <result column="sell_money" jdbcType="DOUBLE" property="sellMoney" />
+    <result column="cost" jdbcType="DOUBLE" property="cost" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, stock, ready, `position`, profit_number, loss_number, winning, profit, buy_money,
+    sell_money, cost, update_time
+  </sql>
+  <select id="selectByExample" parameterType="com.profit.base.domain.BondStatisticsExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from bond_statistics
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bond_statistics
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from bond_statistics
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.profit.base.domain.BondStatisticsExample">
+    delete from bond_statistics
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.profit.base.domain.BondStatistics">
+    insert into bond_statistics (id, stock, ready,
+    `position`, profit_number, loss_number,
+    winning, profit, buy_money,
+    sell_money, cost, update_time
+    )
+    values (#{id,jdbcType=BIGINT}, #{stock,jdbcType=DOUBLE}, #{ready,jdbcType=DOUBLE},
+    #{position,jdbcType=DOUBLE}, #{profitNumber,jdbcType=INTEGER}, #{lossNumber,jdbcType=INTEGER},
+    #{winning,jdbcType=VARCHAR}, #{profit,jdbcType=DOUBLE}, #{buyMoney,jdbcType=DOUBLE},
+    #{sellMoney,jdbcType=DOUBLE}, #{cost,jdbcType=DOUBLE}, #{updateTime,jdbcType=TIMESTAMP}
+    )
+  </insert>
+  <insert id="insertSelective" parameterType="com.profit.base.domain.BondStatistics">
+    insert into bond_statistics
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="stock != null">
+        stock,
+      </if>
+      <if test="ready != null">
+        ready,
+      </if>
+      <if test="position != null">
+        `position`,
+      </if>
+      <if test="profitNumber != null">
+        profit_number,
+      </if>
+      <if test="lossNumber != null">
+        loss_number,
+      </if>
+      <if test="winning != null">
+        winning,
+      </if>
+      <if test="profit != null">
+        profit,
+      </if>
+      <if test="buyMoney != null">
+        buy_money,
+      </if>
+      <if test="sellMoney != null">
+        sell_money,
+      </if>
+      <if test="cost != null">
+        cost,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="stock != null">
+        #{stock,jdbcType=DOUBLE},
+      </if>
+      <if test="ready != null">
+        #{ready,jdbcType=DOUBLE},
+      </if>
+      <if test="position != null">
+        #{position,jdbcType=DOUBLE},
+      </if>
+      <if test="profitNumber != null">
+        #{profitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="lossNumber != null">
+        #{lossNumber,jdbcType=INTEGER},
+      </if>
+      <if test="winning != null">
+        #{winning,jdbcType=VARCHAR},
+      </if>
+      <if test="profit != null">
+        #{profit,jdbcType=DOUBLE},
+      </if>
+      <if test="buyMoney != null">
+        #{buyMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="sellMoney != null">
+        #{sellMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="cost != null">
+        #{cost,jdbcType=DOUBLE},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.profit.base.domain.BondStatisticsExample" resultType="java.lang.Long">
+    select count(*) from bond_statistics
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update bond_statistics
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.stock != null">
+        stock = #{record.stock,jdbcType=DOUBLE},
+      </if>
+      <if test="record.ready != null">
+        ready = #{record.ready,jdbcType=DOUBLE},
+      </if>
+      <if test="record.position != null">
+        `position` = #{record.position,jdbcType=DOUBLE},
+      </if>
+      <if test="record.profitNumber != null">
+        profit_number = #{record.profitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="record.lossNumber != null">
+        loss_number = #{record.lossNumber,jdbcType=INTEGER},
+      </if>
+      <if test="record.winning != null">
+        winning = #{record.winning,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profit != null">
+        profit = #{record.profit,jdbcType=DOUBLE},
+      </if>
+      <if test="record.buyMoney != null">
+        buy_money = #{record.buyMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="record.sellMoney != null">
+        sell_money = #{record.sellMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="record.cost != null">
+        cost = #{record.cost,jdbcType=DOUBLE},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update bond_statistics
+    set id = #{record.id,jdbcType=BIGINT},
+    stock = #{record.stock,jdbcType=DOUBLE},
+    ready = #{record.ready,jdbcType=DOUBLE},
+    `position` = #{record.position,jdbcType=DOUBLE},
+    profit_number = #{record.profitNumber,jdbcType=INTEGER},
+    loss_number = #{record.lossNumber,jdbcType=INTEGER},
+    winning = #{record.winning,jdbcType=VARCHAR},
+    profit = #{record.profit,jdbcType=DOUBLE},
+    buy_money = #{record.buyMoney,jdbcType=DOUBLE},
+    sell_money = #{record.sellMoney,jdbcType=DOUBLE},
+    cost = #{record.cost,jdbcType=DOUBLE},
+    update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.profit.base.domain.BondStatistics">
+    update bond_statistics
+    <set>
+      <if test="stock != null">
+        stock = #{stock,jdbcType=DOUBLE},
+      </if>
+      <if test="ready != null">
+        ready = #{ready,jdbcType=DOUBLE},
+      </if>
+      <if test="position != null">
+        `position` = #{position,jdbcType=DOUBLE},
+      </if>
+      <if test="profitNumber != null">
+        profit_number = #{profitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="lossNumber != null">
+        loss_number = #{lossNumber,jdbcType=INTEGER},
+      </if>
+      <if test="winning != null">
+        winning = #{winning,jdbcType=VARCHAR},
+      </if>
+      <if test="profit != null">
+        profit = #{profit,jdbcType=DOUBLE},
+      </if>
+      <if test="buyMoney != null">
+        buy_money = #{buyMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="sellMoney != null">
+        sell_money = #{sellMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="cost != null">
+        cost = #{cost,jdbcType=DOUBLE},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.profit.base.domain.BondStatistics">
+    update bond_statistics
+    set stock = #{stock,jdbcType=DOUBLE},
+    ready = #{ready,jdbcType=DOUBLE},
+    `position` = #{position,jdbcType=DOUBLE},
+    profit_number = #{profitNumber,jdbcType=INTEGER},
+    loss_number = #{lossNumber,jdbcType=INTEGER},
+    winning = #{winning,jdbcType=VARCHAR},
+    profit = #{profit,jdbcType=DOUBLE},
+    buy_money = #{buyMoney,jdbcType=DOUBLE},
+    sell_money = #{sellMoney,jdbcType=DOUBLE},
+    cost = #{cost,jdbcType=DOUBLE},
+    update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

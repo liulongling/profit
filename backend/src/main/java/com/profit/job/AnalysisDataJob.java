@@ -21,7 +21,7 @@ public class AnalysisDataJob {
     @Scheduled(cron = "0 */1 * * * ?")
     public void task1() {
         LogUtil.info("定时任务[task1]开始执行");
-        bondService.refurbish();
+        bondService.refurbishBondPrice();
         LogUtil.info("定时任务[task1]执行结束");
 
     }
@@ -33,7 +33,6 @@ public class AnalysisDataJob {
     public void task2() {
         LogUtil.info("定时任务[task2]开始执行");
         try {
-//            baseDataAnalysisResultService.analysisData_ID_40();
         } catch (Exception e) {
             LogUtil.error("定时任务[analysisData_ID_40]异常!", e);
         }
@@ -46,7 +45,6 @@ public class AnalysisDataJob {
      */
     @Scheduled(cron = "0 */30 * * * ?")
     public void analysisDataForHalfAnHour() {
-
         LogUtil.info("定时任务[analysisDataForHalfAnHour]开始执行");
 
         LogUtil.info("定时任务[analysisDataForHalfAnHour]执行结束");

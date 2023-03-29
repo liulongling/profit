@@ -57,11 +57,11 @@ public class BondService {
 
         List<BondBuyLog> buyLogs = getBondBuyLogs(gpId, DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM));
         Double buyAmount = 0.0;
-        int transactionNumber = 0;
+        int buyNumber = 0;
         if (buyLogs != null) {
             for (BondBuyLog bondBuyLog : buyLogs) {
                 buyAmount += bondBuyLog.getPrice() * bondBuyLog.getCount();
-                transactionNumber++;
+                buyNumber++;
             }
         }
         todayTaxationDTO.setBuyAmount(Double.parseDouble(String.format("%.2f", buyAmount)));
@@ -86,12 +86,11 @@ public class BondService {
                 }
                 sellAmount += bondSellLog.getPrice() * bondSellLog.getCount();
                 cost += bondSellLog.getCost();
-                transactionNumber++;
             }
         }
         todayTaxationDTO.setSellAmount(Double.parseDouble(String.format("%.2f", sellAmount)));
         todayTaxationDTO.setCost(Double.parseDouble(String.format("%.2f", cost)));
-        todayTaxationDTO.setTransactionNumber(transactionNumber);
+        todayTaxationDTO.setBuyNumber(buyNumber);
         todayTaxationDTO.setMaxProfit(maxProfit);
         todayTaxationDTO.setMaxLoss(maxLoss);
         todayTaxationDTO.setTransactionAmount(Double.parseDouble(String.format("%.2f", buyAmount + sellAmount)));
@@ -342,7 +341,7 @@ public class BondService {
     /**
      * 更新股价
      */
-    public void refurbish() {
+    public void refurbishBondPrice() {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
 //        if (hour >= 9 && hour < 15) {

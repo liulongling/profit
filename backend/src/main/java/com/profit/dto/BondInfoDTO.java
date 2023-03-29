@@ -72,7 +72,7 @@ public class BondInfoDTO extends BondInfo {
     }
 
     public long getGpCount() {
-        return stubCount + gridCount+superStubCount;
+        return stubCount + gridCount + superStubCount;
     }
 
 

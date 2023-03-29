@@ -22,4 +22,13 @@ public class TotalProfitDTO extends TodayTaxationDTO {
      * 总收益
      */
     private Double totalProfit;
+
+    /**
+     * 持股市值
+     */
+    private Double stockValue;
+    /**
+     * 现金
+     */
+    private Double ready;
 }

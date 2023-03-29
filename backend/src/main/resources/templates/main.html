@@ -376,10 +376,10 @@
         getServerPaging($table, "/bond/list", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC" };
         });
-        loadProfitData("/bond/today/analyse");
+        loadTodayProfitData("/bond/today/analyse");
     }
 
-    function loadProfitData(url){
+    function loadTodayProfitData(url){
        let data = {
           startTime:'2020',
           endTime:'2020'
@@ -393,7 +393,7 @@
             traditional: true,
             contentType : "application/json",
             success: function (result) {
-                loadPageData(result);
+                loadTodayPageData(result);
             },
             error: function () {
                 swal("错误", "404", "error");
@@ -403,23 +403,19 @@
     }
 
 
-    function loadPageData(result){
+    function loadTodayPageData(result){
          var textHTML = '<tr>';
          textHTML+='<td>今日收益</td>';
          textHTML+='<td>交易金额(今日)</td>';
          textHTML+='<td>买入金额(今日)</td>';
          textHTML+='<td>卖出金额(今日)</td>';
          textHTML+='<td>佣金费用(今日)</td>';
-         textHTML+='<td>交易次数(今日)</td>';
+         textHTML+='<td>买入次数(今日)</td>';
          textHTML+='<td>盈利笔数(今日)</td>';
          textHTML+='<td>亏损笔数(今日)</td>';
          textHTML+='<td>成功率(今日)</td>';
          textHTML+='<td>最大亏损(今日)</td>';
          textHTML+='<td>最大盈利(今日)</td>';
-         textHTML+='<td>今年总收益</td>';
-         textHTML+='<td>总盈利笔数</td>';
-         textHTML+='<td>总亏损笔数</td>';
-         textHTML+='<td>平均成功率</td>';
 
          textHTML+='</tr>';
 
@@ -429,16 +425,12 @@
           textHTML+='<td>'+result.module.buyAmount+'</td>';
           textHTML+='<td>'+result.module.sellAmount+'</td>';
           textHTML+='<td>'+result.module.cost+'</td>';
-          textHTML+='<td>'+result.module.transactionNumber+'</td>';
+          textHTML+='<td>'+result.module.buyNumber+'</td>';
           textHTML+='<td>'+result.module.profitNumber+'</td>';
           textHTML+='<td>'+result.module.lossNumber+'</td>';
           textHTML+='<td>'+result.module.winning+'</td>';
           textHTML+='<td>'+result.module.maxLoss+'</td>';
           textHTML+='<td>'+result.module.maxProfit+'</td>';
-          textHTML+='<td>'+result.module.totalProfit+'</td>';
-          textHTML+='<td>'+result.module.totalProfitNumber+'</td>';
-          textHTML+='<td>'+result.module.totalLossNumber+'</td>';
-          textHTML+='<td>'+result.module.avgWinning+'</td>';
           textHTML+='</tr>';
           document.getElementById("tableProfit").innerHTML = textHTML;
     }

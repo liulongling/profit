@@ -27,9 +27,9 @@ public class TodayTaxationDTO extends BondInfo {
      */
     private Double cost;
     /**
-     * 交易次数
+     * 买入次数
      */
-    private int transactionNumber;
+    private int buyNumber;
     /**
      * 最大一笔亏损
      */

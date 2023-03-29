@@ -137,7 +137,7 @@ public class BondService {
             stockValue += bondInfoDTO.getMarket();
         }
 
-        totalProfitDTO.setStockValue(stockValue);
+        totalProfitDTO.setStockValue(Double.parseDouble(String.format("%.2f", stockValue)));
         return totalProfitDTO;
     }
 
@@ -157,8 +157,8 @@ public class BondService {
         if (gridProfit == null) gridProfit = 0.00;
         bondInfoDTO.setGridProfit(Double.parseDouble(String.format("%.2f", gridProfit)));
 
-        bondInfoDTO.setStubCount(getBondNumber(bondInfo, BondConstants.LONG_LINE));
-        bondInfoDTO.setGridCount(getBondNumber(bondInfo, BondConstants.SHORT_LINE));
+        bondInfoDTO.setStubCount(getBondNumber(bondInfo, BondConstants.SHORT_LINE));
+        bondInfoDTO.setGridCount(getBondNumber(bondInfo, BondConstants.LONG_LINE));
         bondInfoDTO.setSuperStubCount(getBondNumber(bondInfo, BondConstants.SUPER_SHORT_LINE));
 
         //当前持股盈亏
@@ -386,31 +386,31 @@ public class BondService {
     public void refurbishBondPrice() {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
-//        if (hour >= 9 && hour < 15) {
-        List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
-        for (BondInfo bondInfo : list) {
-            Map<String, String> uriMap = new HashMap<>();
-            if (bondInfo.getId().equals("131810")) {
-                continue;
-            }
-            uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
-            ResponseEntity responseEntity = restTemplate.getForEntity
-                    (
-                            HttpUtil.generateRequestParameters(serverUrl, uriMap),
-                            String.class
-                    );
-
-            if (responseEntity != null) {
-                String reslut = (String) responseEntity.getBody();
-                String[] str = reslut.split("~");
-                if (str != null) {
-                    bondInfo.setPrice(Double.valueOf(str[3]));
-                    bondInfoMapper.updateByPrimaryKey(bondInfo);
+        if (hour >= 9 && hour < 15) {
+            List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
+            for (BondInfo bondInfo : list) {
+                Map<String, String> uriMap = new HashMap<>();
+                if (bondInfo.getId().equals("131810")) {
+                    continue;
                 }
-            }
+                uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
+                ResponseEntity responseEntity = restTemplate.getForEntity
+                        (
+                                HttpUtil.generateRequestParameters(serverUrl, uriMap),
+                                String.class
+                        );
 
+                if (responseEntity != null) {
+                    String reslut = (String) responseEntity.getBody();
+                    String[] str = reslut.split("~");
+                    if (str != null) {
+                        bondInfo.setPrice(Double.valueOf(str[3]));
+                        bondInfoMapper.updateByPrimaryKey(bondInfo);
+                    }
+                }
+
+            }
         }
-//        }
     }
 
     /**
@@ -428,17 +428,26 @@ public class BondService {
 
         if (bondBuyLog.getStatus() != null && bondBuyLog.getStatus() != 3) {
             bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());
-            bondBuyLog.setCost(BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false));
-            refeshBondStatistics(bondBuyLog.getCount() * bondBuyLog.getPrice(), bondBuyLog.getCost());
+            double cost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+            bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", cost)));
+            bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() + bondBuyLog.getCount())));
+            bondBuyLog.setBuyCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost())));
+            refeshBondStatistics(bondBuyLog.getTotalPrice(), bondBuyLog.getCost());
         }
         bondBuyLogMapper.insertSelective(bondBuyLog);
     }
 
 
+    /**
+     * 更新股票统计数据
+     *
+     * @param value
+     * @param cost
+     */
     public void refeshBondStatistics(Double value, Double cost) {
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
-        bondStatistics.setStock(bondStatistics.getStock() + value);
-        bondStatistics.setReady(bondStatistics.getReady() - value - cost);
+        bondStatistics.setStock(Double.parseDouble(String.format("%.2f", bondStatistics.getStock() + value)));
+        bondStatistics.setReady(Double.parseDouble(String.format("%.2f", bondStatistics.getReady() - value - cost)));
         bondStatisticsMapper.updateByPrimaryKey(bondStatistics);
     }
 
@@ -455,18 +464,19 @@ public class BondService {
         //卖出税费计算
         double sellTaxation = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
         bondSellLog.setCost(sellTaxation);
-        bondBuyLog.setCost(Double.parseDouble(String.format("%.3f", bondBuyLog.getCost() + bondSellLog.getCost())));
+        bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost() + bondSellLog.getCost())));
 
         //买入税费计算
         double buyTaxation = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondSellLog.getCount(), false);
         //计算收益 出售总价 - 买入总价 - 买卖费用
         double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
 
-        bondSellLog.setIncome(Double.parseDouble(String.format("%.3f", income)));
+        bondSellLog.setIncome(Double.parseDouble(String.format("%.2f", income)));
         bondSellLog.setGpId(bondInfo.getId());
+        bondSellLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getPrice() + bondSellLog.getCount())));
         bondSellLog.setCreateTime(bondSellLog.getCreateTime());
 
-        bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.3f", bondBuyLog.getSellIncome() + bondSellLog.getIncome())));
+        bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.2f", bondBuyLog.getSellIncome() + bondSellLog.getIncome())));
         bondBuyLog.setSellCount(bondBuyLog.getSellCount() + bondSellLog.getCount());
         bondBuyLog.setOperTime(new Date());
         //查看是否股票是否全部售出
@@ -478,7 +488,7 @@ public class BondService {
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 
-        refeshBondStatistics(-(bondSellLog.getCount() * bondSellLog.getPrice()), bondSellLog.getCost());
+        refeshBondStatistics(-bondSellLog.getTotalPrice(), bondSellLog.getCost());
 
         //长线股票出售完后 添加到待购买池中
         if (bondBuyLog.getType() == BondConstants.LONG_LINE) {

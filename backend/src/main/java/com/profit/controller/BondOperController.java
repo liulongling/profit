@@ -107,7 +107,9 @@ public class BondOperController {
             bondSellLog.setGpId(bondBuyLog.getGpId());
             bondSellLog.setPrice(bondBuyRequest.getSellPrice());
             bondSellLog.setCount(bondBuyRequest.getCount());
-            bondSellLog.setCreateTime(DateUtils.string2Date(bondBuyRequest.getBuyDate(), DateUtils.DATE_PATTERM));
+            Date date =  DateUtils.string2Date(bondBuyRequest.getBuyDate(), DateUtils.DATE_PATTERM);
+            date.setHours(8);
+            bondSellLog.setCreateTime(date);
             bondService.sellBond(bondSellLog);
         }
 

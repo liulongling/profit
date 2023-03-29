@@ -102,7 +102,7 @@ public class BondController {
     @GetMapping("list")
     public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) throws Exception {
         BondInfoExample bondInfoExample = new BondInfoExample();
-        BondInfoExample.Criteria criteria= bondInfoExample.createCriteria();
+        BondInfoExample.Criteria criteria = bondInfoExample.createCriteria();
         if (params.get("isEtf") != null) {
             criteria.andIsEtfEqualTo(Byte.valueOf(params.get("isEtf").toString()));
         }
@@ -141,7 +141,7 @@ public class BondController {
     public ResultDO<Void> insert(@RequestBody BondInfo bondInfo) {
         bondInfo.setCreateTime(new Date());
         bondInfo.setUpdateTime(new Date());
-        bondInfo.setStatus((byte)0);
+        bondInfo.setStatus((byte) 0);
         bondInfoMapper.insert(bondInfo);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
@@ -196,6 +196,16 @@ public class BondController {
         }
 
         totalProfitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", totalProfit)));
+
+        List<BondInfo> bondInfos = bondInfoMapper.selectByExample(new BondInfoExample());
+        Double stockValue = 0.0;
+        for (BondInfo bondInfo : bondInfos) {
+            BondInfoDTO bondInfoDTO = bondService.loadBondInfoDTO(bondInfo);
+            stockValue += bondInfoDTO.getMarket();
+        }
+
+        totalProfitDTO.setStockValue(stockValue);
+
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, totalProfitDTO);
     }
 

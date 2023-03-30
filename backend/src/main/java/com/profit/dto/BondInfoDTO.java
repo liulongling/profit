@@ -17,6 +17,22 @@ public class BondInfoDTO extends BondInfo {
      * 持股数量
      */
     public long gpCount;
+
+    /**
+     * 持仓市值
+     */
+    public Double market;
+
+    /**
+     * 仓位占比
+     */
+    public Double realPosition;
+
+    /**
+     * 规划仓位
+     */
+    public Double position;
+
     /**
      * 短线持股数量
      */
@@ -61,10 +77,6 @@ public class BondInfoDTO extends BondInfo {
      * 是否有可购买
      */
     public boolean waitBuy;
-    /**
-     * 持仓市值
-     */
-    public Double market;
 
 
     public Double getCurProfit() {

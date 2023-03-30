@@ -204,6 +204,9 @@ public class BondService {
         }
 
         bondInfoDTO.setMarket(Double.parseDouble(String.format("%.0f", bondInfo.getPrice() * bondInfoDTO.getGpCount())));
+        BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
+        bondInfoDTO.setRealPosition(Double.parseDouble(String.format("%.2f", bondInfoDTO.getMarket() / (bondInfoDTO.getMarket() + bondStatistics.getReady()) * 10)));
+        bondInfoDTO.setPosition(bondInfo.getPosition());
         return bondInfoDTO;
     }
 

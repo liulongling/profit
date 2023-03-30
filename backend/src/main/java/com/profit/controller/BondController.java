@@ -76,7 +76,7 @@ public class BondController {
             if (bondInfo != null) {
                 if (bondBuyLog.getTotalPrice() == null) {
                     bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() * bondBuyLog.getCount())));
-                    Double buyCost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+                    Double buyCost = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
                     bondBuyLog.setBuyCost(buyCost);
                     bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
                     BondSellLogExample bondSellLogExample = new BondSellLogExample();

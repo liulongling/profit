@@ -1,43 +1,48 @@
 package com.profit.commons.utils;
 
 
+import com.profit.base.domain.BondInfo;
+import com.profit.commons.constants.BondConstants;
+
 public class BondUtils {
 
     /**
      * 计算佣金
      *
-     * @param isETF  是否ETF
-     * @param plate  股票所属板块
-     * @param total  交易金额
-     * @param isSell 是否出售
+     * @param bondInfo
+     * @param total    交易金额
+     * @param isSell   是否出售
      * @return
      */
-    public static Double getTaxation(boolean isETF, String plate, Double total, boolean isSell) {
+    public static Double getTaxation(BondInfo bondInfo, Double total, boolean isSell) {
         Double taxation = 0.000;
-        if (plate.equals("hk")) {
+        if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
+            //券商佣金
+            taxation += total * 0.00001;
+        } else if (bondInfo.getPlate().equals("hk")) {
             //佣金万一
             taxation += total * 0.0001;
             if (isSell) {
                 //过户费成交金额0.002%
                 taxation += total * 0.00002;
-            } else {
-
             }
-
-        } else if ((plate.equals("sh") || plate.equals("sz")) && !isETF) {
-            if (plate.equals("sh")) {
-                //上海过户费成交金额0.002%
-                taxation += total * 0.00002;
-            }
-            if (isSell) {
-                //印花税0.1%
-                taxation += total * 0.001;
+        } else if (bondInfo.isEtf()) {
+            //券商佣金
+            taxation += total * 0.0001;
+        } else if ((bondInfo.getPlate().equals("sh") || bondInfo.getPlate().equals("sz"))) {
+            if (!bondInfo.isEtf()) {
+                if (bondInfo.getPlate().equals("sh")) {
+                    //上海过户费成交金额0.002%
+                    taxation += total * 0.00002;
+                }
+                if (isSell) {
+                    //印花税0.1%
+                    taxation += total * 0.001;
+                }
+                //券商佣金
+                taxation += total * 0.0001;
             }
         }
-        //券商佣金
-        double zqyj = total * 0.0001;
-
-        taxation += zqyj;
         return Double.parseDouble(String.format("%.2f", taxation));
 
     }

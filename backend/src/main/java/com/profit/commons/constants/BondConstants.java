@@ -26,4 +26,8 @@ public class BondConstants {
      * 超短线
      */
     public static final Byte SUPER_SHORT_LINE = 2;
+    /**
+     * 国债逆回购代码
+     */
+    public static final String NHG_CODE = "131810";
 }

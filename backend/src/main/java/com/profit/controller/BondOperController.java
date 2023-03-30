@@ -140,12 +140,11 @@ public class BondOperController {
 
         //未出售的状态下才能修改税费
         if (bondBuyLog.getStatus() == BondConstants.NOT_SELL) {
-            Double buyCost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+            Double buyCost = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", buyCost)));
             bondBuyLog.setBuyCost(Double.parseDouble(String.format("%.2f", buyCost)));
             bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLogRequest.getPrice() * bondBuyLogRequest.getCount())));
         }
-
 
 
         if (bondBuyLogRequest.getType() != null) {

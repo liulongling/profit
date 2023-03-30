@@ -50,4 +50,8 @@ public class BondInfo {
      *
      */
     private Date updateTime;
+
+    public boolean isEtf() {
+        return isEtf == 1;
+    }
 }

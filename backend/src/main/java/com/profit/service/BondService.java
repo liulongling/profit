@@ -307,8 +307,8 @@ public class BondService {
         if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
             int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
             Double curIncome = bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
-            curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondInfo.getPrice(), true);
-            curIncome -= BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), surplusCount * bondBuyLog.getPrice(), false);
+            curIncome -= BondUtils.getTaxation(bondInfo, surplusCount * bondInfo.getPrice(), true);
+            curIncome -= BondUtils.getTaxation(bondInfo, surplusCount * bondBuyLog.getPrice(), false);
             //涨跌幅
             Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
             buyLogDTO.setIncome(curIncome);
@@ -390,7 +390,7 @@ public class BondService {
             List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
             for (BondInfo bondInfo : list) {
                 Map<String, String> uriMap = new HashMap<>();
-                if (bondInfo.getId().equals("131810")) {
+                if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
                     continue;
                 }
                 uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
@@ -428,7 +428,7 @@ public class BondService {
 
         if (bondBuyLog.getStatus() != null && bondBuyLog.getStatus() != 3) {
             bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());
-            double cost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+            double cost = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", cost)));
             bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() * bondBuyLog.getCount())));
             bondBuyLog.setBuyCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost())));
@@ -462,12 +462,12 @@ public class BondService {
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
 
         //卖出税费计算
-        double sellTaxation = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
+        double sellTaxation = BondUtils.getTaxation(bondInfo, bondSellLog.getPrice() * bondSellLog.getCount(), true);
         bondSellLog.setCost(sellTaxation);
         bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost() + bondSellLog.getCost())));
 
         //买入税费计算
-        double buyTaxation = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondSellLog.getCount(), false);
+        double buyTaxation = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondSellLog.getCount(), false);
         //计算收益 出售总价 - 买入总价 - 买卖费用
         double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
 

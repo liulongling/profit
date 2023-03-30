@@ -27,12 +27,22 @@ public class BondBuyLog {
     private Integer count;
 
     /**
+     * 购买总价格
+     */
+    private Double totalPrice;
+
+    /**
+     * 购买消耗佣金
+     */
+    private Double buyCost;
+
+    /**
      * 税费
      */
     private Double cost;
 
     /**
-     * type:0 网格 type:1短线
+     * type:0 网格 type:1短线 type:2流动短线
      */
     private Byte type;
 
@@ -52,7 +62,7 @@ public class BondBuyLog {
     private String buyDate;
 
     /**
-     * 0:未售完 1:已售完
+     * 0:未售完 1:已售完 3：待买入
      */
     private Byte status;
 

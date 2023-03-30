@@ -128,6 +128,10 @@ public class BondOperController {
     public ResultDO<Void> update(@RequestBody BondBuyLog bondBuyLogRequest) {
         BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondBuyLogRequest.getId());
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+        bondBuyLog.setOperTime(new Date());
+        bondBuyLog.setPrice(bondBuyLogRequest.getPrice());
+        bondBuyLog.setCount(bondBuyLogRequest.getCount());
+        bondBuyLog.setBuyDate(bondBuyLogRequest.getBuyDate());
 
         boolean isBuy = false;
         if (bondBuyLog != null && bondBuyLog.getStatus() == BondConstants.WAIT_BUY && bondBuyLogRequest.getStatus() == BondConstants.NOT_SELL) {
@@ -137,12 +141,12 @@ public class BondOperController {
         //未出售的状态下才能修改税费
         if (bondBuyLog.getStatus() == BondConstants.NOT_SELL) {
             Double buyCost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
-            bondBuyLog.setCost(buyCost);
+            bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", buyCost)));
+            bondBuyLog.setBuyCost(Double.parseDouble(String.format("%.2f", buyCost)));
+            bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLogRequest.getPrice() * bondBuyLogRequest.getCount())));
         }
 
-        bondBuyLog.setOperTime(new Date());
-        bondBuyLog.setPrice(bondBuyLogRequest.getPrice());
-        bondBuyLog.setBuyDate(bondBuyLogRequest.getBuyDate());
+
 
         if (bondBuyLogRequest.getType() != null) {
             bondBuyLog.setType(bondBuyLogRequest.getType());

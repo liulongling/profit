@@ -6,6 +6,8 @@
     <result column="gp_id" jdbcType="VARCHAR" property="gpId" />
     <result column="price" jdbcType="DOUBLE" property="price" />
     <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="total_price" jdbcType="DOUBLE" property="totalPrice" />
+    <result column="buy_cost" jdbcType="DOUBLE" property="buyCost" />
     <result column="cost" jdbcType="DOUBLE" property="cost" />
     <result column="type" jdbcType="TINYINT" property="type" />
     <result column="sell_count" jdbcType="INTEGER" property="sellCount" />
@@ -75,8 +77,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, gp_id, price, `count`, cost, `type`, sell_count, sell_income, buy_date, `status`,
-    oper_time, remarks, create_time
+    id, gp_id, price, `count`, total_price, buy_cost, cost, `type`, sell_count, sell_income,
+    buy_date, `status`, oper_time, remarks, create_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondBuyLogExample" resultMap="BaseResultMap">
     select
@@ -108,20 +110,21 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.profit.base.domain.BondBuyLog" keyProperty="id" useGeneratedKeys="true">
+  <insert id="insert" parameterType="com.profit.base.domain.BondBuyLog"  keyProperty="id" useGeneratedKeys="true">
     insert into bond_buy_log (id, gp_id, price,
-    `count`, cost, `type`, sell_count,
+    `count`, total_price, buy_cost,
+    cost, `type`, sell_count,
     sell_income, buy_date, `status`,
     oper_time, remarks, create_time
     )
-
     values (#{id,jdbcType=BIGINT}, #{gpId,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE},
-    #{count,jdbcType=INTEGER}, #{cost,jdbcType=DOUBLE}, #{type,jdbcType=TINYINT}, #{sellCount,jdbcType=INTEGER},
+    #{count,jdbcType=INTEGER}, #{totalPrice,jdbcType=DOUBLE}, #{buyCost,jdbcType=DOUBLE},
+    #{cost,jdbcType=DOUBLE}, #{type,jdbcType=TINYINT}, #{sellCount,jdbcType=INTEGER},
     #{sellIncome,jdbcType=DOUBLE}, #{buyDate,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT},
     #{operTime,jdbcType=TIMESTAMP}, #{remarks,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
     )
   </insert>
-  <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog" keyProperty="id" useGeneratedKeys="true">
+  <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog"  keyProperty="id" useGeneratedKeys="true">
     insert into bond_buy_log
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -135,6 +138,12 @@
       </if>
       <if test="count != null">
         `count`,
+      </if>
+      <if test="totalPrice != null">
+        total_price,
+      </if>
+      <if test="buyCost != null">
+        buy_cost,
       </if>
       <if test="cost != null">
         cost,
@@ -176,6 +185,12 @@
       </if>
       <if test="count != null">
         #{count,jdbcType=INTEGER},
+      </if>
+      <if test="totalPrice != null">
+        #{totalPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="buyCost != null">
+        #{buyCost,jdbcType=DOUBLE},
       </if>
       <if test="cost != null">
         #{cost,jdbcType=DOUBLE},
@@ -227,6 +242,12 @@
       <if test="record.count != null">
         `count` = #{record.count,jdbcType=INTEGER},
       </if>
+      <if test="record.totalPrice != null">
+        total_price = #{record.totalPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="record.buyCost != null">
+        buy_cost = #{record.buyCost,jdbcType=DOUBLE},
+      </if>
       <if test="record.cost != null">
         cost = #{record.cost,jdbcType=DOUBLE},
       </if>
@@ -265,6 +286,8 @@
     gp_id = #{record.gpId,jdbcType=VARCHAR},
     price = #{record.price,jdbcType=DOUBLE},
     `count` = #{record.count,jdbcType=INTEGER},
+    total_price = #{record.totalPrice,jdbcType=DOUBLE},
+    buy_cost = #{record.buyCost,jdbcType=DOUBLE},
     cost = #{record.cost,jdbcType=DOUBLE},
     `type` = #{record.type,jdbcType=TINYINT},
     sell_count = #{record.sellCount,jdbcType=INTEGER},
@@ -289,6 +312,12 @@
       </if>
       <if test="count != null">
         `count` = #{count,jdbcType=INTEGER},
+      </if>
+      <if test="totalPrice != null">
+        total_price = #{totalPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="buyCost != null">
+        buy_cost = #{buyCost,jdbcType=DOUBLE},
       </if>
       <if test="cost != null">
         cost = #{cost,jdbcType=DOUBLE},
@@ -325,6 +354,8 @@
     set gp_id = #{gpId,jdbcType=VARCHAR},
     price = #{price,jdbcType=DOUBLE},
     `count` = #{count,jdbcType=INTEGER},
+    total_price = #{totalPrice,jdbcType=DOUBLE},
+    buy_cost = #{buyCost,jdbcType=DOUBLE},
     cost = #{cost,jdbcType=DOUBLE},
     `type` = #{type,jdbcType=TINYINT},
     sell_count = #{sellCount,jdbcType=INTEGER},
@@ -336,6 +367,7 @@
     create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <select id="sumSellIncome" resultType="java.lang.Double">
     SELECT
     sum(sell_income)

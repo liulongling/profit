@@ -7,6 +7,7 @@
     <result column="buy_id" jdbcType="BIGINT" property="buyId" />
     <result column="price" jdbcType="DOUBLE" property="price" />
     <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="total_price" jdbcType="DOUBLE" property="totalPrice" />
     <result column="cost" jdbcType="DOUBLE" property="cost" />
     <result column="income" jdbcType="DOUBLE" property="income" />
     <result column="surplus_count" jdbcType="INTEGER" property="surplusCount" />
@@ -71,7 +72,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, gp_id, buy_id, price, `count`, cost, income, surplus_count, create_time
+    id, gp_id, buy_id, price, `count`, total_price, cost, income, surplus_count, create_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondSellLogExample" resultMap="BaseResultMap">
     select
@@ -105,11 +106,13 @@
   </delete>
   <insert id="insert" parameterType="com.profit.base.domain.BondSellLog">
     insert into bond_sell_log (id, gp_id, buy_id,
-    price, `count`, cost, income,
-    surplus_count, create_time)
+    price, `count`, total_price,
+    cost, income, surplus_count,
+    create_time)
     values (#{id,jdbcType=BIGINT}, #{gpId,jdbcType=VARCHAR}, #{buyId,jdbcType=BIGINT},
-    #{price,jdbcType=DOUBLE}, #{count,jdbcType=INTEGER}, #{cost,jdbcType=DOUBLE}, #{income,jdbcType=DOUBLE},
-    #{surplusCount,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+    #{price,jdbcType=DOUBLE}, #{count,jdbcType=INTEGER}, #{totalPrice,jdbcType=DOUBLE},
+    #{cost,jdbcType=DOUBLE}, #{income,jdbcType=DOUBLE}, #{surplusCount,jdbcType=INTEGER},
+    #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.profit.base.domain.BondSellLog">
     insert into bond_sell_log
@@ -128,6 +131,9 @@
       </if>
       <if test="count != null">
         `count`,
+      </if>
+      <if test="totalPrice != null">
+        total_price,
       </if>
       <if test="cost != null">
         cost,
@@ -157,6 +163,9 @@
       </if>
       <if test="count != null">
         #{count,jdbcType=INTEGER},
+      </if>
+      <if test="totalPrice != null">
+        #{totalPrice,jdbcType=DOUBLE},
       </if>
       <if test="cost != null">
         #{cost,jdbcType=DOUBLE},
@@ -196,6 +205,9 @@
       <if test="record.count != null">
         `count` = #{record.count,jdbcType=INTEGER},
       </if>
+      <if test="record.totalPrice != null">
+        total_price = #{record.totalPrice,jdbcType=DOUBLE},
+      </if>
       <if test="record.cost != null">
         cost = #{record.cost,jdbcType=DOUBLE},
       </if>
@@ -220,6 +232,7 @@
     buy_id = #{record.buyId,jdbcType=BIGINT},
     price = #{record.price,jdbcType=DOUBLE},
     `count` = #{record.count,jdbcType=INTEGER},
+    total_price = #{record.totalPrice,jdbcType=DOUBLE},
     cost = #{record.cost,jdbcType=DOUBLE},
     income = #{record.income,jdbcType=DOUBLE},
     surplus_count = #{record.surplusCount,jdbcType=INTEGER},
@@ -243,6 +256,9 @@
       <if test="count != null">
         `count` = #{count,jdbcType=INTEGER},
       </if>
+      <if test="totalPrice != null">
+        total_price = #{totalPrice,jdbcType=DOUBLE},
+      </if>
       <if test="cost != null">
         cost = #{cost,jdbcType=DOUBLE},
       </if>
@@ -264,13 +280,13 @@
     buy_id = #{buyId,jdbcType=BIGINT},
     price = #{price,jdbcType=DOUBLE},
     `count` = #{count,jdbcType=INTEGER},
+    total_price = #{totalPrice,jdbcType=DOUBLE},
     cost = #{cost,jdbcType=DOUBLE},
     income = #{income,jdbcType=DOUBLE},
     surplus_count = #{surplusCount,jdbcType=INTEGER},
     create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
-
   <select id="listGroupByGpId" resultType="map">
     SELECT gp_id as gpId,sum(income) as income FROM bond_sell_log
     <where>

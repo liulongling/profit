@@ -415,6 +415,66 @@ public class BondSellLogExample {
             return (Criteria) this;
         }
 
+        public Criteria andTotalPriceIsNull() {
+            addCriterion("total_price is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceIsNotNull() {
+            addCriterion("total_price is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceEqualTo(Double value) {
+            addCriterion("total_price =", value, "totalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceNotEqualTo(Double value) {
+            addCriterion("total_price <>", value, "totalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceGreaterThan(Double value) {
+            addCriterion("total_price >", value, "totalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceGreaterThanOrEqualTo(Double value) {
+            addCriterion("total_price >=", value, "totalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceLessThan(Double value) {
+            addCriterion("total_price <", value, "totalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceLessThanOrEqualTo(Double value) {
+            addCriterion("total_price <=", value, "totalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceIn(List<Double> values) {
+            addCriterion("total_price in", values, "totalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceNotIn(List<Double> values) {
+            addCriterion("total_price not in", values, "totalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceBetween(Double value1, Double value2) {
+            addCriterion("total_price between", value1, value2, "totalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalPriceNotBetween(Double value1, Double value2) {
+            addCriterion("total_price not between", value1, value2, "totalPrice");
+            return (Criteria) this;
+        }
+
         public Criteria andCostIsNull() {
             addCriterion("cost is null");
             return (Criteria) this;

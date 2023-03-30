@@ -1,7 +1,10 @@
 package com.profit.base.domain;
 
+import lombok.Data;
+
 import java.util.Date;
 
+@Data
 public class BondSellLog {
     /**
      * 唯一ID
@@ -29,6 +32,11 @@ public class BondSellLog {
     private Integer count;
 
     /**
+     * 出售总价格
+     */
+    private Double totalPrice;
+
+    /**
      * 佣金
      */
     private Double cost;
@@ -47,76 +55,4 @@ public class BondSellLog {
      * 操作时间
      */
     private Date createTime;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getGpId() {
-        return gpId;
-    }
-
-    public void setGpId(String gpId) {
-        this.gpId = gpId == null ? null : gpId.trim();
-    }
-
-    public Long getBuyId() {
-        return buyId;
-    }
-
-    public void setBuyId(Long buyId) {
-        this.buyId = buyId;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    public Double getCost() {
-        return cost;
-    }
-
-    public void setCost(Double cost) {
-        this.cost = cost;
-    }
-
-    public Double getIncome() {
-        return income;
-    }
-
-    public void setIncome(Double income) {
-        this.income = income;
-    }
-
-    public Integer getSurplusCount() {
-        return surplusCount;
-    }
-
-    public void setSurplusCount(Integer surplusCount) {
-        this.surplusCount = surplusCount;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 }

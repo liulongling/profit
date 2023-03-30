@@ -1,6 +1,5 @@
 package com.profit.controller;
 
-import cn.hutool.json.JSONUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.profit.base.ResultDO;
@@ -43,7 +42,6 @@ public class BondController {
         for (BondSellLog bondSellLog : list) {
             BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondSellLog.getBuyId());
             BondSellDTO bondSellDTO = BeanUtils.copyBean(new BondSellDTO(), bondSellLog);
-            bondSellDTO.setTotalPrice((long) (bondSellDTO.getPrice() * bondSellDTO.getCount()));
             bondSellDTO.setProfitAndLoss(String.format("%.2f", ((bondSellDTO.getPrice() - bondBuyLog.getPrice()) / bondSellDTO.getPrice()) * 100) + "%");
             bondSellDTOS.add(bondSellDTO);
         }
@@ -65,7 +63,7 @@ public class BondController {
             criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
         }
         bondBuyLogExample.setOrderByClause(params.get("sort").toString() + " " + params.get("order").toString());
-        Page<Object> page = PageHelper.startPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
+        Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
         List<BondBuyLog> result = bondBuyLogMapper.selectByExample(bondBuyLogExample);
         if (result == null) {
             return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
@@ -76,6 +74,22 @@ public class BondController {
             BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
             BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(buyLogDTO.getGpId());
             if (bondInfo != null) {
+                if (bondBuyLog.getTotalPrice() == null) {
+                    bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() * bondBuyLog.getCount())));
+                    Double buyCost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+                    bondBuyLog.setBuyCost(buyCost);
+                    bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
+                    BondSellLogExample bondSellLogExample = new BondSellLogExample();
+                    bondSellLogExample.createCriteria().andBuyIdEqualTo(bondBuyLog.getId());
+                    List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
+                    for (BondSellLog bondSellLog : bondSellLogs) {
+                        if (bondSellLog.getTotalPrice() == null) {
+                            bondSellLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getCount() * bondSellLog.getPrice())));
+                            bondSellLogMapper.updateByPrimaryKey(bondSellLog);
+                        }
+                    }
+                }
+
                 buyLogDTO.setName(bondInfo.getName());
                 buyLogDTO.setCurPrice(bondInfo.getPrice());
                 //与上一个买点的格差
@@ -111,7 +125,7 @@ public class BondController {
         }
         criteria.andStatusEqualTo((byte) 0);
         bondInfoExample.setOrderByClause(" id " + params.get("order"));
-        Page<Object> page = PageHelper.startPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
+        Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
         List<BondInfo> result = bondInfoMapper.selectByExample(bondInfoExample);
         if (result == null) {
             return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
@@ -134,7 +148,6 @@ public class BondController {
             bondInfoDTO.setTodayTProfit(todayProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", todayProfitMap.get(bondInfo.getId()))));
             list.add(bondInfoDTO);
         }
-
 
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }

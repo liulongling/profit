@@ -312,7 +312,7 @@ public class BondService {
             //涨跌幅
             Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
             buyLogDTO.setIncome(curIncome);
-            buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.3f", curIncome)) + "(" + zdf + "%)");
+            buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.2f", curIncome)) + "(" + zdf + "%)");
         }
     }
 
@@ -332,13 +332,13 @@ public class BondService {
                 profitDTO = new ProfitDTO();
                 profitDTO.setDate(object.toString());
             }
-            Double profit = Double.parseDouble(String.format("%.3f", profitMap.get(object)));
+            Double profit = Double.parseDouble(String.format("%.2f", profitMap.get(object)));
             if (bondSellRequest.getType() == 0) {
                 profitDTO.setGridProfit(profit);
             } else if (bondSellRequest.getType() == 1) {
                 profitDTO.setStubProfit(profit);
             }
-            profitDTO.setTotalProfit(Double.parseDouble(String.format("%.3f", profitDTO.getGridProfit() + profitDTO.getStubProfit())));
+            profitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", profitDTO.getGridProfit() + profitDTO.getStubProfit())));
             map.put(object.toString(), profitDTO);
         }
     }
@@ -430,7 +430,7 @@ public class BondService {
             bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());
             double cost = BondUtils.getTaxation(bondInfo.getIsEtf() == 1, bondInfo.getPlate(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", cost)));
-            bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() + bondBuyLog.getCount())));
+            bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() * bondBuyLog.getCount())));
             bondBuyLog.setBuyCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost())));
             refeshBondStatistics(bondBuyLog.getTotalPrice(), bondBuyLog.getCost());
         }
@@ -473,7 +473,7 @@ public class BondService {
 
         bondSellLog.setIncome(Double.parseDouble(String.format("%.2f", income)));
         bondSellLog.setGpId(bondInfo.getId());
-        bondSellLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getPrice() + bondSellLog.getCount())));
+        bondSellLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getPrice() * bondSellLog.getCount())));
         bondSellLog.setCreateTime(bondSellLog.getCreateTime());
 
         bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.2f", bondBuyLog.getSellIncome() + bondSellLog.getIncome())));

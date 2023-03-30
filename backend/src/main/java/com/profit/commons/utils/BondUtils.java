@@ -38,7 +38,7 @@ public class BondUtils {
         double zqyj = total * 0.0001;
 
         taxation += zqyj;
-        return Double.parseDouble(String.format("%.3f", taxation));
+        return Double.parseDouble(String.format("%.2f", taxation));
 
     }
 }

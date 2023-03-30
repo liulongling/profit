@@ -26,11 +26,11 @@ public class BondUtils {
                 //过户费成交金额0.002%
                 taxation += total * 0.00002;
             }
-        } else if (bondInfo.isEtf()) {
+        } else if (bondInfo.getIsEtf() == 1) {
             //券商佣金
             taxation += total * 0.0001;
         } else if ((bondInfo.getPlate().equals("sh") || bondInfo.getPlate().equals("sz"))) {
-            if (!bondInfo.isEtf()) {
+            if (bondInfo.getIsEtf() != 1) {
                 if (bondInfo.getPlate().equals("sh")) {
                     //上海过户费成交金额0.002%
                     taxation += total * 0.00002;

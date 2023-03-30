@@ -1,5 +1,6 @@
 package com.profit.base.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 import java.util.Date;
@@ -50,8 +51,4 @@ public class BondInfo {
      *
      */
     private Date updateTime;
-
-    public boolean isEtf() {
-        return isEtf == 1;
-    }
 }

@@ -15,13 +15,25 @@ import javax.annotation.Resource;
 public class AnalysisDataJob {
     @Resource
     private BondService bondService;
+
+    /**
+     * 每分钟执行一次
+     */
+    @Scheduled(cron = "0/10 * * * * ?")
+    public void task() {
+        LogUtil.info("定时任务[task]开始执行");
+        bondService.refurbishBondPrice();
+        LogUtil.info("定时任务[task]执行结束");
+
+    }
+
     /**
      * 每分钟执行一次
      */
     @Scheduled(cron = "0 */1 * * * ?")
     public void task1() {
         LogUtil.info("定时任务[task1]开始执行");
-        bondService.refurbishBondPrice();
+//        bondService.refurbishBondPrice();
         LogUtil.info("定时任务[task1]执行结束");
 
     }

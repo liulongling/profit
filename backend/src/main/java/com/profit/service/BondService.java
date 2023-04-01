@@ -5,6 +5,7 @@ import com.profit.base.mapper.*;
 import com.profit.commons.constants.BondConstants;
 import com.profit.commons.utils.*;
 import com.profit.dto.*;
+import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -128,9 +129,7 @@ public class BondService {
 
         totalProfitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", totalProfit)));
 
-        BondInfoExample bondInfoExample = new BondInfoExample();
-        bondInfoExample.createCriteria().andStatusEqualTo((byte) 0);
-        List<BondInfo> bondInfos = bondInfoMapper.selectByExample(bondInfoExample);
+        List<BondInfo> bondInfos = bondInfoMapper.selectByExample(new BondInfoExample());
         Double stockValue = 0.0;
         for (BondInfo bondInfo : bondInfos) {
             BondInfoDTO bondInfoDTO = loadBondInfoDTO(bondInfo);
@@ -387,9 +386,9 @@ public class BondService {
      * 更新股价
      */
     public void refurbishBondPrice() {
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        if (hour >= 9 && hour < 15) {
+        String date = DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM);
+        Map<String, Object> map = WeekdayUtil.isWeekday(date);
+        if (map != null && BooleanUtils.toBoolean(map.get("isWeekDay").toString())) {
             List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
             for (BondInfo bondInfo : list) {
                 Map<String, String> uriMap = new HashMap<>();

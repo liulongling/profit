@@ -715,6 +715,66 @@ public class BondStatisticsExample {
             return (Criteria) this;
         }
 
+        public Criteria andLossMoneyIsNull() {
+            addCriterion("loss_money is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyIsNotNull() {
+            addCriterion("loss_money is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyEqualTo(Double value) {
+            addCriterion("loss_money =", value, "lossMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyNotEqualTo(Double value) {
+            addCriterion("loss_money <>", value, "lossMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyGreaterThan(Double value) {
+            addCriterion("loss_money >", value, "lossMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyGreaterThanOrEqualTo(Double value) {
+            addCriterion("loss_money >=", value, "lossMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyLessThan(Double value) {
+            addCriterion("loss_money <", value, "lossMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyLessThanOrEqualTo(Double value) {
+            addCriterion("loss_money <=", value, "lossMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyIn(List<Double> values) {
+            addCriterion("loss_money in", values, "lossMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyNotIn(List<Double> values) {
+            addCriterion("loss_money not in", values, "lossMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyBetween(Double value1, Double value2) {
+            addCriterion("loss_money between", value1, value2, "lossMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andLossMoneyNotBetween(Double value1, Double value2) {
+            addCriterion("loss_money not between", value1, value2, "lossMoney");
+            return (Criteria) this;
+        }
+
         public Criteria andCostIsNull() {
             addCriterion("cost is null");
             return (Criteria) this;
@@ -772,66 +832,6 @@ public class BondStatisticsExample {
 
         public Criteria andCostNotBetween(Double value1, Double value2) {
             addCriterion("cost not between", value1, value2, "cost");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeIsNull() {
-            addCriterion("create_time is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeIsNotNull() {
-            addCriterion("create_time is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeEqualTo(Date value) {
-            addCriterion("create_time =", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeNotEqualTo(Date value) {
-            addCriterion("create_time <>", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeGreaterThan(Date value) {
-            addCriterion("create_time >", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("create_time >=", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeLessThan(Date value) {
-            addCriterion("create_time <", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeLessThanOrEqualTo(Date value) {
-            addCriterion("create_time <=", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeIn(List<Date> values) {
-            addCriterion("create_time in", values, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeNotIn(List<Date> values) {
-            addCriterion("create_time not in", values, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeBetween(Date value1, Date value2) {
-            addCriterion("create_time between", value1, value2, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeNotBetween(Date value1, Date value2) {
-            addCriterion("create_time not between", value1, value2, "createTime");
             return (Criteria) this;
         }
 

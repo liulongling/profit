@@ -12,6 +12,7 @@
     <result column="profit" jdbcType="DOUBLE" property="profit" />
     <result column="buy_money" jdbcType="DOUBLE" property="buyMoney" />
     <result column="sell_money" jdbcType="DOUBLE" property="sellMoney" />
+    <result column="loss_money" jdbcType="DOUBLE" property="lossMoney" />
     <result column="cost" jdbcType="DOUBLE" property="cost" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -75,7 +76,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, stock, ready, `position`, profit_number, loss_number, winning, profit, buy_money,
-    sell_money, cost, update_time
+    sell_money, loss_money, cost, update_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondStatisticsExample" resultMap="BaseResultMap">
     select
@@ -111,13 +112,13 @@
     insert into bond_statistics (id, stock, ready,
     `position`, profit_number, loss_number,
     winning, profit, buy_money,
-    sell_money, cost, update_time
-    )
+    sell_money, loss_money, cost,
+    update_time)
     values (#{id,jdbcType=BIGINT}, #{stock,jdbcType=DOUBLE}, #{ready,jdbcType=DOUBLE},
     #{position,jdbcType=DOUBLE}, #{profitNumber,jdbcType=INTEGER}, #{lossNumber,jdbcType=INTEGER},
     #{winning,jdbcType=VARCHAR}, #{profit,jdbcType=DOUBLE}, #{buyMoney,jdbcType=DOUBLE},
-    #{sellMoney,jdbcType=DOUBLE}, #{cost,jdbcType=DOUBLE}, #{updateTime,jdbcType=TIMESTAMP}
-    )
+    #{sellMoney,jdbcType=DOUBLE}, #{lossMoney,jdbcType=DOUBLE}, #{cost,jdbcType=DOUBLE},
+    #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.profit.base.domain.BondStatistics">
     insert into bond_statistics
@@ -151,6 +152,9 @@
       </if>
       <if test="sellMoney != null">
         sell_money,
+      </if>
+      <if test="lossMoney != null">
+        loss_money,
       </if>
       <if test="cost != null">
         cost,
@@ -189,6 +193,9 @@
       </if>
       <if test="sellMoney != null">
         #{sellMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="lossMoney != null">
+        #{lossMoney,jdbcType=DOUBLE},
       </if>
       <if test="cost != null">
         #{cost,jdbcType=DOUBLE},
@@ -237,6 +244,9 @@
       <if test="record.sellMoney != null">
         sell_money = #{record.sellMoney,jdbcType=DOUBLE},
       </if>
+      <if test="record.lossMoney != null">
+        loss_money = #{record.lossMoney,jdbcType=DOUBLE},
+      </if>
       <if test="record.cost != null">
         cost = #{record.cost,jdbcType=DOUBLE},
       </if>
@@ -260,6 +270,7 @@
     profit = #{record.profit,jdbcType=DOUBLE},
     buy_money = #{record.buyMoney,jdbcType=DOUBLE},
     sell_money = #{record.sellMoney,jdbcType=DOUBLE},
+    loss_money = #{record.lossMoney,jdbcType=DOUBLE},
     cost = #{record.cost,jdbcType=DOUBLE},
     update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -296,6 +307,9 @@
       <if test="sellMoney != null">
         sell_money = #{sellMoney,jdbcType=DOUBLE},
       </if>
+      <if test="lossMoney != null">
+        loss_money = #{lossMoney,jdbcType=DOUBLE},
+      </if>
       <if test="cost != null">
         cost = #{cost,jdbcType=DOUBLE},
       </if>
@@ -316,6 +330,7 @@
     profit = #{profit,jdbcType=DOUBLE},
     buy_money = #{buyMoney,jdbcType=DOUBLE},
     sell_money = #{sellMoney,jdbcType=DOUBLE},
+    loss_money = #{lossMoney,jdbcType=DOUBLE},
     cost = #{cost,jdbcType=DOUBLE},
     update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}

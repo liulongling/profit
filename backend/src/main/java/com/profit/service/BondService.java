@@ -137,6 +137,8 @@ public class BondService {
         }
 
         totalProfitDTO.setStockValue(Double.parseDouble(String.format("%.2f", stockValue)));
+        totalProfitDTO.setLossMoney(Double.parseDouble(String.format("%.2f", bondBuyLogMapper.sumLossIncome())));
+        totalProfitDTO.setCost(Double.parseDouble(String.format("%.2f", bondBuyLogMapper.sumCost())));
         return totalProfitDTO;
     }
 
@@ -230,6 +232,7 @@ public class BondService {
         loadProfitDTOData(map, bondSellRequest);
         bondSellRequest.setType(1);
         loadProfitDTOData(map, bondSellRequest);
+
         return map;
     }
 
@@ -517,6 +520,8 @@ public class BondService {
                 .stock(totalProfitDTO.getStockValue())
                 .winning(totalProfitDTO.getAvgWinning())
                 .profit(totalProfitDTO.getTotalProfit())
+                .lossMoney(totalProfitDTO.getLossMoney())
+                .cost(totalProfitDTO.getCost())
                 .updateTime(new Date());
         bondStatisticsMapper.updateByPrimaryKeySelective(bondStatistics.build());
 

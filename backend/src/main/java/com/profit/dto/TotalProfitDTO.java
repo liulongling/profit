@@ -19,6 +19,11 @@ public class TotalProfitDTO extends TodayTaxationDTO {
     private String avgWinning;
 
     /**
+     * 止损金额
+     */
+    private Double lossMoney;
+
+    /**
      * 总收益
      */
     private Double totalProfit;

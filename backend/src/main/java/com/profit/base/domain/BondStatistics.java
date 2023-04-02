@@ -59,6 +59,11 @@ public class BondStatistics {
     private Double sellMoney;
 
     /**
+     * 止损金额
+     */
+    private Double lossMoney;
+
+    /**
      * 消耗总佣金
      */
     private Double cost;

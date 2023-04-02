@@ -380,6 +380,28 @@
     AND
     status in(0,1)
   </select>
+
+  <select id="sumLossIncome" resultType="java.lang.Double">
+    SELECT
+    sum(sell_income)
+    FROM
+    bond_buy_log
+    WHERE
+    <![CDATA[sell_income < 0]]>
+    AND
+    status in(0,1)
+  </select>
+
+
+  <select id="sumCost" resultType="java.lang.Double">
+    SELECT
+    sum(cost)
+    FROM
+    bond_buy_log
+    WHERE
+    status in(0,1)
+  </select>
+
   <select id="sumBuySellCount" resultType="map">
     SELECT
     SUM(COUNT) AS buyCount ,SUM(sell_count) AS sellCount

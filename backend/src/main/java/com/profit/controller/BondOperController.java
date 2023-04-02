@@ -138,6 +138,14 @@ public class BondOperController {
             isBuy = true;
         }
 
+        if (bondBuyLogRequest.getType() != null) {
+            bondBuyLog.setType(bondBuyLogRequest.getType());
+        }
+
+        if (bondBuyLogRequest.getStatus() != null) {
+            bondBuyLog.setStatus(bondBuyLogRequest.getStatus());
+        }
+
         //未出售的状态下才能修改税费
         if (bondBuyLog.getStatus() == BondConstants.NOT_SELL) {
             Double buyCost = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
@@ -146,14 +154,6 @@ public class BondOperController {
             bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLogRequest.getPrice() * bondBuyLogRequest.getCount())));
         }
 
-
-        if (bondBuyLogRequest.getType() != null) {
-            bondBuyLog.setType(bondBuyLogRequest.getType());
-        }
-
-        if (bondBuyLogRequest.getStatus() != null) {
-            bondBuyLog.setStatus(bondBuyLogRequest.getStatus());
-        }
 
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 

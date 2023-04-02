@@ -421,10 +421,9 @@
          textHTML+='<td>持股市值</td>';
          textHTML+='<td>现金</td>';
          textHTML+='<td>仓位</td>';
-         textHTML+='<td>购买总额</td>';
-         textHTML+='<td>出售总额</td>';
+         textHTML+='<td>止损金额</td>';
          textHTML+='<td>总佣金(税费)</td>';
-         textHTML+='<td>今年总收益</td>';
+         textHTML+='<td>总收益</td>';
          textHTML+='<td>总盈利笔数</td>';
          textHTML+='<td>总亏损笔数</td>';
          textHTML+='<td>平均成功率</td>';
@@ -434,9 +433,8 @@
           textHTML+='<td>'+result.module.stock+'</td>';
           textHTML+='<td>'+result.module.ready+'</td>';
           textHTML+='<td>'+result.module.position+'</td>';
-          textHTML+='<td>开发中...</td>';
-          textHTML+='<td>开发中...</td>';
-          textHTML+='<td>开发中...</td>';
+          textHTML+='<td>'+result.module.lossMoney+'</td>';
+          textHTML+='<td>'+result.module.cost+'</td>';
           textHTML+='<td>'+result.module.profit+'</td>';
           textHTML+='<td>'+result.module.profitNumber+'</td>';
           textHTML+='<td>'+result.module.lossNumber+'</td>';

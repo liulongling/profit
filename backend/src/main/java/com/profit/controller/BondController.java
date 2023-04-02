@@ -74,19 +74,14 @@ public class BondController {
             BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
             BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(buyLogDTO.getGpId());
             if (bondInfo != null) {
-                if (bondBuyLog.getTotalPrice() == null) {
-                    bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() * bondBuyLog.getCount())));
-                    Double buyCost = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
-                    bondBuyLog.setBuyCost(buyCost);
-                    bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
-                    BondSellLogExample bondSellLogExample = new BondSellLogExample();
-                    bondSellLogExample.createCriteria().andBuyIdEqualTo(bondBuyLog.getId());
-                    List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
-                    for (BondSellLog bondSellLog : bondSellLogs) {
-                        if (bondSellLog.getTotalPrice() == null) {
-                            bondSellLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getCount() * bondSellLog.getPrice())));
-                            bondSellLogMapper.updateByPrimaryKey(bondSellLog);
-                        }
+                BondSellLogExample bondSellLogExample = new BondSellLogExample();
+                bondSellLogExample.createCriteria().andBuyIdEqualTo(bondBuyLog.getId());
+                List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
+                for (BondSellLog bondSellLog : bondSellLogs) {
+                    if (bondSellLog.getTotalCost() == null) {
+                        Double buyCost = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondSellLog.getCount(), false);
+                        bondSellLog.setTotalCost(Double.parseDouble(String.format("%.2f", bondSellLog.getCost() + buyCost)));
+                        bondSellLogMapper.updateByPrimaryKey(bondSellLog);
                     }
                 }
 

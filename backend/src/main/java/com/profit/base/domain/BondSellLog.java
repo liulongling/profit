@@ -37,6 +37,11 @@ public class BondSellLog {
     private Double totalPrice;
 
     /**
+     * 总佣金税费，包含购买佣金
+     */
+    private Double totalCost;
+
+    /**
      * 佣金
      */
     private Double cost;

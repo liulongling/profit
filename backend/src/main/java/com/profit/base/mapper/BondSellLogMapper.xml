@@ -9,6 +9,7 @@
     <result column="count" jdbcType="INTEGER" property="count" />
     <result column="total_price" jdbcType="DOUBLE" property="totalPrice" />
     <result column="cost" jdbcType="DOUBLE" property="cost" />
+    <result column="total_cost" jdbcType="DOUBLE" property="totalCost" />
     <result column="income" jdbcType="DOUBLE" property="income" />
     <result column="surplus_count" jdbcType="INTEGER" property="surplusCount" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
@@ -72,7 +73,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, gp_id, buy_id, price, `count`, total_price, cost, income, surplus_count, create_time
+    id, gp_id, buy_id, price, `count`, total_price, cost, total_cost, income, surplus_count,
+    create_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondSellLogExample" resultMap="BaseResultMap">
     select
@@ -107,12 +109,12 @@
   <insert id="insert" parameterType="com.profit.base.domain.BondSellLog">
     insert into bond_sell_log (id, gp_id, buy_id,
     price, `count`, total_price,
-    cost, income, surplus_count,
-    create_time)
+    cost, total_cost, income,
+    surplus_count, create_time)
     values (#{id,jdbcType=BIGINT}, #{gpId,jdbcType=VARCHAR}, #{buyId,jdbcType=BIGINT},
     #{price,jdbcType=DOUBLE}, #{count,jdbcType=INTEGER}, #{totalPrice,jdbcType=DOUBLE},
-    #{cost,jdbcType=DOUBLE}, #{income,jdbcType=DOUBLE}, #{surplusCount,jdbcType=INTEGER},
-    #{createTime,jdbcType=TIMESTAMP})
+    #{cost,jdbcType=DOUBLE}, #{totalCost,jdbcType=DOUBLE}, #{income,jdbcType=DOUBLE},
+    #{surplusCount,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.profit.base.domain.BondSellLog">
     insert into bond_sell_log
@@ -137,6 +139,9 @@
       </if>
       <if test="cost != null">
         cost,
+      </if>
+      <if test="totalCost != null">
+        total_cost,
       </if>
       <if test="income != null">
         income,
@@ -169,6 +174,9 @@
       </if>
       <if test="cost != null">
         #{cost,jdbcType=DOUBLE},
+      </if>
+      <if test="totalCost != null">
+        #{totalCost,jdbcType=DOUBLE},
       </if>
       <if test="income != null">
         #{income,jdbcType=DOUBLE},
@@ -211,6 +219,9 @@
       <if test="record.cost != null">
         cost = #{record.cost,jdbcType=DOUBLE},
       </if>
+      <if test="record.totalCost != null">
+        total_cost = #{record.totalCost,jdbcType=DOUBLE},
+      </if>
       <if test="record.income != null">
         income = #{record.income,jdbcType=DOUBLE},
       </if>
@@ -234,6 +245,7 @@
     `count` = #{record.count,jdbcType=INTEGER},
     total_price = #{record.totalPrice,jdbcType=DOUBLE},
     cost = #{record.cost,jdbcType=DOUBLE},
+    total_cost = #{record.totalCost,jdbcType=DOUBLE},
     income = #{record.income,jdbcType=DOUBLE},
     surplus_count = #{record.surplusCount,jdbcType=INTEGER},
     create_time = #{record.createTime,jdbcType=TIMESTAMP}
@@ -262,6 +274,9 @@
       <if test="cost != null">
         cost = #{cost,jdbcType=DOUBLE},
       </if>
+      <if test="totalCost != null">
+        total_cost = #{totalCost,jdbcType=DOUBLE},
+      </if>
       <if test="income != null">
         income = #{income,jdbcType=DOUBLE},
       </if>
@@ -282,6 +297,7 @@
     `count` = #{count,jdbcType=INTEGER},
     total_price = #{totalPrice,jdbcType=DOUBLE},
     cost = #{cost,jdbcType=DOUBLE},
+    total_cost = #{totalCost,jdbcType=DOUBLE},
     income = #{income,jdbcType=DOUBLE},
     surplus_count = #{surplusCount,jdbcType=INTEGER},
     create_time = #{createTime,jdbcType=TIMESTAMP}

@@ -478,6 +478,7 @@ public class BondService {
 
         bondSellLog.setIncome(Double.parseDouble(String.format("%.2f", income)));
         bondSellLog.setGpId(bondInfo.getId());
+        bondSellLog.setTotalCost(Double.parseDouble(String.format("%.2f", buyTaxation + sellTaxation)));
         bondSellLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getPrice() * bondSellLog.getCount())));
         bondSellLog.setCreateTime(bondSellLog.getCreateTime());
 

@@ -107,12 +107,15 @@ public class BondService {
     public TotalProfitDTO loadTotalProfitDTO() {
         TotalProfitDTO totalProfitDTO = new TotalProfitDTO();
         BondSellLogExample bondSellLogExample = new BondSellLogExample();
-        bondSellLogExample.createCriteria().andGpIdNotEqualTo("131810").andIncomeGreaterThan(0.0);
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+
+        bondSellLogExample.createCriteria().andGpIdNotEqualTo("131810").andIncomeGreaterThan(0.0).andCreateTimeBetween(DateUtils.getBeginTime(year, 1), DateUtils.getEndTime(year, 12));
         Long totalProfitNumber = bondSellLogMapper.countByExample(bondSellLogExample);
         totalProfitDTO.setTotalProfitNumber(totalProfitNumber.intValue());
 
         bondSellLogExample = new BondSellLogExample();
-        bondSellLogExample.createCriteria().andIncomeLessThan(0.0);
+        bondSellLogExample.createCriteria().andGpIdNotEqualTo("131810").andIncomeLessThan(0.0).andCreateTimeBetween(DateUtils.getBeginTime(year, 1), DateUtils.getEndTime(year, 12));
         long totalLossNumber = bondSellLogMapper.countByExample(bondSellLogExample);
         totalProfitDTO.setTotalLossNumber(totalLossNumber);
         if (totalProfitNumber + totalLossNumber > 0) {
@@ -120,13 +123,11 @@ public class BondService {
             totalProfitDTO.setAvgWinning(StringUtil.pencentWin(totalProfitNumber, totalProfitNumber + totalLossNumber));
         }
 
-        Map<String, ProfitDTO> map = totalProfit();
-        Double totalProfit = 0.0;
-        for (String key : map.keySet()) {
-            ProfitDTO profitDTO = map.get(key);
-            totalProfit += profitDTO.getTotalProfit();
-        }
+        BondSellRequest bondSellRequest = new BondSellRequest();
+        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getBeginTime(year, 1)));
+        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getEndTime(year, 12)));
 
+        Double totalProfit = bondSellLogMapper.sumIncome(bondSellRequest);
         totalProfitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", totalProfit)));
 
         List<BondInfo> bondInfos = bondInfoMapper.selectByExample(new BondInfoExample());
@@ -137,8 +138,8 @@ public class BondService {
         }
 
         totalProfitDTO.setStockValue(Double.parseDouble(String.format("%.2f", stockValue)));
-        totalProfitDTO.setLossMoney(Double.parseDouble(String.format("%.2f", bondBuyLogMapper.sumLossIncome())));
-        totalProfitDTO.setCost(Double.parseDouble(String.format("%.2f", bondBuyLogMapper.sumCost())));
+        totalProfitDTO.setLossMoney(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumLossIncome(bondSellRequest))));
+        totalProfitDTO.setCost(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumCost(bondSellRequest))));
         return totalProfitDTO;
     }
 
@@ -217,23 +218,31 @@ public class BondService {
      *
      * @return
      */
-    public Map<String, ProfitDTO> totalProfit() {
-        BondSellRequest bondSellRequest = new BondSellRequest();
-        bondSellRequest.setType(0);
+    public ProfitDTO totalProfit() {
+        ProfitDTO profitDTO = new ProfitDTO();
+        for (int i = 1; i <= 12; i++) {
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            String month = i < 10 ? ("0" + i) : String.valueOf(i);
+            profitDTO.getDate().add(year + month);
+            BondSellRequest bondSellRequest = new BondSellRequest();
+            bondSellRequest.setType(0);
+            bondSellRequest.setStartTime(DateUtils.getFirstDayOfMonth(i));
+            bondSellRequest.setEndTime(DateUtils.getLastDayOfMonth(i));
+            Double gridProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByType(bondSellRequest)));
+            profitDTO.getGridProfit().add(gridProfit);
+            bondSellRequest.setType(1);
+            Double stubProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByType(bondSellRequest)));
+            profitDTO.getStubProfit().add(stubProfit);
+            profitDTO.getTotalProfit().add(Double.parseDouble(String.format("%.2f", gridProfit + stubProfit)));
 
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
+            Double lossProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumLossIncome(bondSellRequest)));
+            profitDTO.getLossProfit().add(lossProfit);
 
-        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getBeginTime(year, 1)));
-        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getBeginTime(year, 12)));
-
-        Map<String, ProfitDTO> map = new HashMap<>();
-
-        loadProfitDTOData(map, bondSellRequest);
-        bondSellRequest.setType(1);
-        loadProfitDTOData(map, bondSellRequest);
-
-        return map;
+            Double cost = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumCost(bondSellRequest)));
+            profitDTO.getCost().add(cost);
+        }
+        return profitDTO;
     }
 
     /**
@@ -318,33 +327,6 @@ public class BondService {
             Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
             buyLogDTO.setIncome(curIncome);
             buyLogDTO.setCurIncome(Double.parseDouble(String.format("%.2f", curIncome)) + "(" + zdf + "%)");
-        }
-    }
-
-
-    /**
-     * 加载收益数据
-     *
-     * @param map
-     * @param bondSellRequest
-     */
-    public void loadProfitDTOData(Map<String, ProfitDTO> map, BondSellRequest bondSellRequest) {
-        List<Map<Object, Object>> profitList = bondSellLogMapper.listGroupByDate(bondSellRequest);
-        Map<Object, Object> profitMap = BeanUtils.list2Map(profitList, "date", "income");
-        for (Object object : profitMap.keySet()) {
-            ProfitDTO profitDTO = map.get(object);
-            if (profitDTO == null || !map.containsKey(object)) {
-                profitDTO = new ProfitDTO();
-                profitDTO.setDate(object.toString());
-            }
-            Double profit = Double.parseDouble(String.format("%.2f", profitMap.get(object)));
-            if (bondSellRequest.getType() == 0) {
-                profitDTO.setGridProfit(profit);
-            } else if (bondSellRequest.getType() == 1) {
-                profitDTO.setStubProfit(profit);
-            }
-            profitDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", profitDTO.getGridProfit() + profitDTO.getStubProfit())));
-            map.put(object.toString(), profitDTO);
         }
     }
 

@@ -313,9 +313,9 @@
     GROUP BY gp_id
   </select>
 
-  <select id="listGroupByDate"  resultType="map">
+  <select id="sumIncomeByType"  resultType="java.lang.Double">
     SELECT
-    DATE_FORMAT(a.create_time, '%Y%m') as date,sum(a.income) as income
+    IFNULL(sum(a.income),0)
     FROM
     bond_sell_log as a,bond_buy_log as b
     <where>
@@ -329,6 +329,41 @@
         b.type = #{request.type}
       </if>
     </where>
-    GROUP BY DATE_FORMAT(a.create_time, '%Y%m') desc;
+  </select>
+
+  <select id="sumLossIncome" resultType="java.lang.Double">
+    SELECT
+    IFNULL(sum(income),0)
+    FROM
+    bond_sell_log
+    <where>
+      <![CDATA[income < 0]]>
+      AND
+      <if test="request.startTime != null and request.endTime != null">
+        create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+    </where>
+  </select>
+
+  <select id="sumIncome" resultType="java.lang.Double">
+    SELECT
+    IFNULL(sum(income),0)
+    FROM
+    bond_sell_log
+    <where>
+      <if test="request.startTime != null and request.endTime != null">
+        create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+    </where>
+  </select>
+
+
+  <select id="sumCost" resultType="java.lang.Double">
+    SELECT
+    IFNULL(sum(total_cost),0)
+    FROM
+    bond_sell_log
+    WHERE
+    create_time BETWEEN #{request.startTime} AND #{request.endTime}
   </select>
 </mapper>

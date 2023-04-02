@@ -33,5 +33,11 @@ public interface BondSellLogMapper {
 
     List<Map<Object, Object>> listGroupByGpId(@Param("request") BondSellRequest request);
 
-    List<Map<Object, Object>> listGroupByDate(@Param("request") BondSellRequest request);
+    double sumIncomeByType(@Param("request") BondSellRequest request);
+
+    Double sumCost(@Param("request") BondSellRequest request);
+
+    Double sumIncome(@Param("request") BondSellRequest request);
+    Double sumLossIncome(@Param("request") BondSellRequest request);
+
 }

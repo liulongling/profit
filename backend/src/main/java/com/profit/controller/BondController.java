@@ -175,9 +175,9 @@ public class BondController {
     }
 
     @PostMapping("analyse")
-    public ResultDO<List<ProfitDTO>> analyse(@RequestBody BondSellRequest bondSellRequest) {
-        Map<String, ProfitDTO> map = bondService.totalProfit();
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new ArrayList<>(map.values()));
+    public ResultDO<ProfitDTO> analyse(@RequestBody BondSellRequest bondSellRequest) {
+        ProfitDTO profitDTO = bondService.totalProfit();
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, profitDTO);
     }
 
     @PostMapping("today/analyse")

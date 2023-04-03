@@ -331,8 +331,11 @@ public class DateUtils {
         int firstDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
         // 设置日历中月份的最小天数
         calendar.set(Calendar.DAY_OF_MONTH, firstDay);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
         // 格式化日期
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat(TIME_PATTERN);
         String firstDayDate = sdf.format(calendar.getTime());
         return firstDayDate;
 
@@ -358,8 +361,11 @@ public class DateUtils {
         }
         // 设置日历中月份的最大天数
         calendar.set(Calendar.DAY_OF_MONTH, lastDay);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
         // 格式化日期
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat(TIME_PATTERN);
         String lastDayDate = sdf.format(calendar.getTime());
         return lastDayDate;
 

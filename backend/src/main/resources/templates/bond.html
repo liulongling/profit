@@ -675,7 +675,7 @@
     function filter_no_sell_flow() {
         let data = {
             status:'0',
-            type:'2'
+            type:'3'
         };
         getServerPaging($table, "/bond/operating/list", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status,type:data.type};

@@ -715,6 +715,126 @@ public class BondSellLogExample {
             return (Criteria) this;
         }
 
+        public Criteria andRealyBeforeIsNull() {
+            addCriterion("realy_before is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeIsNotNull() {
+            addCriterion("realy_before is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeEqualTo(Double value) {
+            addCriterion("realy_before =", value, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeNotEqualTo(Double value) {
+            addCriterion("realy_before <>", value, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeGreaterThan(Double value) {
+            addCriterion("realy_before >", value, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeGreaterThanOrEqualTo(Double value) {
+            addCriterion("realy_before >=", value, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeLessThan(Double value) {
+            addCriterion("realy_before <", value, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeLessThanOrEqualTo(Double value) {
+            addCriterion("realy_before <=", value, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeIn(List<Double> values) {
+            addCriterion("realy_before in", values, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeNotIn(List<Double> values) {
+            addCriterion("realy_before not in", values, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeBetween(Double value1, Double value2) {
+            addCriterion("realy_before between", value1, value2, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyBeforeNotBetween(Double value1, Double value2) {
+            addCriterion("realy_before not between", value1, value2, "realyBefore");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterIsNull() {
+            addCriterion("realy_after is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterIsNotNull() {
+            addCriterion("realy_after is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterEqualTo(Double value) {
+            addCriterion("realy_after =", value, "realyAfter");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterNotEqualTo(Double value) {
+            addCriterion("realy_after <>", value, "realyAfter");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterGreaterThan(Double value) {
+            addCriterion("realy_after >", value, "realyAfter");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterGreaterThanOrEqualTo(Double value) {
+            addCriterion("realy_after >=", value, "realyAfter");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterLessThan(Double value) {
+            addCriterion("realy_after <", value, "realyAfter");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterLessThanOrEqualTo(Double value) {
+            addCriterion("realy_after <=", value, "realyAfter");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterIn(List<Double> values) {
+            addCriterion("realy_after in", values, "realyAfter");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterNotIn(List<Double> values) {
+            addCriterion("realy_after not in", values, "realyAfter");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterBetween(Double value1, Double value2) {
+            addCriterion("realy_after between", value1, value2, "realyAfter");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealyAfterNotBetween(Double value1, Double value2) {
+            addCriterion("realy_after not between", value1, value2, "realyAfter");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

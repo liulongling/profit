@@ -227,30 +227,42 @@
          for(let i in result.module.date){
             textHTML+='<td>'+result.module.date[i]+'</td>';
          }
+
          textHTML+= '</tr>';
          textHTML+= '<tr>';
          textHTML+='<td>短线收益</td>';
          for(let i in result.module.stubProfit){
             textHTML+='<td>'+result.module.stubProfit[i]+'</td>';
          }
+
          textHTML+= '</tr>';
          textHTML+= '<tr>';
          textHTML+='<td>长线收益</td>';
             for(let i in result.module.gridProfit){
             textHTML+='<td>'+result.module.gridProfit[i]+'</td>';
          }
+
+         textHTML+= '</tr>';
+         textHTML+= '<tr>';
+         textHTML+='<td>国债收益</td>';
+            for(let i in result.module.nationalProfit){
+            textHTML+='<td>'+result.module.nationalProfit[i]+'</td>';
+         }
+
          textHTML+= '</tr>';
          textHTML+= '<tr>';
          textHTML+='<td>割肉亏损</td>';
             for(let i in result.module.lossProfit){
             textHTML+='<td>'+result.module.lossProfit[i]+'</td>';
          }
+
          textHTML+= '</tr>';
          textHTML+= '<tr>';
          textHTML+='<td>佣金税费</td>';
             for(let i in result.module.cost){
             textHTML+='<td>'+result.module.cost[i]+'</td>';
          }
+
          textHTML+= '</tr>';
          textHTML+= '<tr>';
          textHTML+='<td>总收益</td>';

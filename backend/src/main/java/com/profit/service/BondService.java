@@ -58,6 +58,13 @@ public class BondService {
         }
         todayTaxationDTO.setTodayProfit(Double.parseDouble(String.format("%.2f", profit)));
 
+        //今日止损
+        BondSellRequest bondSellRequest = new BondSellRequest();
+        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getTime(new Date(), 0, 0, 0)));
+        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getTime(new Date(), 23, 59, 59)));
+        todayTaxationDTO.setTodayLossProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumLossIncome(bondSellRequest))));
+
+
         List<BondBuyLog> buyLogs = getBondBuyLogs(gpId, DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM));
         Double buyAmount = 0.0;
         int buyNumber = 0;
@@ -226,15 +233,25 @@ public class BondService {
             String month = i < 10 ? ("0" + i) : String.valueOf(i);
             profitDTO.getDate().add(year + month);
             BondSellRequest bondSellRequest = new BondSellRequest();
-            bondSellRequest.setType(0);
             bondSellRequest.setStartTime(DateUtils.getFirstDayOfMonth(i));
             bondSellRequest.setEndTime(DateUtils.getLastDayOfMonth(i));
+
+            //短线收益
+            bondSellRequest.setType(0);
             Double gridProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByType(bondSellRequest)));
             profitDTO.getGridProfit().add(gridProfit);
+
+            //短线收益
             bondSellRequest.setType(1);
             Double stubProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByType(bondSellRequest)));
             profitDTO.getStubProfit().add(stubProfit);
-            profitDTO.getTotalProfit().add(Double.parseDouble(String.format("%.2f", gridProfit + stubProfit)));
+
+            //国债逆回购收益
+            bondSellRequest.setType(2);
+            Double nationalProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByType(bondSellRequest)));
+            profitDTO.getNationalProfit().add(nationalProfit);
+
+            profitDTO.getTotalProfit().add(Double.parseDouble(String.format("%.2f", gridProfit + stubProfit + nationalProfit)));
 
             Double lossProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumLossIncome(bondSellRequest)));
             profitDTO.getLossProfit().add(lossProfit);
@@ -374,28 +391,31 @@ public class BondService {
         String date = DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM);
         Map<String, Object> map = WeekdayUtil.isWeekday(date);
         if (map != null && BooleanUtils.toBoolean(map.get("isWeekDay").toString())) {
-            List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
-            for (BondInfo bondInfo : list) {
-                Map<String, String> uriMap = new HashMap<>();
-                if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
-                    continue;
-                }
-                uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
-                ResponseEntity responseEntity = restTemplate.getForEntity
-                        (
-                                HttpUtil.generateRequestParameters(serverUrl, uriMap),
-                                String.class
-                        );
+            Calendar calendar = Calendar.getInstance();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            if (hour >= 9 && hour < 15) {
+                List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
+                for (BondInfo bondInfo : list) {
+                    Map<String, String> uriMap = new HashMap<>();
+                    if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
+                        continue;
+                    }
+                    uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
+                    ResponseEntity responseEntity = restTemplate.getForEntity
+                            (
+                                    HttpUtil.generateRequestParameters(serverUrl, uriMap),
+                                    String.class
+                            );
 
-                if (responseEntity != null) {
-                    String reslut = (String) responseEntity.getBody();
-                    String[] str = reslut.split("~");
-                    if (str != null) {
-                        bondInfo.setPrice(Double.valueOf(str[3]));
-                        bondInfoMapper.updateByPrimaryKey(bondInfo);
+                    if (responseEntity != null) {
+                        String reslut = (String) responseEntity.getBody();
+                        String[] str = reslut.split("~");
+                        if (str != null) {
+                            bondInfo.setPrice(Double.valueOf(str[3]));
+                            bondInfoMapper.updateByPrimaryKey(bondInfo);
+                        }
                     }
                 }
-
             }
         }
     }
@@ -431,11 +451,12 @@ public class BondService {
      * @param value
      * @param cost
      */
-    public void refeshBondStatistics(Double value, Double cost) {
+    public BondStatistics refeshBondStatistics(Double value, Double cost) {
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
         bondStatistics.setStock(Double.parseDouble(String.format("%.2f", bondStatistics.getStock() + value)));
         bondStatistics.setReady(Double.parseDouble(String.format("%.2f", bondStatistics.getReady() - value - cost)));
         bondStatisticsMapper.updateByPrimaryKey(bondStatistics);
+        return bondStatistics;
     }
 
     /**
@@ -472,11 +493,16 @@ public class BondService {
             bondBuyLog.setStatus((byte) 1);
         }
         int surplusCount = getBondNumber(bondInfo, bondBuyLog.getType()).intValue();
+
         bondSellLog.setSurplusCount(surplusCount);
+
+        BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
+        bondSellLog.setRealyBefore(bondStatistics.getReady());
+        bondStatistics = refeshBondStatistics(-bondSellLog.getTotalPrice(), bondSellLog.getCost());
+        bondSellLog.setRealyAfter(bondStatistics.getReady());
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 
-        refeshBondStatistics(-bondSellLog.getTotalPrice(), bondSellLog.getCost());
 
         //长线股票出售完后 添加到待购买池中
         if (bondBuyLog.getType() == BondConstants.LONG_LINE) {

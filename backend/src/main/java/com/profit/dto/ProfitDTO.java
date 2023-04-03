@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class ProfitDTO {
     private List<String> date;
+    private List<Double> nationalProfit;
     private List<Double> stubProfit;
     private List<Double> gridProfit;
     private List<Double> lossProfit;
@@ -16,6 +17,7 @@ public class ProfitDTO {
 
     public ProfitDTO() {
         date = new ArrayList<>();
+        nationalProfit = new ArrayList<>();
         stubProfit = new ArrayList<>();
         gridProfit = new ArrayList<>();
         lossProfit = new ArrayList<>();

@@ -11,6 +11,10 @@ public class TodayTaxationDTO extends BondInfo {
      */
     private Double todayProfit;
     /**
+     * 今日止损金额
+     */
+    private Double todayLossProfit;
+    /**
      * 交易金额
      */
     private Double transactionAmount;

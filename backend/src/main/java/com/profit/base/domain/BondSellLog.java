@@ -57,6 +57,17 @@ public class BondSellLog {
     private Integer surplusCount;
 
     /**
+     * 出售前现金
+     */
+    private Double realyBefore;
+
+
+    /**
+     * 出售后现金
+     */
+    private Double realyAfter;
+
+    /**
      * 操作时间
      */
     private Date createTime;

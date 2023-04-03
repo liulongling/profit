@@ -438,12 +438,63 @@ public class BondService {
             double cost = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", cost)));
             bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() * bondBuyLog.getCount())));
+
             bondBuyLog.setBuyCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost())));
             refeshBondStatistics(bondBuyLog.getTotalPrice(), bondBuyLog.getCost());
         }
         bondBuyLogMapper.insertSelective(bondBuyLog);
     }
 
+    /**
+     * 购买国债逆回购
+     *
+     * @param bondBuyRequest
+     */
+    public void buyGz(BondBuyRequest bondBuyRequest) {
+        BondBuyLog bondBuyLog = BeanUtils.copyBean(new BondBuyLog(), bondBuyRequest);
+
+        double buyTotalPrice = Double.parseDouble(String.format("%.2f", 100.0 * bondBuyLog.getCount()));
+
+        BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+        bondBuyLog.setType(BondConstants.GZ_NHG);
+        bondBuyLog.setCreateTime(new Date());
+        bondBuyLog.setOperTime(new Date());
+        bondBuyLog.setSellCount(bondBuyRequest.getCount());
+        bondBuyLog.setStatus(BondConstants.SOLD);
+        bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());
+        bondBuyLog.setCost(BondUtils.getTaxation(bondInfo, buyTotalPrice, false));
+        bondBuyLog.setTotalPrice(buyTotalPrice);
+        bondBuyLog.setBuyCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost())));
+
+        Date buyDate = DateUtils.string2Date(bondBuyRequest.getBuyDate(), DateUtils.DATE_PATTERM);
+        Date sellDate = DateUtils.string2Date(bondBuyRequest.getSellDate(), DateUtils.DATE_PATTERM);
+
+        //计算国债利息
+        int day = DateUtils.compareDateInterval(buyDate, sellDate);
+        Double profit = Double.parseDouble(String.format("%.2f", (bondBuyLog.getTotalPrice() * bondBuyLog.getPrice() * 0.01 * day) / 365));
+        bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.2f", profit - bondBuyLog.getBuyCost())));
+        bondBuyLogMapper.insertSelective(bondBuyLog);
+
+        sellDate.setHours(8);
+
+        BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
+        Double beforeReady = bondStatistics.getReady();
+        Double sellTotalPrice = buyTotalPrice + bondBuyLog.getSellIncome();
+        bondStatistics = addReady(bondBuyLog.getSellIncome());
+        BondSellLog bondSellLog = new BondSellLog();
+        bondSellLog.setBuyId(bondBuyLog.getId());
+        bondSellLog.setGpId(bondBuyLog.getGpId());
+        bondSellLog.setPrice(100.0);
+        bondSellLog.setIncome(bondBuyLog.getSellIncome());
+        bondSellLog.setCount(bondBuyRequest.getCount());
+        bondSellLog.setTotalPrice(sellTotalPrice);
+        bondSellLog.setCost(0.0);
+        bondSellLog.setTotalCost(bondBuyLog.getCost());
+        bondSellLog.setCreateTime(sellDate);
+        bondSellLog.setRealyBefore(beforeReady);
+        bondSellLog.setRealyAfter(bondStatistics.getReady());
+        bondSellLogMapper.insert(bondSellLog);
+    }
 
     /**
      * 更新股票统计数据
@@ -455,6 +506,18 @@ public class BondService {
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
         bondStatistics.setStock(Double.parseDouble(String.format("%.2f", bondStatistics.getStock() + value)));
         bondStatistics.setReady(Double.parseDouble(String.format("%.2f", bondStatistics.getReady() - value - cost)));
+        bondStatisticsMapper.updateByPrimaryKey(bondStatistics);
+        return bondStatistics;
+    }
+
+    /**
+     * 增加现金
+     *
+     * @param value
+     */
+    public BondStatistics addReady(Double value) {
+        BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
+        bondStatistics.setReady(Double.parseDouble(String.format("%.2f", bondStatistics.getReady() + value)));
         bondStatisticsMapper.updateByPrimaryKey(bondStatistics);
         return bondStatistics;
     }

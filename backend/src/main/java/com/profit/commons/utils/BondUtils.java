@@ -18,7 +18,9 @@ public class BondUtils {
         Double taxation = 0.000;
         if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
             //券商佣金
-            taxation += total * 0.00001;
+            if(!isSell){
+                taxation += total * 0.00001;
+            }
         } else if (bondInfo.getPlate().equals("hk")) {
             //佣金万一
             taxation += total * 0.0001;

@@ -23,9 +23,13 @@ public class BondConstants {
      */
     public static final Byte SHORT_LINE = 1;
     /**
+     * 国债
+     */
+    public static final Byte GZ_NHG = 2;
+    /**
      * 超短线
      */
-    public static final Byte SUPER_SHORT_LINE = 2;
+    public static final Byte SUPER_SHORT_LINE = 3;
     /**
      * 国债逆回购代码
      */

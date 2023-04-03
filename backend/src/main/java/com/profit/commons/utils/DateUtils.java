@@ -32,6 +32,15 @@ public class DateUtils {
     private static final DateTimeFormatter FORMATTER_MONTH_DATE = DateTimeFormatter.ofPattern(DateUtils.PATTERN_MONTH_DATE).withLocale(Locale.SIMPLIFIED_CHINESE);
     private static final DateTimeFormatter FORMATTER_DATE_ES_INDEX_SUFFIX = DateTimeFormatter.ofPattern(DateUtils.PATTERN_DATE_ES_INDEX_SUFFIX).withLocale(Locale.getDefault());
 
+    public static int compareDateInterval(Date date1, Date date2) {
+        Calendar aCalendar = Calendar.getInstance();
+        aCalendar.setTime(date1);
+        int day1 = aCalendar.get(Calendar.DAY_OF_YEAR);
+        aCalendar.setTime(date2);
+        int day2 = aCalendar.get(Calendar.DAY_OF_YEAR);
+        return day2 - day1;
+    }
+
     public static Date string2Date(String date, String patterm) {
         try {
             return new SimpleDateFormat(patterm).parse(date);

@@ -100,20 +100,23 @@ public class BondOperController {
 
     @PostMapping("buy")
     public ResultDO<Void> buy(@RequestBody BondBuyRequest bondBuyRequest) {
-        BondBuyLog bondBuyLog = BeanUtils.copyBean(new BondBuyLog(), bondBuyRequest);
-        bondService.buyBond(bondBuyLog);
-        if (bondBuyRequest.getSellPrice() != null && bondBuyRequest.getSellPrice() > 0 && bondBuyLog.getId() > 0) {
-            BondSellLog bondSellLog = new BondSellLog();
-            bondSellLog.setBuyId(bondBuyLog.getId());
-            bondSellLog.setGpId(bondBuyLog.getGpId());
-            bondSellLog.setPrice(bondBuyRequest.getSellPrice());
-            bondSellLog.setCount(bondBuyRequest.getCount());
-            Date date = DateUtils.string2Date(bondBuyRequest.getBuyDate(), DateUtils.DATE_PATTERM);
-            date.setHours(8);
-            bondSellLog.setCreateTime(date);
-            bondService.sellBond(bondSellLog);
+        if (bondBuyRequest.getGpId().equals(BondConstants.NHG_CODE)) {
+            bondService.buyGz(bondBuyRequest);
+        } else {
+            BondBuyLog bondBuyLog = BeanUtils.copyBean(new BondBuyLog(), bondBuyRequest);
+            bondService.buyBond(bondBuyLog);
+            if (bondBuyRequest.getSellPrice() != null && bondBuyRequest.getSellPrice() > 0 && bondBuyLog.getId() > 0) {
+                Date date = DateUtils.string2Date(bondBuyRequest.getSellDate(), DateUtils.DATE_PATTERM);
+                date.setHours(8);
+                BondSellLog bondSellLog = new BondSellLog();
+                bondSellLog.setBuyId(bondBuyLog.getId());
+                bondSellLog.setGpId(bondBuyLog.getGpId());
+                bondSellLog.setPrice(bondBuyRequest.getSellPrice());
+                bondSellLog.setCount(bondBuyRequest.getCount());
+                bondSellLog.setCreateTime(date);
+                bondService.sellBond(bondSellLog);
+            }
         }
-
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 

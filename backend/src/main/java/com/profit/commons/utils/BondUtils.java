@@ -15,7 +15,7 @@ public class BondUtils {
      * @return
      */
     public static Double getTaxation(BondInfo bondInfo, Double total, boolean isSell) {
-        Double taxation = 0.000;
+        Double taxation = 0.00;
         if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
             //券商佣金
             if(!isSell){
@@ -33,10 +33,8 @@ public class BondUtils {
             taxation += total * 0.0001;
         } else if ((bondInfo.getPlate().equals("sh") || bondInfo.getPlate().equals("sz"))) {
             if (bondInfo.getIsEtf() != 1) {
-                if (bondInfo.getPlate().equals("sh")) {
-                    //上海过户费成交金额0.002%
-                    taxation += total * 0.00002;
-                }
+                //过户费成交金额0.001%
+                taxation += total * 0.00001;
                 if (isSell) {
                     //印花税0.1%
                     taxation += total * 0.001;

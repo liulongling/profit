@@ -48,7 +48,7 @@ public class BondInfoDTO extends BondInfo {
     /**
      * 成本价
      */
-    public Double costPrice;
+    public String costPrice;
     /**
      * 持股数量盈亏
      */

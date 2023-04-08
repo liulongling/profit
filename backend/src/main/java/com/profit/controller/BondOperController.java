@@ -55,9 +55,9 @@ public class BondOperController {
             status = Byte.valueOf(params.get("status").toString());
             criteria.andStatusEqualTo(status);
             if (status == 1) {
-                bondBuyLogExample.setOrderByClause("buy_date desc");
+//                bondBuyLogExample.setOrderByClause("buy_date desc");
             } else {
-                bondBuyLogExample.setOrderByClause("price desc");
+                bondBuyLogExample.setOrderByClause("price asc");
             }
         }
 

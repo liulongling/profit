@@ -16,7 +16,7 @@
     <!-- theme stylesheet-->
     <link rel="stylesheet" href="../../static/css/table.css" th:href="@{/css/table.css}">
     <!-- 每30秒钟刷新一次页面 -->
-    <meta http-equiv="refresh" content="60">
+<!--    <meta http-equiv="refresh" content="60">-->
 </head>
 
 <body onload="init();">
@@ -46,6 +46,7 @@
             <li><a href="#全部" data-toggle="tab" onclick="init();">全部</a></li>
             <li><a href="#股票" data-toggle="tab" onclick="filter();">股票</a></li>
             <li><a href="#ETF" data-toggle="tab" onclick="filterEtf();">ETF</a></li>
+            <li><a href="#NHG" data-toggle="tab" onclick="filterNhg();">逆回购</a></li>
         </ul>
     </div>
 
@@ -520,6 +521,15 @@
     function filterEtf() {
         let data = {
             isEtf: '1'
+        };
+        getServerPaging($table, "/bond/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", isEtf: data.isEtf};
+        });
+    }
+
+     function filterNhg() {
+        let data = {
+            isEtf: '2'
         };
         getServerPaging($table, "/bond/list", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", isEtf: data.isEtf};

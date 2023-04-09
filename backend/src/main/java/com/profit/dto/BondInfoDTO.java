@@ -6,6 +6,10 @@ import lombok.Data;
 @Data
 public class BondInfoDTO extends BondInfo {
     /**
+     * 总收益
+     */
+    public Double totalProfit;
+    /**
      * 短线收益
      */
     public Double stubProfit;

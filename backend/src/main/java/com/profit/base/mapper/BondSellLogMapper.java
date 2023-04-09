@@ -38,6 +38,9 @@ public interface BondSellLogMapper {
     Double sumCost(@Param("request") BondSellRequest request);
 
     Double sumIncome(@Param("request") BondSellRequest request);
+
+    Double sumIncomeByGpId(@Param("gpId") String gpId);
+
     Double sumLossIncome(@Param("request") BondSellRequest request);
 
 }

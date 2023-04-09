@@ -187,6 +187,9 @@ public class BondService {
             bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
         }
 
+
+        bondInfoDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByGpId(bondInfo.getId()))));
+
         //计算成本价 = (当前价格 * 股票数量 - 总盈亏) /数量
         Double costPrice = Double.parseDouble(String.format("%.3f", (bondInfo.getPrice() * bondInfoDTO.getGpCount() - bondInfoDTO.getCurProfit()) / bondInfoDTO.getGpCount()));
         Double ykb = (bondInfo.getPrice() - costPrice) / costPrice * 100;

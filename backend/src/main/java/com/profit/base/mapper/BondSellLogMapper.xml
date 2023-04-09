@@ -335,6 +335,7 @@
     create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <select id="listGroupByGpId" resultType="map">
     SELECT gp_id as gpId,sum(income) as income FROM bond_sell_log
     <where>
@@ -387,6 +388,15 @@
         create_time BETWEEN #{request.startTime} AND #{request.endTime}
       </if>
     </where>
+  </select>
+
+  <select id="sumIncomeByGpId" resultType="java.lang.Double">
+    SELECT
+    IFNULL(sum(income),0)
+    FROM
+    bond_sell_log
+    WHERE
+    gp_id = #{gpId}
   </select>
 
   <select id="sumCost" resultType="java.lang.Double">

@@ -27,7 +27,6 @@
     <h2>知行合一</h2>
     <h2>熊市股票要做T，牛市股票要持股</h2>
     <h2>长线股票不做T，下跌趋势不做T</h2>
-    <h2>2023年不碰新能源和光伏</h2>
 
     <div class="panel-body">
         <table id="tableTodayProfit" class="table table-striped table-hover table-bordered"></table>
@@ -504,7 +503,7 @@
           textHTML+='<td>'+result.module.buyAmount+'</td>';
           textHTML+='<td>'+result.module.sellAmount+'</td>';
           textHTML+='<td>'+result.module.cost+'</td>';
-          textHTML+='<td>'+result.module.buyNumber+'</td>';
+          textHTML+='<td><a href = "http://127.0.0.1:8080/todayTransaction" target= "http://127.0.0.1:8080/todayTransaction">'+result.module.buyNumber+'</a></td>';
           textHTML+='<td>'+result.module.profitNumber+'</td>';
           textHTML+='<td>'+result.module.lossNumber+'</td>';
           textHTML+='<td>'+result.module.winning+'</td>';

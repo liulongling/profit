@@ -29,4 +29,9 @@ public class TemplatePath {
      */
     public static final String ALL_BOND_HTML = "allBond";
 
+    /**
+     * 今日交易
+     */
+    public static final String TODAY_TRANSACTION = "todayTransaction";
+
 }

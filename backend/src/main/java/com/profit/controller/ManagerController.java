@@ -27,4 +27,9 @@ public class ManagerController {
     public String allbond() {
         return TemplatePath.ALL_BOND_HTML;
     }
+
+    @GetMapping("todayTransaction")
+    public String todayTransaction() {
+        return TemplatePath.TODAY_TRANSACTION;
+    }
 }

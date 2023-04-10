@@ -11,8 +11,10 @@ import com.profit.commons.constants.BondConstants;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.*;
 import com.profit.comparator.ComparatorBondSell;
+import com.profit.comparator.ComparatorGpId;
 import com.profit.dto.BondBuyLogDTO;
 import com.profit.dto.BondBuyRequest;
+import com.profit.dto.BondTransactionDTO;
 import com.profit.service.BondService;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +33,60 @@ public class BondOperController {
     private BondSellLogMapper bondSellLogMapper;
     @Resource
     private BondService bondService;
+
+    @GetMapping("todayTransaction")
+    public ResultDO<PageUtils<BondTransactionDTO>> todayTransaction(@RequestParam Map<String, Object> params) {
+
+        BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+        BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
+        if (params.get("id") != null) {
+            criteria.andGpIdEqualTo(params.get("id").toString());
+        }
+
+        criteria.andBuyDateEqualTo(DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM));
+        bondBuyLogExample.setOrderByClause("oper_time desc");
+
+        List<BondBuyLog> buyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
+        List<BondTransactionDTO> list = new ArrayList<>();
+        if (buyLogs != null) {
+            for (BondBuyLog bondBuyLog : buyLogs) {
+                BondTransactionDTO bondTransactionDTO = BeanUtils.copyBean(new BondTransactionDTO(), bondBuyLog);
+                bondTransactionDTO.setOperateDate(bondBuyLog.getBuyDate());
+                bondTransactionDTO.setRemarks("买入");
+
+                BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+                bondTransactionDTO.setName(bondInfo.getName());
+                list.add(bondTransactionDTO);
+            }
+        }
+
+        BondSellLogExample bondSellLogExample = new BondSellLogExample();
+        BondSellLogExample.Criteria bondSellLogExampleCriteria = bondSellLogExample.createCriteria();
+        if (params.get("id") != null) {
+            bondSellLogExampleCriteria.andGpIdEqualTo(params.get("id").toString());
+        }
+
+        bondSellLogExampleCriteria.andCreateTimeBetween(DateUtils.getTodayDateTime(0, 0, 0), DateUtils.getTodayDateTime(23, 59, 59));
+        bondSellLogExample.setOrderByClause("create_time desc");
+        List<BondSellLog> sellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
+        if (sellLogs != null) {
+            for (BondSellLog bondSellLog : sellLogs) {
+                BondTransactionDTO bondTransactionDTO = BeanUtils.copyBean(new BondTransactionDTO(), bondSellLog);
+                bondTransactionDTO.setOperateDate(DateUtils.getDateString(bondSellLog.getCreateTime()));
+                bondTransactionDTO.setRemarks("卖出");
+
+                BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondSellLog.getGpId());
+                bondTransactionDTO.setName(bondInfo.getName());
+                list.add(bondTransactionDTO);
+            }
+        }
+
+        ComparatorGpId comparator = new ComparatorGpId();
+        Collections.sort(list, comparator);
+
+
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(list.size(), list));
+    }
 
     @GetMapping("list")
     public ResultDO<PageUtils<BondBuyLogDTO>> getBonds(@RequestParam Map<String, Object> params) {

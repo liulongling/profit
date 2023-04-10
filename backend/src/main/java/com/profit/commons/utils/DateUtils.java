@@ -290,6 +290,20 @@ public class DateUtils {
         return false;
     }
 
+
+
+    /**
+     * 获取当天指定时间
+     *
+     * @param hour   几点
+     * @param minute 分钟
+     * @param second 秒
+     * @return
+     */
+    public static Date getTodayDateTime(int hour, int minute, int second) {
+        return string2Date(getTimeString(getTime(new Date(), hour, minute, second)),TIME_PATTERN);
+    }
+
     /**
      * 获取当天指定时间
      *

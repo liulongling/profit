@@ -371,9 +371,8 @@
     bond_sell_log
     <where>
       <![CDATA[income < 0]]>
-      AND
       <if test="request.startTime != null and request.endTime != null">
-        create_time BETWEEN #{request.startTime} AND #{request.endTime}
+        AND  create_time BETWEEN #{request.startTime} AND #{request.endTime}
       </if>
     </where>
   </select>
@@ -386,6 +385,9 @@
     <where>
       <if test="request.startTime != null and request.endTime != null">
         create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+      <if test="request.gpId != null">
+        AND gp_id = #{request.gpId}
       </if>
     </where>
   </select>

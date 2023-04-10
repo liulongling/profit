@@ -190,6 +190,14 @@ public class BondService {
 
         bondInfoDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByGpId(bondInfo.getId()))));
 
+
+        BondSellRequest bondSellRequest = new BondSellRequest();
+        bondSellRequest.setGpId(bondInfo.getId());
+        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getBeginTime(Calendar.getInstance().get(Calendar.YEAR), 1)));
+        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getBeginTime(Calendar.getInstance().get(Calendar.YEAR), 12)));
+        bondInfoDTO.setCurYearProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncome(bondSellRequest))));
+
+
         //计算成本价 = (当前价格 * 股票数量 - 总盈亏) /数量
         Double costPrice = Double.parseDouble(String.format("%.3f", (bondInfo.getPrice() * bondInfoDTO.getGpCount() - bondInfoDTO.getCurProfit()) / bondInfoDTO.getGpCount()));
         Double ykb = (bondInfo.getPrice() - costPrice) / costPrice * 100;

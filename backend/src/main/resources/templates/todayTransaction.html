@@ -29,8 +29,8 @@
     <div class="panel panel-default">
         <ul id="myTab" class="nav nav-tabs">
             <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter();">短线</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_wg();">长线</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_buy();">买入</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_sell();">卖出</a></li>
         </ul>
     </div>
 
@@ -100,10 +100,32 @@
     }
 
     function init() {
+       let data = {
+            type: '0'
+        };
         getServerPaging($table, "/bond/operating/todayTransaction", params => {
-            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC"};
+            return { limit: params.limit, offset: params.offset, sort: "create_time", type: data.type};
         });
     }
+
+    function filter_buy() {
+        let data = {
+            type: '1'
+        };
+        getServerPaging($table, "/bond/operating/todayTransaction", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", type: data.type};
+        });
+    }
+
+    function filter_sell() {
+        let data = {
+            type: '2'
+        };
+        getServerPaging($table, "/bond/operating/todayTransaction", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", type: data.type};
+        });
+    }
+
 </script>
 </body>
 </html>

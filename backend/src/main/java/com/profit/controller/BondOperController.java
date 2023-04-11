@@ -37,47 +37,53 @@ public class BondOperController {
     @GetMapping("todayTransaction")
     public ResultDO<PageUtils<BondTransactionDTO>> todayTransaction(@RequestParam Map<String, Object> params) {
 
-        BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
-        BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
-        if (params.get("id") != null) {
-            criteria.andGpIdEqualTo(params.get("id").toString());
-        }
+        int type = Integer.parseInt(params.get("type").toString());
 
-        criteria.andBuyDateEqualTo(DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM));
-        bondBuyLogExample.setOrderByClause("oper_time desc");
-
-        List<BondBuyLog> buyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
         List<BondTransactionDTO> list = new ArrayList<>();
-        if (buyLogs != null) {
-            for (BondBuyLog bondBuyLog : buyLogs) {
-                BondTransactionDTO bondTransactionDTO = BeanUtils.copyBean(new BondTransactionDTO(), bondBuyLog);
-                bondTransactionDTO.setOperateDate(bondBuyLog.getBuyDate());
-                bondTransactionDTO.setRemarks("买入");
 
-                BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
-                bondTransactionDTO.setName(bondInfo.getName());
-                list.add(bondTransactionDTO);
+        if (type == 0 || type == 1) {
+            BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+            BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
+            if (params.get("id") != null) {
+                criteria.andGpIdEqualTo(params.get("id").toString());
+            }
+
+            criteria.andBuyDateEqualTo(DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM));
+            bondBuyLogExample.setOrderByClause("oper_time desc");
+            List<BondBuyLog> buyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
+            if (buyLogs != null) {
+                for (BondBuyLog bondBuyLog : buyLogs) {
+                    BondTransactionDTO bondTransactionDTO = BeanUtils.copyBean(new BondTransactionDTO(), bondBuyLog);
+                    bondTransactionDTO.setOperateDate(bondBuyLog.getBuyDate());
+                    bondTransactionDTO.setRemarks("买入");
+
+                    BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+                    bondTransactionDTO.setName(bondInfo.getName());
+                    list.add(bondTransactionDTO);
+                }
             }
         }
 
-        BondSellLogExample bondSellLogExample = new BondSellLogExample();
-        BondSellLogExample.Criteria bondSellLogExampleCriteria = bondSellLogExample.createCriteria();
-        if (params.get("id") != null) {
-            bondSellLogExampleCriteria.andGpIdEqualTo(params.get("id").toString());
-        }
+        if (type == 0 || type == 2) {
+            BondSellLogExample bondSellLogExample = new BondSellLogExample();
+            BondSellLogExample.Criteria bondSellLogExampleCriteria = bondSellLogExample.createCriteria();
+            if (params.get("id") != null) {
+                bondSellLogExampleCriteria.andGpIdEqualTo(params.get("id").toString());
+            }
 
-        bondSellLogExampleCriteria.andCreateTimeBetween(DateUtils.getTodayDateTime(0, 0, 0), DateUtils.getTodayDateTime(23, 59, 59));
-        bondSellLogExample.setOrderByClause("create_time desc");
-        List<BondSellLog> sellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
-        if (sellLogs != null) {
-            for (BondSellLog bondSellLog : sellLogs) {
-                BondTransactionDTO bondTransactionDTO = BeanUtils.copyBean(new BondTransactionDTO(), bondSellLog);
-                bondTransactionDTO.setOperateDate(DateUtils.getDateString(bondSellLog.getCreateTime()));
-                bondTransactionDTO.setRemarks("卖出");
+            bondSellLogExampleCriteria.andCreateTimeBetween(DateUtils.getTodayDateTime(0, 0, 0), DateUtils.getTodayDateTime(23, 59, 59));
+            bondSellLogExample.setOrderByClause("create_time desc");
+            List<BondSellLog> sellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
+            if (sellLogs != null) {
+                for (BondSellLog bondSellLog : sellLogs) {
+                    BondTransactionDTO bondTransactionDTO = BeanUtils.copyBean(new BondTransactionDTO(), bondSellLog);
+                    bondTransactionDTO.setOperateDate(DateUtils.getDateString(bondSellLog.getCreateTime()));
+                    bondTransactionDTO.setRemarks("卖出");
 
-                BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondSellLog.getGpId());
-                bondTransactionDTO.setName(bondInfo.getName());
-                list.add(bondTransactionDTO);
+                    BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondSellLog.getGpId());
+                    bondTransactionDTO.setName(bondInfo.getName());
+                    list.add(bondTransactionDTO);
+                }
             }
         }
 

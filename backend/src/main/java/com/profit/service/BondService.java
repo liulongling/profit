@@ -94,7 +94,9 @@ public class BondService {
                 if (bondSellLog.getIncome() < maxLoss) {
                     maxLoss = bondSellLog.getIncome();
                 }
-                sellAmount += bondSellLog.getPrice() * bondSellLog.getCount();
+                if(!bondSellLog.getGpId().equals(BondConstants.NHG_CODE)){
+                    sellAmount += bondSellLog.getPrice() * bondSellLog.getCount();
+                }
                 cost += bondSellLog.getCost();
             }
         }

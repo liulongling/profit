@@ -84,7 +84,9 @@ public class BondService {
         if (buyLogs != null) {
             for (BondSellLog bondSellLog : sellLogs) {
                 if (bondSellLog.getIncome() > 0) {
-                    todayTaxationDTO.incrProfitNumber();
+                    if (!bondSellLog.getGpId().equals(BondConstants.NHG_CODE)) {
+                        todayTaxationDTO.incrProfitNumber();
+                    }
                 } else {
                     todayTaxationDTO.incrPlossNumber();
                 }
@@ -94,7 +96,7 @@ public class BondService {
                 if (bondSellLog.getIncome() < maxLoss) {
                     maxLoss = bondSellLog.getIncome();
                 }
-                if(!bondSellLog.getGpId().equals(BondConstants.NHG_CODE)){
+                if (!bondSellLog.getGpId().equals(BondConstants.NHG_CODE)) {
                     sellAmount += bondSellLog.getPrice() * bondSellLog.getCount();
                 }
                 cost += bondSellLog.getCost();
@@ -454,7 +456,7 @@ public class BondService {
             bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() * bondBuyLog.getCount())));
 
             bondBuyLog.setBuyCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost())));
-            refeshBondStatistics(bondBuyLog.getTotalPrice(), bondBuyLog.getCost());
+            refeshBondStatistics(bondBuyLog.getTotalPrice(), bondBuyLog.getCost(), 0.5);
         }
         bondBuyLogMapper.insertSelective(bondBuyLog);
     }
@@ -516,10 +518,11 @@ public class BondService {
      * @param value
      * @param cost
      */
-    public BondStatistics refeshBondStatistics(Double value, Double cost) {
+    public BondStatistics refeshBondStatistics(Double value, Double cost, Double freeze) {
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
         bondStatistics.setStock(Double.parseDouble(String.format("%.2f", bondStatistics.getStock() + value)));
-        bondStatistics.setReady(Double.parseDouble(String.format("%.2f", bondStatistics.getReady() - value - cost)));
+        bondStatistics.setReady(Double.parseDouble(String.format("%.2f", bondStatistics.getReady() - value - cost - freeze)));
+        bondStatistics.setFreeze(bondStatistics.getFreeze() + freeze);
         bondStatisticsMapper.updateByPrimaryKey(bondStatistics);
         return bondStatistics;
     }
@@ -575,7 +578,7 @@ public class BondService {
 
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
         bondSellLog.setRealyBefore(bondStatistics.getReady());
-        bondStatistics = refeshBondStatistics(-bondSellLog.getTotalPrice(), bondSellLog.getCost());
+        bondStatistics = refeshBondStatistics(-bondSellLog.getTotalPrice(), bondSellLog.getCost(), bondSellLog.getFreeze());
         bondSellLog.setRealyAfter(bondStatistics.getReady());
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);

@@ -17,6 +17,11 @@ public class BondSellLog {
     private String gpId;
 
     /**
+     * 预冻结资金
+     */
+    private Double freeze;
+
+    /**
      *
      */
     private Long buyId;

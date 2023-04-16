@@ -24,6 +24,11 @@ public class BondStatistics {
     private Double ready;
 
     /**
+     * 冻结费用
+     */
+    private Double freeze;
+
+    /**
      * 仓位占比
      */
     private Double position;

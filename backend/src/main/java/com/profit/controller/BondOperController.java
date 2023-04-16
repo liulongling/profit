@@ -119,7 +119,7 @@ public class BondOperController {
             if (status == 1) {
 //                bondBuyLogExample.setOrderByClause("buy_date desc");
             } else {
-                bondBuyLogExample.setOrderByClause("price asc");
+                bondBuyLogExample.setOrderByClause("price desc");
             }
         }
 
@@ -223,7 +223,7 @@ public class BondOperController {
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 
         if (isBuy) {
-            bondService.refeshBondStatistics(bondBuyLog.getCount() * bondBuyLog.getPrice(), bondBuyLog.getCost());
+            bondService.refeshBondStatistics(bondBuyLog.getCount() * bondBuyLog.getPrice(), bondBuyLog.getCost(),0.5);
         }
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }

@@ -5,6 +5,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="stock" jdbcType="DOUBLE" property="stock" />
     <result column="ready" jdbcType="DOUBLE" property="ready" />
+    <result column="freeze" jdbcType="DOUBLE" property="freeze" />
     <result column="position" jdbcType="DOUBLE" property="position" />
     <result column="profit_number" jdbcType="INTEGER" property="profitNumber" />
     <result column="loss_number" jdbcType="INTEGER" property="lossNumber" />
@@ -75,8 +76,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, stock, ready, `position`, profit_number, loss_number, winning, profit, buy_money,
-    sell_money, loss_money, cost, update_time
+    id, stock, ready, `freeze`, `position`, profit_number, loss_number, winning, profit,
+    buy_money, sell_money, loss_money, cost, update_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondStatisticsExample" resultMap="BaseResultMap">
     select
@@ -110,15 +111,15 @@
   </delete>
   <insert id="insert" parameterType="com.profit.base.domain.BondStatistics">
     insert into bond_statistics (id, stock, ready,
-    `position`, profit_number, loss_number,
-    winning, profit, buy_money,
-    sell_money, loss_money, cost,
-    update_time)
+    `freeze`, `position`, profit_number,
+    loss_number, winning, profit,
+    buy_money, sell_money, loss_money,
+    cost, update_time)
     values (#{id,jdbcType=BIGINT}, #{stock,jdbcType=DOUBLE}, #{ready,jdbcType=DOUBLE},
-    #{position,jdbcType=DOUBLE}, #{profitNumber,jdbcType=INTEGER}, #{lossNumber,jdbcType=INTEGER},
-    #{winning,jdbcType=VARCHAR}, #{profit,jdbcType=DOUBLE}, #{buyMoney,jdbcType=DOUBLE},
-    #{sellMoney,jdbcType=DOUBLE}, #{lossMoney,jdbcType=DOUBLE}, #{cost,jdbcType=DOUBLE},
-    #{updateTime,jdbcType=TIMESTAMP})
+    #{freeze,jdbcType=DOUBLE}, #{position,jdbcType=DOUBLE}, #{profitNumber,jdbcType=INTEGER},
+    #{lossNumber,jdbcType=INTEGER}, #{winning,jdbcType=VARCHAR}, #{profit,jdbcType=DOUBLE},
+    #{buyMoney,jdbcType=DOUBLE}, #{sellMoney,jdbcType=DOUBLE}, #{lossMoney,jdbcType=DOUBLE},
+    #{cost,jdbcType=DOUBLE}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.profit.base.domain.BondStatistics">
     insert into bond_statistics
@@ -131,6 +132,9 @@
       </if>
       <if test="ready != null">
         ready,
+      </if>
+      <if test="freeze != null">
+        `freeze`,
       </if>
       <if test="position != null">
         `position`,
@@ -172,6 +176,9 @@
       </if>
       <if test="ready != null">
         #{ready,jdbcType=DOUBLE},
+      </if>
+      <if test="freeze != null">
+        #{freeze,jdbcType=DOUBLE},
       </if>
       <if test="position != null">
         #{position,jdbcType=DOUBLE},
@@ -223,6 +230,9 @@
       <if test="record.ready != null">
         ready = #{record.ready,jdbcType=DOUBLE},
       </if>
+      <if test="record.freeze != null">
+        `freeze` = #{record.freeze,jdbcType=DOUBLE},
+      </if>
       <if test="record.position != null">
         `position` = #{record.position,jdbcType=DOUBLE},
       </if>
@@ -263,6 +273,7 @@
     set id = #{record.id,jdbcType=BIGINT},
     stock = #{record.stock,jdbcType=DOUBLE},
     ready = #{record.ready,jdbcType=DOUBLE},
+    `freeze` = #{record.freeze,jdbcType=DOUBLE},
     `position` = #{record.position,jdbcType=DOUBLE},
     profit_number = #{record.profitNumber,jdbcType=INTEGER},
     loss_number = #{record.lossNumber,jdbcType=INTEGER},
@@ -285,6 +296,9 @@
       </if>
       <if test="ready != null">
         ready = #{ready,jdbcType=DOUBLE},
+      </if>
+      <if test="freeze != null">
+        `freeze` = #{freeze,jdbcType=DOUBLE},
       </if>
       <if test="position != null">
         `position` = #{position,jdbcType=DOUBLE},
@@ -323,6 +337,7 @@
     update bond_statistics
     set stock = #{stock,jdbcType=DOUBLE},
     ready = #{ready,jdbcType=DOUBLE},
+    `freeze` = #{freeze,jdbcType=DOUBLE},
     `position` = #{position,jdbcType=DOUBLE},
     profit_number = #{profitNumber,jdbcType=INTEGER},
     loss_number = #{lossNumber,jdbcType=INTEGER},

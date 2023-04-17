@@ -143,11 +143,15 @@ public class BondService {
 
         List<BondInfo> bondInfos = bondInfoMapper.selectByExample(new BondInfoExample());
         Double stockValue = 0.0;
+        Double todayStockProfit = 0.0;
+
         for (BondInfo bondInfo : bondInfos) {
             BondInfoDTO bondInfoDTO = loadBondInfoDTO(bondInfo);
             stockValue += bondInfoDTO.getMarket();
+            todayStockProfit += bondInfoDTO.getTodayStockProfit();
         }
 
+        totalProfitDTO.setTodayStockProfit(Double.parseDouble(String.format("%.2f", todayStockProfit)));
         totalProfitDTO.setStockValue(Double.parseDouble(String.format("%.2f", stockValue)));
         totalProfitDTO.setLossMoney(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumLossIncome(bondSellRequest))));
         totalProfitDTO.setCost(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumCost(bondSellRequest))));
@@ -191,9 +195,7 @@ public class BondService {
             bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
         }
 
-
         bondInfoDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByGpId(bondInfo.getId()))));
-
 
         BondSellRequest bondSellRequest = new BondSellRequest();
         bondSellRequest.setGpId(bondInfo.getId());
@@ -232,6 +234,11 @@ public class BondService {
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
         bondInfoDTO.setRealPosition(Double.parseDouble(String.format("%.2f", bondInfoDTO.getMarket() / (bondInfoDTO.getMarket() + bondStatistics.getReady()) * 10)));
         bondInfoDTO.setPosition(bondInfo.getPosition());
+
+        //计算今日盈亏 = 持股数量*当前价格-(持股数量 * 昨日收盘价) + 今日T收益
+        Double todayProfit = (bondInfoDTO.getGpCount() * bondInfo.getPrice() - bondInfoDTO.getGpCount() * bondInfo.getOldPrice()) + bondInfoDTO.getTodayTProfit();
+        bondInfoDTO.setTodayStockProfit(todayProfit);
+
         return bondInfoDTO;
     }
 
@@ -409,7 +416,8 @@ public class BondService {
         if (map != null && BooleanUtils.toBoolean(map.get("isWeekDay").toString())) {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            if (hour >= 9 && hour < 15) {
+            int minute = calendar.get(Calendar.MINUTE);
+            if (hour >= 9 && hour <= 15) {
                 List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
                 for (BondInfo bondInfo : list) {
                     Map<String, String> uriMap = new HashMap<>();
@@ -428,7 +436,9 @@ public class BondService {
                         String[] str = reslut.split("~");
                         if (str != null) {
                             bondInfo.setPrice(Double.valueOf(str[3]));
-                            bondInfoMapper.updateByPrimaryKey(bondInfo);
+                            if (minute < 10 || hour >= 15) {
+                                bondInfoMapper.updateByPrimaryKey(bondInfo);
+                            }
                         }
                     }
                 }

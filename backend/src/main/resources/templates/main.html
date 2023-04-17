@@ -431,6 +431,7 @@
     function loadStatisticsPageData(result){
          var textHTML = '<tr>';
          textHTML+='<td>持股市值</td>';
+         textHTML+='<td>预冻资金</td>';
          textHTML+='<td>现金</td>';
          textHTML+='<td>仓位</td>';
          textHTML+='<td>止损亏损(今年)</td>';
@@ -443,6 +444,7 @@
 
           textHTML +=('<tr>');
           textHTML+='<td>'+result.module.stock+'</td>';
+          textHTML+='<td>'+result.module.freeze+'</td>';
           textHTML+='<td>'+result.module.ready+'</td>';
           textHTML+='<td>'+result.module.position+'</td>';
           textHTML+='<td>'+result.module.lossMoney+'</td>';
@@ -482,6 +484,7 @@
     function loadTodayPageData(result){
          var textHTML = '<tr>';
          textHTML+='<td>收益(今日)</td>';
+         textHTML+='<td>持股盈亏(今日)</td>';
          textHTML+='<td>止损亏损(今日)</td>';
          textHTML+='<td>交易金额(今日)</td>';
          textHTML+='<td>买入金额(今日)</td>';
@@ -498,6 +501,7 @@
 
           textHTML +=('<tr>');
           textHTML+='<td>'+result.module.todayProfit+'</td>';
+          textHTML+='<td>'+result.module.todayStockProfit+'</td>';
           textHTML+='<td>'+result.module.todayLossProfit+'</td>';
           textHTML+='<td>'+result.module.transactionAmount+'</td>';
           textHTML+='<td>'+result.module.buyAmount+'</td>';

@@ -305,6 +305,66 @@ public class BondInfoExample {
             return (Criteria) this;
         }
 
+        public Criteria andOldPriceIsNull() {
+            addCriterion("old_price is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceIsNotNull() {
+            addCriterion("old_price is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceEqualTo(Double value) {
+            addCriterion("old_price =", value, "oldPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceNotEqualTo(Double value) {
+            addCriterion("old_price <>", value, "oldPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceGreaterThan(Double value) {
+            addCriterion("old_price >", value, "oldPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceGreaterThanOrEqualTo(Double value) {
+            addCriterion("old_price >=", value, "oldPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceLessThan(Double value) {
+            addCriterion("old_price <", value, "oldPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceLessThanOrEqualTo(Double value) {
+            addCriterion("old_price <=", value, "oldPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceIn(List<Double> values) {
+            addCriterion("old_price in", values, "oldPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceNotIn(List<Double> values) {
+            addCriterion("old_price not in", values, "oldPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceBetween(Double value1, Double value2) {
+            addCriterion("old_price between", value1, value2, "oldPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldPriceNotBetween(Double value1, Double value2) {
+            addCriterion("old_price not between", value1, value2, "oldPrice");
+            return (Criteria) this;
+        }
+
         public Criteria andPlateIsNull() {
             addCriterion("plate is null");
             return (Criteria) this;

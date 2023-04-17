@@ -77,7 +77,11 @@ public class BondInfoDTO extends BondInfo {
     /**
      * 今日T收益
      */
-    public Double todayTProfit;
+    public Double todayTProfit = 0.0;
+    /**
+     * 今日盈亏
+     */
+    public Double todayStockProfit;
     /**
      * 胜率
      */

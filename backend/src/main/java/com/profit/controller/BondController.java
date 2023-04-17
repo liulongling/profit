@@ -34,6 +34,92 @@ public class BondController {
     @Resource
     private BaseDataMapper baseDataMapper;
 
+    @GetMapping("list")
+    public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) throws Exception {
+        BondInfoExample bondInfoExample = new BondInfoExample();
+        BondInfoExample.Criteria criteria = bondInfoExample.createCriteria();
+        if (params.get("isEtf") != null) {
+            criteria.andIsEtfEqualTo(Byte.valueOf(params.get("isEtf").toString()));
+        }
+        criteria.andStatusEqualTo((byte) 0);
+        bondInfoExample.setOrderByClause(" id " + params.get("order"));
+        Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
+        List<BondInfo> result = bondInfoMapper.selectByExample(bondInfoExample);
+        if (result == null) {
+            return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
+        }
+        List<BondInfoDTO> list = new ArrayList<>(result.size());
+
+        //上月出售总收益
+        Map<String, String> lastMonthMap = DateUtils.getLastMonthTime();
+        Map<Object, Object> lastMonthProfitMap = bondService.getProfitByDate(lastMonthMap.get("startDate"), lastMonthMap.get("endDate"));
+
+        //本月出售总收益
+        Map<Object, Object> curMonthProfitMap = bondService.getProfitByDate(DateUtils.getMonthStart(), DateUtils.getMonthEnd());
+
+        //今日出售总收益
+        Map<Object, Object> todayProfitMap = bondService.getProfitByDate(DateUtils.getTimeString(DateUtils.getTime(new Date(), 0, 0, 0)), DateUtils.getTimeString(DateUtils.getTime(new Date(), 23, 59, 59)));
+        for (BondInfo bondInfo : result) {
+            BondInfoDTO bondInfoDTO = bondService.loadBondInfoDTO(bondInfo);
+            bondInfoDTO.setLastMonthProfit(lastMonthProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", lastMonthProfitMap.get(bondInfo.getId()))));
+            bondInfoDTO.setCurMonthProfit(curMonthProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", curMonthProfitMap.get(bondInfo.getId()))));
+            bondInfoDTO.setTodayTProfit(todayProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", todayProfitMap.get(bondInfo.getId()))));
+            list.add(bondInfoDTO);
+        }
+
+        Collections.sort(list,new ComparatorBondMarket());
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
+    }
+
+
+    @PostMapping("insert")
+    public ResultDO<Void> insert(@RequestBody BondInfo bondInfo) {
+        bondInfo.setCreateTime(new Date());
+        bondInfo.setUpdateTime(new Date());
+        bondInfo.setStatus((byte) 0);
+        bondInfoMapper.insert(bondInfo);
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
+    }
+
+    @PostMapping("info")
+    public ResultDO<TodayTaxationDTO> info(@RequestBody BondInfo bondInfo) {
+        bondInfo = bondInfoMapper.selectByPrimaryKey(bondInfo.getId());
+        TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(bondInfo.getId());
+        todayTaxationDTO.setPrice(bondInfo.getPrice());
+        todayTaxationDTO.setName(bondInfo.getName());
+        bondService.getBondNumber(bondInfo, BondConstants.LONG_LINE);
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, todayTaxationDTO);
+    }
+
+    @PostMapping("update")
+    public ResultDO<Void> update(@RequestBody BondInfo bondInfo) {
+        bondInfo.setUpdateTime(new Date());
+        bondInfoMapper.updateByPrimaryKeySelective(bondInfo);
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
+    }
+
+    @PostMapping("analyse")
+    public ResultDO<ProfitDTO> analyse(@RequestBody BondSellRequest bondSellRequest) {
+        ProfitDTO profitDTO = bondService.totalProfit();
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, profitDTO);
+    }
+
+    @PostMapping("today/analyse")
+    public ResultDO<TodayTaxationDTO> todayAnalyse(@RequestBody BondSellRequest bondSellRequest) {
+        TotalProfitDTO totalProfitDTO = bondService.loadTotalProfitDTO();
+        TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(null);
+        todayTaxationDTO.setTodayStockProfit(totalProfitDTO.getTodayStockProfit());
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, todayTaxationDTO);
+    }
+
+    @PostMapping("total/analyse")
+    public ResultDO<BondStatistics> totalAnalyse(@RequestBody BondSellRequest bondSellRequest) {
+        BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
+        double p = (bondStatistics.getStock() / (bondStatistics.getStock() + bondStatistics.getReady())) * 100;
+        bondStatistics.setPosition(Double.parseDouble(String.format("%.2f", p)));
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondStatistics);
+    }
+
     @PostMapping("sell/log")
     public ResultDO<List<BondSellDTO>> getSellLogs(@RequestBody BondSellRequest bondSellRequest) throws Exception {
         BondSellLogExample bondSellLogExample = new BondSellLogExample();
@@ -112,90 +198,5 @@ public class BondController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
 
-    @GetMapping("list")
-    public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) throws Exception {
-        BondInfoExample bondInfoExample = new BondInfoExample();
-        BondInfoExample.Criteria criteria = bondInfoExample.createCriteria();
-        if (params.get("isEtf") != null) {
-            criteria.andIsEtfEqualTo(Byte.valueOf(params.get("isEtf").toString()));
-        }
-        criteria.andStatusEqualTo((byte) 0);
-        bondInfoExample.setOrderByClause(" id " + params.get("order"));
-        Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
-        List<BondInfo> result = bondInfoMapper.selectByExample(bondInfoExample);
-        if (result == null) {
-            return new ResultDO<>(false, ResultCode.DB_ERROR, ResultCode.MSG_DB_ERROR, null);
-        }
-        List<BondInfoDTO> list = new ArrayList<>(result.size());
-
-        //上月出售总收益
-        Map<String, String> lastMonthMap = DateUtils.getLastMonthTime();
-        Map<Object, Object> lastMonthProfitMap = bondService.getProfitByDate(lastMonthMap.get("startDate"), lastMonthMap.get("endDate"));
-
-        //本月出售总收益
-        Map<Object, Object> curMonthProfitMap = bondService.getProfitByDate(DateUtils.getMonthStart(), DateUtils.getMonthEnd());
-
-        //今日出售总收益
-        Map<Object, Object> todayProfitMap = bondService.getProfitByDate(DateUtils.getTimeString(DateUtils.getTime(new Date(), 0, 0, 0)), DateUtils.getTimeString(DateUtils.getTime(new Date(), 23, 59, 59)));
-        for (BondInfo bondInfo : result) {
-            BondInfoDTO bondInfoDTO = bondService.loadBondInfoDTO(bondInfo);
-            bondInfoDTO.setLastMonthProfit(lastMonthProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", lastMonthProfitMap.get(bondInfo.getId()))));
-            bondInfoDTO.setCurMonthProfit(curMonthProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", curMonthProfitMap.get(bondInfo.getId()))));
-            bondInfoDTO.setTodayTProfit(todayProfitMap.get(bondInfo.getId()) == null ? 0 : Double.parseDouble(String.format("%.2f", todayProfitMap.get(bondInfo.getId()))));
-            list.add(bondInfoDTO);
-        }
-
-        Collections.sort(list,new ComparatorBondMarket());
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
-    }
-
-
-    @PostMapping("insert")
-    public ResultDO<Void> insert(@RequestBody BondInfo bondInfo) {
-        bondInfo.setCreateTime(new Date());
-        bondInfo.setUpdateTime(new Date());
-        bondInfo.setStatus((byte) 0);
-        bondInfoMapper.insert(bondInfo);
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
-    }
-
-    @PostMapping("info")
-    public ResultDO<TodayTaxationDTO> info(@RequestBody BondInfo bondInfo) {
-        bondInfo = bondInfoMapper.selectByPrimaryKey(bondInfo.getId());
-        TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(bondInfo.getId());
-        todayTaxationDTO.setPrice(bondInfo.getPrice());
-        todayTaxationDTO.setName(bondInfo.getName());
-        bondService.getBondNumber(bondInfo, BondConstants.LONG_LINE);
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, todayTaxationDTO);
-    }
-
-    @PostMapping("update")
-    public ResultDO<Void> update(@RequestBody BondInfo bondInfo) {
-        bondInfo.setUpdateTime(new Date());
-        bondInfoMapper.updateByPrimaryKeySelective(bondInfo);
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
-    }
-
-    @PostMapping("analyse")
-    public ResultDO<ProfitDTO> analyse(@RequestBody BondSellRequest bondSellRequest) {
-        ProfitDTO profitDTO = bondService.totalProfit();
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, profitDTO);
-    }
-
-    @PostMapping("today/analyse")
-    public ResultDO<TotalProfitDTO> todayAnalyse(@RequestBody BondSellRequest bondSellRequest) {
-        TotalProfitDTO totalProfitDTO = bondService.loadTotalProfitDTO();
-        TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(null);
-        BeanUtils.copyBean(totalProfitDTO, todayTaxationDTO);
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, totalProfitDTO);
-    }
-
-    @PostMapping("total/analyse")
-    public ResultDO<BondStatistics> totalAnalyse(@RequestBody BondSellRequest bondSellRequest) {
-        BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
-        double p = (bondStatistics.getStock() / (bondStatistics.getStock() + bondStatistics.getReady())) * 100;
-        bondStatistics.setPosition(Double.parseDouble(String.format("%.2f", p)));
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondStatistics);
-    }
 
 }

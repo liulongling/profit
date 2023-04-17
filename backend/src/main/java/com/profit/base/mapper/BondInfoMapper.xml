@@ -5,6 +5,7 @@
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="price" jdbcType="DOUBLE" property="price" />
+    <result column="old_price" jdbcType="DOUBLE" property="oldPrice" />
     <result column="plate" jdbcType="VARCHAR" property="plate" />
     <result column="is_etf" jdbcType="TINYINT" property="isEtf" />
     <result column="position" jdbcType="DOUBLE" property="position" />
@@ -71,7 +72,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, `name`, price, plate, is_etf, `position`, `status`, create_time, update_time
+    id, `name`, price, old_price, plate, is_etf, `position`, `status`, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondInfoExample" resultMap="BaseResultMap">
     select
@@ -105,13 +106,13 @@
   </delete>
   <insert id="insert" parameterType="com.profit.base.domain.BondInfo">
     insert into bond_info (id, `name`, price,
-    plate, is_etf, `position`,
-    `status`, create_time, update_time
-    )
+    old_price, plate, is_etf,
+    `position`, `status`, create_time,
+    update_time)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE},
-    #{plate,jdbcType=VARCHAR}, #{isEtf,jdbcType=TINYINT}, #{position,jdbcType=DOUBLE},
-    #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-    )
+    #{oldPrice,jdbcType=DOUBLE}, #{plate,jdbcType=VARCHAR}, #{isEtf,jdbcType=TINYINT},
+    #{position,jdbcType=DOUBLE}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP},
+    #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.profit.base.domain.BondInfo">
     insert into bond_info
@@ -124,6 +125,9 @@
       </if>
       <if test="price != null">
         price,
+      </if>
+      <if test="oldPrice != null">
+        old_price,
       </if>
       <if test="plate != null">
         plate,
@@ -153,6 +157,9 @@
       </if>
       <if test="price != null">
         #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="oldPrice != null">
+        #{oldPrice,jdbcType=DOUBLE},
       </if>
       <if test="plate != null">
         #{plate,jdbcType=VARCHAR},
@@ -192,6 +199,9 @@
       <if test="record.price != null">
         price = #{record.price,jdbcType=DOUBLE},
       </if>
+      <if test="record.oldPrice != null">
+        old_price = #{record.oldPrice,jdbcType=DOUBLE},
+      </if>
       <if test="record.plate != null">
         plate = #{record.plate,jdbcType=VARCHAR},
       </if>
@@ -220,6 +230,7 @@
     set id = #{record.id,jdbcType=VARCHAR},
     `name` = #{record.name,jdbcType=VARCHAR},
     price = #{record.price,jdbcType=DOUBLE},
+    old_price = #{record.oldPrice,jdbcType=DOUBLE},
     plate = #{record.plate,jdbcType=VARCHAR},
     is_etf = #{record.isEtf,jdbcType=TINYINT},
     `position` = #{record.position,jdbcType=DOUBLE},
@@ -238,6 +249,9 @@
       </if>
       <if test="price != null">
         price = #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="oldPrice != null">
+        old_price = #{oldPrice,jdbcType=DOUBLE},
       </if>
       <if test="plate != null">
         plate = #{plate,jdbcType=VARCHAR},
@@ -264,6 +278,7 @@
     update bond_info
     set `name` = #{name,jdbcType=VARCHAR},
     price = #{price,jdbcType=DOUBLE},
+    old_price = #{oldPrice,jdbcType=DOUBLE},
     plate = #{plate,jdbcType=VARCHAR},
     is_etf = #{isEtf,jdbcType=TINYINT},
     `position` = #{position,jdbcType=DOUBLE},

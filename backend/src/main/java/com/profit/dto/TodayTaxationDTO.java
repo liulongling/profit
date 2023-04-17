@@ -7,6 +7,10 @@ import lombok.Data;
 public class TodayTaxationDTO extends BondInfo {
 
     /**
+     * 今日持股盈亏
+     */
+    private Double todayStockProfit;
+    /**
      * 今日总收益
      */
     private Double todayProfit;

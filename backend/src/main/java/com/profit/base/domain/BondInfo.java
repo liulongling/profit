@@ -23,6 +23,11 @@ public class BondInfo {
     private Double price;
 
     /**
+     * 昨日收盘价
+     */
+    private Double oldPrice;
+
+    /**
      * 上市所属板块 0：上证 1:深圳 2：创业板 3：etf
      */
     private String plate;

@@ -8,6 +8,7 @@ import com.profit.base.mapper.*;
 import com.profit.commons.constants.BondConstants;
 import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.*;
+import com.profit.comparator.ComparatorBondMarket;
 import com.profit.comparator.ComparatorIncome;
 import com.profit.dto.*;
 import com.profit.service.BondService;
@@ -144,6 +145,7 @@ public class BondController {
             list.add(bondInfoDTO);
         }
 
+        Collections.sort(list,new ComparatorBondMarket());
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
 

@@ -152,8 +152,7 @@ public class BondOperController {
             buyLogDTO.setGirdSpacing(girdSpacing);
             list.add(buyLogDTO);
             if (status == 1) {
-                ComparatorBondSell comparator = new ComparatorBondSell();
-                Collections.sort(list, comparator);
+                Collections.sort(list, new ComparatorBondSell());
             }
         }
 
@@ -176,6 +175,7 @@ public class BondOperController {
                 bondSellLog.setPrice(bondBuyRequest.getSellPrice());
                 bondSellLog.setCount(bondBuyRequest.getCount());
                 bondSellLog.setCreateTime(date);
+                bondSellLog.setFreeze(0.5);
                 bondService.sellBond(bondSellLog);
             }
         }

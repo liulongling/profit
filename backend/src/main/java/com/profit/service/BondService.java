@@ -195,10 +195,11 @@ public class BondService {
             bondInfoDTO.setGpProfit(Double.parseDouble(String.format("%.2f", total)));
         }
 
-        bondInfoDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByGpId(bondInfo.getId()))));
-
         BondSellRequest bondSellRequest = new BondSellRequest();
         bondSellRequest.setGpId(bondInfo.getId());
+        bondInfoDTO.setTotalProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByGpId(bondSellRequest))));
+
+
         bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getBeginTime(Calendar.getInstance().get(Calendar.YEAR), 1)));
         bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getBeginTime(Calendar.getInstance().get(Calendar.YEAR), 12)));
         bondInfoDTO.setCurYearProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncome(bondSellRequest))));
@@ -232,10 +233,15 @@ public class BondService {
 
         bondInfoDTO.setMarket(Double.parseDouble(String.format("%.0f", bondInfo.getPrice() * bondInfoDTO.getGpCount())));
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
-        bondInfoDTO.setRealPosition(Double.parseDouble(String.format("%.2f", bondInfoDTO.getMarket() / (bondInfoDTO.getMarket() + bondStatistics.getReady()) * 10)));
+
+        bondInfoDTO.setRealPosition(Double.parseDouble(String.format("%.2f", bondInfoDTO.getMarket() / (bondStatistics.getStock() + bondStatistics.getReady()) * 10)));
         bondInfoDTO.setPosition(bondInfo.getPosition());
 
-        //计算今日盈亏 = 持股数量*当前价格-(持股数量 * 昨日收盘价) + 今日T收益
+        //计算今日T收益
+        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getTime(new Date(), 0, 0, 0)));
+        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getTime(new Date(), 23, 59, 59)));
+        bondInfoDTO.setTodayTProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByGpId(bondSellRequest))));
+        //计算今日盈亏 = 持股数量*当前价格-(昨日持股数量 * 昨日收盘价) + 今日T收益
         Double todayProfit = (bondInfoDTO.getGpCount() * bondInfo.getPrice() - bondInfoDTO.getGpCount() * bondInfo.getOldPrice()) + bondInfoDTO.getTodayTProfit();
         bondInfoDTO.setTodayStockProfit(todayProfit);
 
@@ -436,9 +442,10 @@ public class BondService {
                         String[] str = reslut.split("~");
                         if (str != null) {
                             bondInfo.setPrice(Double.valueOf(str[3]));
-                            if (minute < 10 || hour >= 15) {
-                                bondInfoMapper.updateByPrimaryKey(bondInfo);
+                            if (hour >= 15) {
+                                bondInfo.setOldPrice(bondInfo.getPrice());
                             }
+                            bondInfoMapper.updateByPrimaryKey(bondInfo);
                         }
                     }
                 }

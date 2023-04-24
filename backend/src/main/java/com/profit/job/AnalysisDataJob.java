@@ -33,7 +33,7 @@ public class AnalysisDataJob {
     @Scheduled(cron = "0 */1 * * * ?")
     public void task1() {
         LogUtil.info("定时任务[task1]开始执行");
-//        bondService.refurbishBondPrice();
+        bondService.initTask();
         LogUtil.info("定时任务[task1]执行结束");
 
     }

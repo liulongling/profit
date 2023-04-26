@@ -430,7 +430,14 @@ public class BondService {
                     if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
                         continue;
                     }
-                    uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
+                    if (bondInfo.getId().equals("1-600036")) {
+                        uriMap.put("q", bondInfo.getPlate() + "600036");
+                    } else if (bondInfo.getId().equals("1-002142")) {
+                        uriMap.put("q", bondInfo.getPlate() + "002142");
+                    } else {
+                        uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
+                    }
+
                     ResponseEntity responseEntity = restTemplate.getForEntity
                             (
                                     HttpUtil.generateRequestParameters(serverUrl, uriMap),

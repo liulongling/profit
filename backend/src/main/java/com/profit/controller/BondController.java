@@ -77,6 +77,7 @@ public class BondController {
         bondInfo.setCreateTime(new Date());
         bondInfo.setUpdateTime(new Date());
         bondInfo.setStatus((byte) 0);
+        bondInfo.setOldPrice(bondInfo.getPrice());
         bondInfoMapper.insert(bondInfo);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }

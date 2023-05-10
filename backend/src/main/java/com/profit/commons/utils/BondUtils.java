@@ -6,6 +6,20 @@ import com.profit.commons.constants.BondConstants;
 
 public class BondUtils {
 
+    public static String getBaseId(String id) {
+        if (id.equals("1-600036")) {
+            return "600036";
+        } else if (id.equals("1-002142")) {
+            return "002142";
+        } else if (id.equals("1-512480")) {
+            return "512480";
+        } else if (id.equals("1-515790")) {
+            return "515790";
+        } else {
+            return id;
+        }
+    }
+
     /**
      * 计算佣金
      *
@@ -18,7 +32,7 @@ public class BondUtils {
         Double taxation = 0.00;
         if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
             //券商佣金
-            if(!isSell){
+            if (!isSell) {
                 taxation += total * 0.00001;
             }
         } else if (bondInfo.getPlate().equals("hk")) {

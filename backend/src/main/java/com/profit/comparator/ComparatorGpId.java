@@ -1,5 +1,6 @@
 package com.profit.comparator;
 
+import com.profit.commons.utils.BondUtils;
 import com.profit.dto.BondTransactionDTO;
 
 import java.util.Comparator;
@@ -21,7 +22,8 @@ public class ComparatorGpId implements Comparator {
     public int compare(Object o1, Object o2) {
         BondTransactionDTO className1 = (BondTransactionDTO) o1;
         BondTransactionDTO className2 = (BondTransactionDTO) o2;
-        if (Integer.parseInt(className1.getGpId()) < Integer.parseInt(className2.getGpId())) {
+
+        if (Integer.parseInt(BondUtils.getBaseId(className1.getGpId())) < Integer.parseInt(BondUtils.getBaseId(className2.getGpId()))) {
             return 1;
         }
 

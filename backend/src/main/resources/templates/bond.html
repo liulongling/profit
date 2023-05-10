@@ -553,14 +553,8 @@
     function operateFormatter(value, row, index) {  // 赋予的参数
         return [
             '<button class="btn btn-primary view" data-toggle="modal" data-target="#alterModal" onclick="initUpdate('+ index +');">编辑</button>&nbsp;&nbsp;'+
-            '<button class="btn btn-primary view" data-toggle="modal" data-target="#sellModal" onclick="sell('+ index +');">出售</button>&nbsp;&nbsp;'
-        ].join('');
-    }
-
-    function operateFormatter(value, row, index) {  // 赋予的参数
-        return [
-            '<button class="btn btn-primary view" data-toggle="modal" data-target="#alterModal" onclick="initUpdate('+ index +');">编辑</button>&nbsp;&nbsp;'+
-            '<button class="btn btn-primary view" data-toggle="modal" data-target="#sellModal" onclick="sell('+ index +');">出售</button>&nbsp;&nbsp;'
+            '<button class="btn btn-primary view" data-toggle="modal" data-target="#sellModal" onclick="sell('+ index +');">出售</button>&nbsp;&nbsp;'+
+            '<button class="btn btn-primary view" onclick="deleteOne('+ index +');">删除</button>&nbsp;&nbsp;'
         ].join('');
     }
 
@@ -856,7 +850,15 @@
 
 
 
-
+    function deleteOne(index) {
+        dialog("确定删除吗？", () => {
+            let data = { id: $table.bootstrapTable('getData')[index].id };
+            parameterPostRequest("/bond/delete", data, () => {
+                swal("正确", "删除成功", "success");
+                init();
+            });
+        });
+    }
 
 
 </script>

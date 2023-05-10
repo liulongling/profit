@@ -70,8 +70,10 @@ public class BondService {
         int buyNumber = 0;
         if (buyLogs != null) {
             for (BondBuyLog bondBuyLog : buyLogs) {
-                buyAmount += bondBuyLog.getPrice() * bondBuyLog.getCount();
-                buyNumber++;
+                if (!bondBuyLog.getGpId().equals(BondConstants.NHG_CODE)) {
+                    buyAmount += bondBuyLog.getPrice() * bondBuyLog.getCount();
+                    buyNumber++;
+                }
             }
         }
         todayTaxationDTO.setBuyAmount(Double.parseDouble(String.format("%.2f", buyAmount)));
@@ -430,14 +432,7 @@ public class BondService {
                     if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
                         continue;
                     }
-                    if (bondInfo.getId().equals("1-600036")) {
-                        uriMap.put("q", bondInfo.getPlate() + "600036");
-                    } else if (bondInfo.getId().equals("1-002142")) {
-                        uriMap.put("q", bondInfo.getPlate() + "002142");
-                    } else {
-                        uriMap.put("q", bondInfo.getPlate() + bondInfo.getId());
-                    }
-
+                    uriMap.put("q", bondInfo.getPlate() + BondUtils.getBaseId(bondInfo.getId()));
                     ResponseEntity responseEntity = restTemplate.getForEntity
                             (
                                     HttpUtil.generateRequestParameters(serverUrl, uriMap),

@@ -199,5 +199,10 @@ public class BondController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
 
+    @PostMapping("delete")
+    public ResultDO<Void> delete(@RequestBody BondBuyLog bondBuyLog) {
+        bondBuyLogMapper.deleteByPrimaryKey(bondBuyLog.getId());
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
+    }
 
 }

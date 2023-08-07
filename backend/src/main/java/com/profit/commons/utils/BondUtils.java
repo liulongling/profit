@@ -15,6 +15,8 @@ public class BondUtils {
             return "512480";
         } else if (id.equals("1-515790")) {
             return "515790";
+        } else if (id.equals("1-600340")) {
+            return "600340";
         } else {
             return id;
         }

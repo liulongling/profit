@@ -442,13 +442,17 @@ public class BondService {
                     if (responseEntity != null) {
                         String reslut = (String) responseEntity.getBody();
                         String[] str = reslut.split("~");
-                        if (str != null) {
-                            bondInfo.setPrice(Double.valueOf(str[3]));
-                            if (hour >= 15) {
-                                bondInfo.setOldPrice(bondInfo.getPrice());
+                        try {
+                            if (str != null) {
+                                bondInfo.setPrice(Double.valueOf(str[3]));
+                                if (hour >= 15) {
+                                    bondInfo.setOldPrice(bondInfo.getPrice());
+                                }
                             }
-                            bondInfoMapper.updateByPrimaryKey(bondInfo);
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
+                        bondInfoMapper.updateByPrimaryKey(bondInfo);
                     }
                 }
             }

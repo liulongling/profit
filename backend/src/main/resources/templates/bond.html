@@ -35,7 +35,7 @@
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell();">未出售(全部)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_gird();">未出售(长线)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_stu();">未出售(短线)</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_flow();">未出售(流动)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_flow();">未出售(超短)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_wait_buy();">待买入</a></li>
         </ul>
     </div>
@@ -91,6 +91,7 @@
                             <select class="form-control" id="insert_input_type">
                                 <option value="1">短线</option>
                                 <option value="0">长线</option>
+                                <option value="2">超短</option>
                             </select>
                         </div>
                     </div>
@@ -158,7 +159,7 @@
                             <select class="form-control" id="insert_input_bond_type">
                                 <option value="1">短线</option>
                                 <option value="0">长线</option>
-                                <option value="2">流动</option>
+                                <option value="2">超短</option>
                             </select>
                         </div>
                     </div>
@@ -208,7 +209,7 @@
                             <select class="form-control" id="alert_input_type">
                                 <option value="0">长线</option>
                                 <option value="1">短线</option>
-                                <option value="2">流动</option>
+                                <option value="2">超短</option>
                             </select>
                         </div>
                     </div>
@@ -683,7 +684,7 @@
     function filter_no_sell_flow() {
         let data = {
             status:'0',
-            type:'3'
+            type:'2'
         };
         getServerPaging($table, "/bond/operating/list", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status,type:data.type};

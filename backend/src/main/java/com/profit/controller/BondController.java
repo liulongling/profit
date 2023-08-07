@@ -67,7 +67,7 @@ public class BondController {
             list.add(bondInfoDTO);
         }
 
-        Collections.sort(list,new ComparatorBondMarket());
+        Collections.sort(list, new ComparatorBondMarket());
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
 
@@ -202,6 +202,16 @@ public class BondController {
     @PostMapping("delete")
     public ResultDO<Void> delete(@RequestBody BondBuyLog bondBuyLog) {
         bondBuyLogMapper.deleteByPrimaryKey(bondBuyLog.getId());
+        //查询是否有出售
+        BondSellLogExample bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andBuyIdEqualTo(bondBuyLog.getId());
+        List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
+        if (bondSellLogs != null) {
+            for (BondSellLog bondSellLog : bondSellLogs) {
+                bondSellLogMapper.deleteByPrimaryKey(bondSellLog.getId());
+            }
+        }
+
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 

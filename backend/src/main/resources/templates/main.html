@@ -47,7 +47,6 @@
             <li><a href="#ETF" data-toggle="tab" onclick="filterEtf();">ETF</a></li>
             <li><a href="#NHG" data-toggle="tab" onclick="filterNhg();">逆回购</a></li>
             <li><a href="#KZZ" data-toggle="tab" onclick="filterKzz();">可转债</a></li>
-            <li><a href="#KZZ" data-toggle="tab" onclick="filterYh();">银河</a></li>
         </ul>
     </div>
 
@@ -392,7 +391,7 @@
     }
 
     function bondInfo(index){
-      let url = "http://127.0.0.1:8080/bond/?id="+$table.bootstrapTable('getData')[index].id;
+      let url = "http://127.0.0.1:"+window.location.port+"/bond/?id="+$table.bootstrapTable('getData')[index].id;
       window.open(url);
     }
 
@@ -450,7 +449,7 @@
           textHTML+='<td>'+result.module.position+'</td>';
           textHTML+='<td>'+result.module.lossMoney+'</td>';
           textHTML+='<td>'+result.module.cost+'</td>';
-          textHTML+='<td><a href = "http://127.0.0.1:8080/allbond" target= "http://127.0.0.1:8080/allbond">'+result.module.profit+'</a></td>';
+          textHTML+='<td><a href = "http://127.0.0.1:'+window.location.port+'/allbond" target= "http://127.0.0.1:'+window.location.port+'/allbond">'+result.module.profit+'</a></td>';
           textHTML+='<td>'+result.module.profitNumber+'</td>';
           textHTML+='<td>'+result.module.lossNumber+'</td>';
           textHTML+='<td>'+result.module.winning+'</td>';
@@ -508,7 +507,7 @@
           textHTML+='<td>'+result.module.buyAmount+'</td>';
           textHTML+='<td>'+result.module.sellAmount+'</td>';
           textHTML+='<td>'+result.module.cost+'</td>';
-          textHTML+='<td><a href = "http://127.0.0.1:8080/todayTransaction" target= "http://127.0.0.1:8080/todayTransaction">'+result.module.buyNumber+'</a></td>';
+          textHTML+='<td><a href = "http://127.0.0.1:"+window.location.port+"/todayTransaction" target= "http://127.0.0.1:"+window.location.port+"/todayTransaction">'+result.module.buyNumber+'</a></td>';
           textHTML+='<td>'+result.module.profitNumber+'</td>';
           textHTML+='<td>'+result.module.lossNumber+'</td>';
           textHTML+='<td>'+result.module.winning+'</td>';

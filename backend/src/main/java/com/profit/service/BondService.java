@@ -419,44 +419,54 @@ public class BondService {
      * 更新股价
      */
     public void refurbishBondPrice() {
+        if (!isUpdateBondInfo()) {
+            return;
+        }
+        List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
+        for (BondInfo bondInfo : list) {
+            Map<String, String> uriMap = new HashMap<>();
+            if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
+                continue;
+            }
+            uriMap.put("q", bondInfo.getPlate() + BondUtils.getBaseId(bondInfo.getId()));
+            ResponseEntity responseEntity = restTemplate.getForEntity
+                    (
+                            HttpUtil.generateRequestParameters(serverUrl, uriMap),
+                            String.class
+                    );
+
+            if (responseEntity != null) {
+                String reslut = (String) responseEntity.getBody();
+                String[] str = reslut.split("~");
+                try {
+                    if (str != null) {
+                        bondInfo.setPrice(Double.valueOf(str[3]));
+                        Calendar calendar = Calendar.getInstance();
+                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                        if (hour >= 15) {
+                            bondInfo.setOldPrice(bondInfo.getPrice());
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                bondInfoMapper.updateByPrimaryKey(bondInfo);
+            }
+        }
+    }
+
+
+    public boolean isUpdateBondInfo() {
         String date = DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM);
         Map<String, Object> map = WeekdayUtil.isWeekday(date);
         if (map != null && BooleanUtils.toBoolean(map.get("isWeekDay").toString())) {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int minute = calendar.get(Calendar.MINUTE);
             if (hour >= 9 && hour <= 15) {
-                List<BondInfo> list = bondInfoMapper.selectByExample(new BondInfoExample());
-                for (BondInfo bondInfo : list) {
-                    Map<String, String> uriMap = new HashMap<>();
-                    if (bondInfo.getId().equals(BondConstants.NHG_CODE)) {
-                        continue;
-                    }
-                    uriMap.put("q", bondInfo.getPlate() + BondUtils.getBaseId(bondInfo.getId()));
-                    ResponseEntity responseEntity = restTemplate.getForEntity
-                            (
-                                    HttpUtil.generateRequestParameters(serverUrl, uriMap),
-                                    String.class
-                            );
-
-                    if (responseEntity != null) {
-                        String reslut = (String) responseEntity.getBody();
-                        String[] str = reslut.split("~");
-                        try {
-                            if (str != null) {
-                                bondInfo.setPrice(Double.valueOf(str[3]));
-                                if (hour >= 15) {
-                                    bondInfo.setOldPrice(bondInfo.getPrice());
-                                }
-                            }
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                        bondInfoMapper.updateByPrimaryKey(bondInfo);
-                    }
-                }
+                return true;
             }
         }
+        return false;
     }
 
     /**

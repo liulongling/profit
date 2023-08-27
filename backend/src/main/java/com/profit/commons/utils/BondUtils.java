@@ -52,8 +52,8 @@ public class BondUtils {
                 //过户费成交金额0.001%
                 taxation += total * 0.00001;
                 if (isSell) {
-                    //印花税0.1%
-                    taxation += total * 0.001;
+                    //印花税0.1% --> 0.05% 20230827印花税减半
+                    taxation += total * 0.0005;
                 }
                 //券商佣金
                 taxation += total * 0.0001;

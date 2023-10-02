@@ -28,6 +28,16 @@ public class ManagerController {
         return TemplatePath.ALL_BOND_HTML;
     }
 
+    @GetMapping("profit")
+    public String profit() {
+        return TemplatePath.PROFIT_HTML;
+    }
+
+    @GetMapping("login")
+    public String login() {
+        return TemplatePath.USER_LOGIN;
+    }
+
     @GetMapping("todayTransaction")
     public String todayTransaction() {
         return TemplatePath.TODAY_TRANSACTION;

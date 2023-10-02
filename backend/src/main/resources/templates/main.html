@@ -310,16 +310,6 @@
             title: '今年总收益',
             width: "70px",
             formatter: stringFormatter
-        },  {
-            field: 'waitBuy',
-            title: '待买入',
-            width: "50px",
-            formatter: stringFormatter
-        }, {
-            field: 'todayTProfit',
-            title: '今日T收益',
-            width: "70px",
-            formatter: stringFormatter
         }, {
             field: 'winning',
             title: '成功率',
@@ -449,8 +439,8 @@
           textHTML+='<td>'+result.module.position+'</td>';
           textHTML+='<td>'+result.module.lossMoney+'</td>';
           textHTML+='<td>'+result.module.cost+'</td>';
-          textHTML+='<td><a href = "http://127.0.0.1:'+window.location.port+'/allbond" target= "http://127.0.0.1:'+window.location.port+'/allbond">'+result.module.profit+'</a></td>';
-          textHTML+='<td>'+result.module.profitNumber+'</td>';
+          textHTML+='<td><a href = "http://127.0.0.1:'+window.location.port+'/profit" target= "http://127.0.0.1:'+window.location.port+'/profit">'+result.module.profit+'</a></td>';
+          textHTML+='<td><a href = "http://127.0.0.1:'+window.location.port+'/allbond" target= "http://127.0.0.1:'+window.location.port+'/allbond">'+result.module.profitNumber+'</a></td>';
           textHTML+='<td>'+result.module.lossNumber+'</td>';
           textHTML+='<td>'+result.module.winning+'</td>';
           textHTML+='</tr>';
@@ -590,7 +580,7 @@
     function deleteOne(index) {
         dialog("确定删除吗？", () => {
             let data = { id: $table.bootstrapTable('getData')[index].id };
-            parameterPostRequest("/student/delete", data, () => {
+            parameterPostRequest("/bond/delete", data, () => {
                 swal("正确", "删除成功", "success");
                 init();
             });

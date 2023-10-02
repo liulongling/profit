@@ -5,6 +5,8 @@ import com.profit.base.mapper.*;
 import com.profit.commons.constants.BondConstants;
 import com.profit.commons.utils.*;
 import com.profit.dto.*;
+import com.profit.model.EChartsData;
+import com.profit.model.EChartsElement;
 import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -256,13 +258,21 @@ public class BondService {
      *
      * @return
      */
-    public ProfitDTO totalProfit() {
+    public EChartsData totalProfit() {
+        EChartsData eChartsData = new EChartsData();
+        eChartsData.setText("收益分析");
+        eChartsData.getLegend().add("短线收益");
+        eChartsData.getLegend().add("长线收益");
+        eChartsData.getLegend().add("总收益");
+
         ProfitDTO profitDTO = new ProfitDTO();
         for (int i = 1; i <= 12; i++) {
             Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
             String month = i < 10 ? ("0" + i) : String.valueOf(i);
             profitDTO.getDate().add(year + month);
+            eChartsData.getXAxis().add(year + month);
+
             BondSellRequest bondSellRequest = new BondSellRequest();
             bondSellRequest.setStartTime(DateUtils.getFirstDayOfMonth(i));
             bondSellRequest.setEndTime(DateUtils.getLastDayOfMonth(i));
@@ -277,12 +287,8 @@ public class BondService {
             Double stubProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByType(bondSellRequest)));
             profitDTO.getStubProfit().add(stubProfit);
 
-            //国债逆回购收益
-            bondSellRequest.setType(2);
-            Double nationalProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumIncomeByType(bondSellRequest)));
-            profitDTO.getNationalProfit().add(nationalProfit);
 
-            profitDTO.getTotalProfit().add(Double.parseDouble(String.format("%.2f", gridProfit + stubProfit + nationalProfit)));
+            profitDTO.getTotalProfit().add(Double.parseDouble(String.format("%.2f", gridProfit + stubProfit)));
 
             Double lossProfit = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumLossIncome(bondSellRequest)));
             profitDTO.getLossProfit().add(lossProfit);
@@ -290,7 +296,27 @@ public class BondService {
             Double cost = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumCost(bondSellRequest)));
             profitDTO.getCost().add(cost);
         }
-        return profitDTO;
+        for (String s : eChartsData.getLegend()) {
+            eChartsData.getSeries().add(loadEChartsElement(s, profitDTO));
+        }
+        return eChartsData;
+    }
+
+    public EChartsElement loadEChartsElement(String s, ProfitDTO profitDTO) {
+        List<Double> list = new ArrayList<>();
+        if (s.equals("短线收益")) {
+            list = profitDTO.getStubProfit();
+        } else if (s.equals("长线收益")) {
+            list = profitDTO.getGridProfit();
+        } else if (s.equals("总收益")) {
+            list = profitDTO.getTotalProfit();
+        }
+        EChartsElement eChartsElement = new EChartsElement();
+        eChartsElement.setName(s);
+        eChartsElement.setType("line");
+//        eChartsElement.setStack("Total");
+        eChartsElement.setData(list);
+        return eChartsElement;
     }
 
     /**

@@ -228,4 +228,20 @@ public class BondOperController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 
+    @PostMapping("delete")
+    public ResultDO<Void> delete(@RequestBody BondBuyLog bondBuyLog) {
+        bondBuyLogMapper.deleteByPrimaryKey(bondBuyLog.getId());
+        //查询是否有出售
+        BondSellLogExample bondSellLogExample = new BondSellLogExample();
+        bondSellLogExample.createCriteria().andBuyIdEqualTo(bondBuyLog.getId());
+        List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
+        if (bondSellLogs != null) {
+            for (BondSellLog bondSellLog : bondSellLogs) {
+                bondSellLogMapper.deleteByPrimaryKey(bondSellLog.getId());
+            }
+        }
+
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
+    }
+
 }

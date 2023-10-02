@@ -35,7 +35,6 @@
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell();">未出售(全部)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_gird();">未出售(长线)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_stu();">未出售(短线)</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_flow();">未出售(超短)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_wait_buy();">待买入</a></li>
         </ul>
     </div>
@@ -91,7 +90,6 @@
                             <select class="form-control" id="insert_input_type">
                                 <option value="1">短线</option>
                                 <option value="0">长线</option>
-                                <option value="2">超短</option>
                             </select>
                         </div>
                     </div>
@@ -159,7 +157,6 @@
                             <select class="form-control" id="insert_input_bond_type">
                                 <option value="1">短线</option>
                                 <option value="0">长线</option>
-                                <option value="2">超短</option>
                             </select>
                         </div>
                     </div>
@@ -209,7 +206,6 @@
                             <select class="form-control" id="alert_input_type">
                                 <option value="0">长线</option>
                                 <option value="1">短线</option>
-                                <option value="2">超短</option>
                             </select>
                         </div>
                     </div>
@@ -854,7 +850,7 @@
     function deleteOne(index) {
         dialog("确定删除吗？", () => {
             let data = { id: $table.bootstrapTable('getData')[index].id };
-            parameterPostRequest("/bond/delete", data, () => {
+            parameterPostRequest("/bond/operating/delete", data, () => {
                 swal("正确", "删除成功", "success");
                 init();
             });

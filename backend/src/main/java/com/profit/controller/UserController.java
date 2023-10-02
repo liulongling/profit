@@ -22,11 +22,6 @@ public class UserController {
     @Resource
     private SyUserMapper syUserMapper;
 
-    @GetMapping("login")
-    public String showLogin() {
-        return TemplatePath.USER_LOGIN;
-    }
-
     @PostMapping("login")
     public String login(@ModelAttribute SyUser userDO) {
         if (StringUtils.isEmpty(userDO.getLoginName()) || StringUtils.isEmpty(userDO.getPassword())) {

@@ -11,6 +11,7 @@ import com.profit.commons.utils.*;
 import com.profit.comparator.ComparatorBondMarket;
 import com.profit.comparator.ComparatorIncome;
 import com.profit.dto.*;
+import com.profit.model.EChartsData;
 import com.profit.service.BondService;
 import org.springframework.web.bind.annotation.*;
 
@@ -100,9 +101,9 @@ public class BondController {
     }
 
     @PostMapping("analyse")
-    public ResultDO<ProfitDTO> analyse(@RequestBody BondSellRequest bondSellRequest) {
-        ProfitDTO profitDTO = bondService.totalProfit();
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, profitDTO);
+    public ResultDO<EChartsData> analyse(@RequestBody BondSellRequest bondSellRequest) {
+        EChartsData eChartsData = bondService.totalProfit();
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, eChartsData);
     }
 
     @PostMapping("today/analyse")
@@ -199,20 +200,12 @@ public class BondController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
 
+
     @PostMapping("delete")
-    public ResultDO<Void> delete(@RequestBody BondBuyLog bondBuyLog) {
-        bondBuyLogMapper.deleteByPrimaryKey(bondBuyLog.getId());
-        //查询是否有出售
-        BondSellLogExample bondSellLogExample = new BondSellLogExample();
-        bondSellLogExample.createCriteria().andBuyIdEqualTo(bondBuyLog.getId());
-        List<BondSellLog> bondSellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
-        if (bondSellLogs != null) {
-            for (BondSellLog bondSellLog : bondSellLogs) {
-                bondSellLogMapper.deleteByPrimaryKey(bondSellLog.getId());
-            }
-        }
+    public ResultDO<Void> delete(@RequestBody BondInfo bondInfo) {
 
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
+
 
 }

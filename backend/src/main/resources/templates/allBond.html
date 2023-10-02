@@ -25,16 +25,12 @@
     </div>
 </div>
 
-<div class="panel-body" style="width: 500px">
-    <table id="tableTotalProfit" style="width: 500px;"
-           class="table table-striped table-hover table-bordered"></table>
-</div>
-
 
 <div class="panel-body" style="padding-bottom:0;">
     <div class="panel panel-default">
         <ul id="myTab" class="nav nav-tabs">
             <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_super_short_not_sell();">超短线(未出售)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_short_not_sell();">短线(未出售)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_long_not_sell();">长线(未出售)</a></li>
             <li><a href="#ios" data-toggle="tab" onclick="filter_sold();">已出售</a></li>
@@ -84,11 +80,6 @@
         }, {
             field: 'typeName',
             title: '类型',
-            width: '30px',
-            formatter: stringFormatter
-        }, {
-            field: 'girdSpacing',
-            title: '格差',
             width: '30px',
             formatter: stringFormatter
         }, {
@@ -149,6 +140,15 @@
         }]);
     }
 
+    function filter_super_short_not_sell() {
+        let data = {
+            type: '2',
+            status: '0'
+        };
+        getServerPaging($table, "/bond/all", params => {
+            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", type: data.type,status:data.status};
+        });
+    }
 
     function filter_short_not_sell() {
         let data = {
@@ -197,7 +197,7 @@
         });
     }
 
- function loadProfitData(url){
+  function loadProfitData(url){
        let data = {
           startTime:'2020',
           endTime:'2020'
@@ -219,60 +219,6 @@
          }
         );
     }
-
-
-    function loadPageData(result){
-         var textHTML = '<tr>';
-         textHTML+='<td>日期(月份)</td>';
-         for(let i in result.module.date){
-            textHTML+='<td>'+result.module.date[i]+'</td>';
-         }
-
-         textHTML+= '</tr>';
-         textHTML+= '<tr>';
-         textHTML+='<td>短线收益</td>';
-         for(let i in result.module.stubProfit){
-            textHTML+='<td>'+result.module.stubProfit[i]+'</td>';
-         }
-
-         textHTML+= '</tr>';
-         textHTML+= '<tr>';
-         textHTML+='<td>长线收益</td>';
-            for(let i in result.module.gridProfit){
-            textHTML+='<td>'+result.module.gridProfit[i]+'</td>';
-         }
-
-         textHTML+= '</tr>';
-         textHTML+= '<tr>';
-         textHTML+='<td>国债收益</td>';
-            for(let i in result.module.nationalProfit){
-            textHTML+='<td>'+result.module.nationalProfit[i]+'</td>';
-         }
-
-         textHTML+= '</tr>';
-         textHTML+= '<tr>';
-         textHTML+='<td>割肉亏损</td>';
-            for(let i in result.module.lossProfit){
-            textHTML+='<td>'+result.module.lossProfit[i]+'</td>';
-         }
-
-         textHTML+= '</tr>';
-         textHTML+= '<tr>';
-         textHTML+='<td>佣金税费</td>';
-            for(let i in result.module.cost){
-            textHTML+='<td>'+result.module.cost[i]+'</td>';
-         }
-
-         textHTML+= '</tr>';
-         textHTML+= '<tr>';
-         textHTML+='<td>总收益</td>';
-            for(let i in result.module.totalProfit){
-            textHTML+='<td>'+result.module.totalProfit[i]+'</td>';
-         }
-         textHTML+= '</tr>';
-         document.getElementById("tableProfit").innerHTML = textHTML;
-    }
-
 </script>
 </body>
 </html>

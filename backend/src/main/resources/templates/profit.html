@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title id="title">盈利股票</title>
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap3.4.1.min.css"
+          th:href="@{/css/lib/bootstrap3.4.1.min.css}">
+    <!-- Bootstrap-table CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap-table.min.css"
+          th:href="@{/css/lib/bootstrap-table.min.css}">
+    <!-- jquery-ui CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/jquery-ui.min.css" th:href="@{/css/lib/jquery-ui.min.css}">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="../../static/css/table.css" th:href="@{/css/table.css}">
+</head>
+
+<body onload="init();">
+
+
+
+<div class="container" style="width: 2000px;" align="center">
+    <div id="pie" style="width:1000px; height: 800px;" align="center"></div>
+</div>
+
+
+
+<!-- JavaScript files-->
+<!-- jquery.js -->
+<script src="../../static/js/lib/jquery.min.js" th:src="@{/js/lib/jquery.min.js}"></script>
+<!-- Bootstrap.js -->
+<script src="../../static/js/lib/bootstrap3.4.1.min.js" th:src="@{/js/lib/bootstrap3.4.1.min.js}"></script>
+<!-- Bootstrap-table.js -->
+<script src="../../static/js/lib/bootstrap-table.min.js" th:src="@{/js/lib/bootstrap-table.min.js}"></script>
+<script src="../../static/js/lib/bootstrap-table-zh-CN.min.js"
+        th:src="@{/js/lib/bootstrap-table-zh-CN.min.js}"></script>
+<!-- sweetalert2.js -->
+<script src="../../static/js/lib/sweetalert.min.js" th:src="@{/js/lib/sweetalert.min.js}"></script>
+<script src="../../static/js/lib/es6-promise.auto.min.js" th:src="@{/js/lib/es6-promise.auto.min.js}"></script>
+<!-- jquery-ui.js -->
+<script src="../../static/js/lib/jquery-ui.min.js" th:src="@{/js/lib/jquery-ui.min.js}"></script>
+<script src="../../static/js/common.js" th:src="@{/js/common.js}"></script>
+<script src="../../static/js/dragModel.js" th:src="@{/js/dragModel.js}"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.1.0/echarts.min.js"></script>
+<script>
+    /** 初始化 */
+    let $table = $('#table');
+    changeToolTip();
+
+    function init() {
+        loadProfitData("/bond/analyse");
+    }
+
+   function loadProfitData(url){
+       let data = {
+          startTime:'2020',
+          endTime:'2020'
+       };
+      $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            async : false, //同步执行
+            data: JSON.stringify(data),
+            traditional: true,
+            contentType : "application/json",
+            success: function (result) {
+                loadPageData(result);
+            },
+            error: function () {
+                swal("错误", "404", "error");
+            }
+         }
+        );
+    }
+
+
+    function loadPageData(result){
+        option = {
+          title: {
+            text: result.module.text
+          },
+          tooltip: {
+            trigger: 'axis'
+          },
+          legend: {
+            data: result.module.legend
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          toolbox: {
+            feature: {
+              saveAsImage: {}
+            }
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: result.module.xaxis
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: result.module.series
+        };
+
+      // 获取页面容器
+     var chartDom = document.getElementById('pie');
+     // 容器初始化初始化（echarts）
+     var myChart = echarts.init(chartDom);
+     // 设置容器的相关配置项
+     myChart.setOption(option);
+    }
+
+
+
+</script>
+</body>
+</html>

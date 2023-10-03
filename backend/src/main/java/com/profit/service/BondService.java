@@ -269,6 +269,10 @@ public class BondService {
         for (int i = 1; i <= 12; i++) {
             Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
+            int curMonth = calendar.get(Calendar.MONTH);
+            if (i > curMonth) {
+                continue;
+            }
             String month = i < 10 ? ("0" + i) : String.valueOf(i);
             profitDTO.getDate().add(year + month);
             eChartsData.getXAxis().add(year + month);

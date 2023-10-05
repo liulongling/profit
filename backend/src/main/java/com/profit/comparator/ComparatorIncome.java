@@ -20,6 +20,7 @@ public class ComparatorIncome implements Comparator {
     public int compare(Object o1, Object o2) {
         BondBuyLogDTO className1 = (BondBuyLogDTO) o1;
         BondBuyLogDTO className2 = (BondBuyLogDTO) o2;
+        //收益高的排在最前面
         if (className1.getIncome() < className2.getIncome()) {
             return 1;
         }

@@ -72,6 +72,16 @@ public class BondController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
 
+    @PostMapping("allBonds")
+    public ResultDO<List<BondInfo>> allBonds() throws Exception {
+        BondInfoExample bondInfoExample = new BondInfoExample();
+        BondInfoExample.Criteria criteria = bondInfoExample.createCriteria();
+        criteria.andStatusEqualTo((byte) 0);
+        List<BondInfo> list = bondInfoMapper.selectByExample(bondInfoExample);
+
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, list);
+    }
+
 
     @PostMapping("insert")
     public ResultDO<Void> insert(@RequestBody BondInfo bondInfo) {
@@ -137,8 +147,8 @@ public class BondController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondSellDTOS);
     }
 
-    @GetMapping("all")
-    public ResultDO<PageUtils<BondBuyLogDTO>> allBondInfos(@RequestParam Map<String, Object> params) throws Exception {
+    @GetMapping("search/bondInfos")
+    public ResultDO<PageUtils<BondBuyLogDTO>> getBondInfos(@RequestParam Map<String, Object> params) throws Exception {
         List<BondBuyLogDTO> list = new ArrayList<>();
         BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
         BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
@@ -151,6 +161,10 @@ public class BondController {
         if (params.get("type") != null) {
             criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
         }
+        if (params.get("id") != null) {
+            criteria.andGpIdEqualTo(params.get("id").toString());
+        }
+
         bondBuyLogExample.setOrderByClause(params.get("sort").toString() + " " + params.get("order").toString());
         Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
         List<BondBuyLog> result = bondBuyLogMapper.selectByExample(bondBuyLogExample);
@@ -199,7 +213,6 @@ public class BondController {
 
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
-
 
     @PostMapping("delete")
     public ResultDO<Void> delete(@RequestBody BondInfo bondInfo) {

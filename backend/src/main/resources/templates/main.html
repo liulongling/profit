@@ -323,55 +323,6 @@
         }]);
     }
 
-  function loadProfitData() {
-    let datePicker = datePickerStruct($("#reservation").val());
-    let startDate = datePicker.startDate;
-    let endDate = datePicker.endDate;
-    $.ajax({
-      type: "POST",
-      url: "/bond/analyse",
-      dataType: "json",
-      data: {
-        "startDate": startDate,
-        "endDate": endDate
-      },
-      success: function (chartData) {
-        if (window.onlineRealtimeChart != null) {
-          window.onlineRealtimeChart.destroy();
-        }
-        window.onlineRealtimeChart = new Chart(document.getElementById('areaChart'), {
-          type: type,
-          data: chartData,
-          options: {
-            responsive: true,
-            responsiveAnimationDuration: 3,
-            aspectRatio: 3,
-            tooltips: {
-              mode: 'index',
-              intersect: false,
-            },
-            hover: {
-              mode: 'nearest',
-              intersect: true
-            }
-          }
-        });
-      }
-    });
-  }
-
-
-  $(function () {
-      window.scrollTo(0,0);
-      let nowDate = new Date();
-      let today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
-      $('#reservation').daterangepicker({
-          timePickerIncrement: 30
-          , "locale": datePickerLocale,
-          "maxDate": today
-      });
-  });
-
     function operateFormatter(value, row, index) {  // 赋予的参数
         return [
             '<button class="btn btn-primary view" data-toggle="modal" data-target="#alterModal" onclick="initUpdate('+ index +');">编辑</button>&nbsp;&nbsp;'+
@@ -461,7 +412,7 @@
             traditional: true,
             contentType : "application/json",
             success: function (result) {
-                loadTodayPageData(result);
+                drawTodayPageData(result);
             },
             error: function () {
                 swal("错误", "404", "error");
@@ -471,7 +422,7 @@
     }
 
 
-    function loadTodayPageData(result){
+    function drawTodayPageData(result){
          var textHTML = '<tr>';
          textHTML+='<td>收益(今日)</td>';
 <!--         textHTML+='<td>持股盈亏(今日)</td>';-->

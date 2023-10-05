@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title id="title">盈利股票</title>
+    <title id="title">股票汇总</title>
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="../../static/css/lib/bootstrap3.4.1.min.css"
           th:href="@{/css/lib/bootstrap3.4.1.min.css}">
@@ -21,23 +21,12 @@
 
 <div class="container" style="width: 2000px;" align="center">
     <div class="panel-body">
-        <table id="tableProfit" class="table table-striped table-hover table-bordered"></table>
+        <table id="bond" class="table table-striped table-hover table-bordered"></table>
     </div>
 </div>
 
 
 <div class="panel-body" style="padding-bottom:0;">
-    <div class="panel panel-default">
-        <ul id="myTab" class="nav nav-tabs">
-            <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_super_short_not_sell();">超短线(未出售)</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_short_not_sell();">短线(未出售)</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_long_not_sell();">长线(未出售)</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_sold();">已出售</a></li>
-            <li><a href="#ios" data-toggle="tab" onclick="filter_wait_buy();">待买入</a></li>
-        </ul>
-    </div>
-
     <table id="table"></table>
 </div>
 
@@ -80,6 +69,11 @@
         }, {
             field: 'typeName',
             title: '类型',
+            width: '30px',
+            formatter: stringFormatter
+        }, {
+            field: 'girdSpacing',
+            title: '格差',
             width: '30px',
             formatter: stringFormatter
         }, {
@@ -132,72 +126,30 @@
             title: '出售日期',
             width: "70px",
             formatter: stringFormatter
-        }, {
-            field: 'cost',
-            title: '税费佣金',
-            width: "70px",
-            formatter: stringFormatter
         }]);
     }
 
-    function filter_super_short_not_sell() {
-        let data = {
-            type: '2',
-            status: '0'
-        };
-        getServerPaging($table, "/bond/all", params => {
-            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", type: data.type,status:data.status};
-        });
-    }
 
-    function filter_short_not_sell() {
+    function filter_short_not_sell(id) {
+        console.log("得到的结果是：" + id)
         let data = {
             type: '1',
             status: '0'
         };
-        getServerPaging($table, "/bond/all", params => {
-            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", type: data.type,status:data.status};
-        });
-    }
-
-    function filter_long_not_sell() {
-        let data = {
-            type: '0',
-            status: '0'
-        };
-        getServerPaging($table, "/bond/all", params => {
-            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", type: data.type,status:data.status};
-        });
-    }
-
-    function  filter_sold() {
-        let data = {
-            status: '1'
-        };
-        getServerPaging($table, "/bond/all", params => {
-            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", status: data.status};
-        });
-    }
-
-
-    function  filter_wait_buy() {
-        let data = {
-            status: '3'
-        };
-        getServerPaging($table, "/bond/all", params => {
-            return { limit: params.limit, offset: params.offset,sort: "oper_time", order: "DESC", status: data.status};
+        getServerPaging($table, "/bond/search/bondInfos", params => {
+            return { limit: params.limit, offset: params.offset,sort: "price", order: "DESC", type: data.type,status:data.status,id:id};
         });
     }
 
 
     function init() {
-        loadProfitData("/bond/analyse");
-        getServerPaging($table, "/bond/all", params => {
+        loadAllBonds("/bond/allBonds");
+        getServerPaging($table, "/bond/search/bondInfos", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC"};
         });
     }
 
-  function loadProfitData(url){
+  function loadAllBonds(url){
        let data = {
           startTime:'2020',
           endTime:'2020'
@@ -211,7 +163,7 @@
             traditional: true,
             contentType : "application/json",
             success: function (result) {
-                loadPageData(result);
+                drawAllBonds(result);
             },
             error: function () {
                 swal("错误", "404", "error");
@@ -219,6 +171,23 @@
          }
         );
     }
+
+    function drawAllBonds(result){
+       let list = result.module;
+       var textHTML = '<tr>';
+       for(let i in list){
+           console.log("得到的结果是：" + JSON.stringify(list[i]))
+           textHTML += '<td>';
+           console.log("得到的结果ID是：" + list[i].id)
+           textHTML += '<button class="btn btn-primary view"  onclick="filter_short_not_sell(\''+ list[i].id+'\');">'+list[i].name+'</button>&nbsp;&nbsp;';
+           textHTML += '</td>';
+       }
+       textHTML += '</tr>';
+       document.getElementById("bond").innerHTML = textHTML;
+
+    }
+
+
 </script>
 </body>
 </html>

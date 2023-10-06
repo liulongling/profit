@@ -4,9 +4,8 @@
 .
 ├── LICENSE
 ├── conf                                            # 配置目录
-│   ├── warehouse.properties                        # backend服务外部配置文件(正式服)
-│   ├── warehouse_dev.properties                    # backend服务外部配置文件(开发服)
-│   └── warehouse_test.properties                   # backend服务外部配置文件(测试服)
+│   ├── dev.properties                              # backend服务外部配置文件(开发服)
+│   └── test.properties                             # backend服务外部配置文件(测试服)
 ├── doc                                             # 文档目录
 ├── backend                                         # 后端项目主目录
 │   ├── backend.iml

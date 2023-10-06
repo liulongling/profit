@@ -112,7 +112,13 @@ public class BondController {
 
     @PostMapping("analyse")
     public ResultDO<EChartsData> analyse(@RequestBody BondSellRequest bondSellRequest) {
-        EChartsData eChartsData = bondService.totalProfit();
+        EChartsData eChartsData = null;
+        if(bondSellRequest.getGpId() != null){
+            eChartsData = bondService.countProfit(bondSellRequest);
+        }else {
+            eChartsData = bondService.totalProfit();
+        }
+
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, eChartsData);
     }
 

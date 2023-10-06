@@ -415,4 +415,18 @@
     WHERE
     create_time BETWEEN #{request.startTime} AND #{request.endTime}
   </select>
+
+  <select id="listIncomeGroupByDate" resultType="map">
+    select DATE_FORMAT(create_time, '%Y%m%d') as incomeDate, sum(income) as income from bond_sell_log
+    <where>
+      <if test="request.gpId != null">
+         gp_id = #{request.gpId}
+      </if>
+      <if test="request.startTime != null and request.endTime != null">
+        AND create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+    </where>
+    GROUP BY  DATE_FORMAT(create_time, '%Y%m%d') asc
+  </select>
+
 </mapper>

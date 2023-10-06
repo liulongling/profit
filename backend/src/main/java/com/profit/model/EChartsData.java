@@ -21,7 +21,7 @@ public class EChartsData {
      */
     private List<String> xAxis = new ArrayList<>();
     /**
-     * 多条折线
+     *
      */
     private List<EChartsElement> series = new ArrayList<>();
 

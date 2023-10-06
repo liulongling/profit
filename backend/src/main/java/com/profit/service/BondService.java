@@ -446,6 +446,22 @@ public class BondService {
     }
 
     /**
+     * 查询指定范围内收益
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return
+     */
+    public Map<Object, Object> getProfitByGpId(String gpId, String startTime, String endTime) {
+        BondSellRequest bondSellRequest = new BondSellRequest();
+        bondSellRequest.setStartTime(startTime);
+        bondSellRequest.setEndTime(endTime);
+        bondSellRequest.setGpId(gpId);
+        List<Map<Object, Object>> profitList = bondSellLogMapper.listIncomeGroupByDate(bondSellRequest);
+        return BeanUtils.list2Map(profitList, "incomeDate", "income");
+    }
+
+    /**
      * 更新股价
      */
     public void refurbishBondPrice() {
@@ -679,4 +695,33 @@ public class BondService {
 
     }
 
+    public EChartsData countProfit(BondSellRequest bondSellRequest) {
+        EChartsData eChartsData = new EChartsData();
+        BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondSellRequest.getGpId());
+        eChartsData.setText(bondInfo.getName());
+        //近30天收益
+        Date startDate = DateUtils.getNeverDayStartTime(180);
+        Date endDate = DateUtils.getNeverDayEndTime(180);
+        Map<Object, Object> unsortMap = getProfitByGpId(bondSellRequest.getGpId(), DateUtils.getDateString(startDate), DateUtils.getDateString(endDate));
+        Map<Object, Object> lastMonthProfitMap = new TreeMap<>(unsortMap);
+        List<Object> incomeDateList = new ArrayList<>(lastMonthProfitMap.keySet());
+        eChartsData.getXAxis().addAll(((List<String>) (List) incomeDateList));
+
+
+        EChartsElement eChartsElement = new EChartsElement();
+        eChartsElement.setName("Direct");
+        eChartsElement.setType("bar");
+        eChartsElement.setBarWidth("50%");
+
+        List<Double> incomeList = new ArrayList<>();
+        for (Object object : lastMonthProfitMap.values()) {
+            incomeList.add(Double.parseDouble(String.format("%.0f", object)));
+        }
+        eChartsElement.setData(incomeList);
+
+        List<EChartsElement> series = new ArrayList<>();
+        series.add(eChartsElement);
+        eChartsData.setSeries(series);
+        return eChartsData;
+    }
 }

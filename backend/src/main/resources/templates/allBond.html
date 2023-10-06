@@ -30,6 +30,139 @@
     <table id="table"></table>
 </div>
 
+<!-- 模态框（Modal） 新增 -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="addModalLabel">
+                    买入股票
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_gp_id">股票代码</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="insert_input_gp_id" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_price">购买价格</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="insert_input_price">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_count">购买数量</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="insert_input_count" title="不能为空">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_buy_date">购买日期</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="insert_input_buy_date" title="不能为空">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_type">类型</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="insert_input_type">
+                                <option value="1">短线</option>
+                                <option value="0">长线</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_status">状态</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="insert_input_status">
+                                <option value="0">未出售</option>
+                                <option value="1">已出售</option>
+                                <option value="3">待买入</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_count">备注</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="insert_input_remarks" title="不能为空">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="insert();">添加</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+<!--模态框（Modal） 出售-->
+<div class="modal fade" id="sellModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="sellModalLabel">
+                    出售股票
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_buy_id">序号</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_buy_id" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_gp_id">股票代码</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_gp_id" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_input_price">出售价格</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_input_price">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_input_count">出售数量</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_input_count">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_input_freeze">预冻资金</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_input_freeze">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_input_date">出售日期</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="sell_input_date">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="sellSave()">出售</button>
+            </div>
+        </div> <!--/.modal-content -->
+    </div><!--/.modal-->
+</div>
 
 <!-- JavaScript files-->
 <!-- jquery.js -->
@@ -60,6 +193,11 @@
             field: 'id',
             title: '序号',
             width: "35px",
+            formatter: stringFormatter
+        }, {
+            field: 'gpId',
+            title: '股票Id',
+            width: '50px',
             formatter: stringFormatter
         }, {
             field: 'name',
@@ -126,11 +264,115 @@
             title: '出售日期',
             width: "70px",
             formatter: stringFormatter
+        }, {
+            field: 'operation',
+            title: '操作',
+            width: '170px',
+            formatter: operateFormatter // 自定义方法，添加操作按钮
         }]);
     }
 
+     function operateFormatter(value, row, index) {  // 赋予的参数
+        return [
+            '<button class="btn btn-primary view" data-toggle="modal" data-target="#addModal" onclick="buyBond('+ index +');">购买</button>&nbsp;&nbsp;'+
+            '<button class="btn btn-primary view" data-toggle="modal" data-target="#sellModal" onclick="sell('+ index +');">出售</button>&nbsp;&nbsp;'
+        ].join('');
+    }
 
-    function filter_short_not_sell(id) {
+    let curPrice;
+    let gpId;
+    function loadBondInfoData(url,index){
+       let rows = $table.bootstrapTable('getData');
+       console.log("index：" + index + " id:"+rows[index].gpId)
+       gpId = rows[index].gpId;
+       let data = {
+          id:rows[index].gpId
+       };
+      $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            async : false, //同步执行
+            data: JSON.stringify(data),
+            traditional: true,
+            contentType : "application/json",
+            success: function (result) {
+                 curPrice = result.module.price;
+            },
+            error: function () {
+                swal("错误", "404", "error");
+            }
+         }
+        );
+    }
+
+    function sell(index) {
+        loadBondInfoData("/bond/info",index);
+        let rows = $table.bootstrapTable('getData');
+        $('#sell_buy_id').val(rows[index].id);
+        $('#sell_gp_id').val(rows[index].gpId);
+        $('#sell_input_count').val(rows[index].count - rows[index].sellCount);
+        $('#sell_input_price').val(curPrice);
+        $('#sell_input_freeze').val(0.5);
+        var now = new Date();
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+        $('#sell_input_date').val(today);
+
+    }
+
+    function sellSave() {
+         let data = {
+            buyId: $('#sell_buy_id').val(),
+            price: $('#sell_input_price').val(),
+            freeze:$('#sell_input_freeze').val(),
+            count: $('#sell_input_count').val(),
+            createTime: $('#sell_input_date').val()
+         };
+         if (data.price <= 0) {
+            swal("操作提示", "价格不合法", "info");
+        } else {
+            parameterPostRequest("/bond/operating/sell", data, () => {
+                $('#addModal').modal('hide');
+                swal("正确", "添加成功", "success");
+                init();
+            });
+        }
+    }
+
+    function insert() {
+        let data = {
+            count: $('#insert_input_count').val(),
+            gpId: $('#insert_input_gp_id').val(),
+            price: $('#insert_input_price').val(),
+            buyDate: $('#insert_input_buy_date').val(),
+            remarks: $('#insert_input_remarks').val(),
+            type: $('#insert_input_type').val(),
+            status: $('#insert_input_status').val(),
+        };
+         if (data.id <= 0) {
+            swal("操作提示", "请输入股票代码", "info");
+        } else if (data.price <= 0) {
+            swal("操作提示", "价格不合法", "info");
+        } else {
+            parameterPostRequest("/bond/operating/buy", data, () => {
+                $('#addModal').modal('hide');
+                swal("正确", "添加成功", "success");
+                init();
+            });
+        }
+    }
+
+   function buyBond(index){
+        loadBondInfoData("/bond/info",index);
+        $('#insert_input_gp_id').val(gpId);
+        $('#insert_input_price').val(curPrice);
+        $('#insert_input_count').val(100);
+        $("#insert_input_buy_date").val(new Date().toISOString().substring(0, 10));
+   }
+
+    function bondClick(id) {
         console.log("得到的结果是：" + id)
         let data = {
             type: '1',
@@ -179,13 +421,14 @@
            console.log("得到的结果是：" + JSON.stringify(list[i]))
            textHTML += '<td>';
            console.log("得到的结果ID是：" + list[i].id)
-           textHTML += '<button class="btn btn-primary view"  onclick="filter_short_not_sell(\''+ list[i].id+'\');">'+list[i].name+'</button>&nbsp;&nbsp;';
+           textHTML += '<button class="btn btn-primary view"  onclick="bondClick(\''+ list[i].id+'\');">'+list[i].name+'</button>&nbsp;&nbsp;';
            textHTML += '</td>';
        }
        textHTML += '</tr>';
        document.getElementById("bond").innerHTML = textHTML;
 
     }
+
 
 
 </script>

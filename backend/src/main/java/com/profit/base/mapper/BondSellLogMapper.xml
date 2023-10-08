@@ -417,7 +417,7 @@
   </select>
 
   <select id="listIncomeGroupByDate" resultType="map">
-    select DATE_FORMAT(create_time, '%Y%m%d') as incomeDate, sum(income) as income from bond_sell_log
+    select DATE_FORMAT(create_time, '%m%d') as incomeDate, sum(income) as income from bond_sell_log
     <where>
       <if test="request.gpId != null">
          gp_id = #{request.gpId}

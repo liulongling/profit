@@ -334,9 +334,9 @@
             swal("操作提示", "价格不合法", "info");
         } else {
             parameterPostRequest("/bond/operating/sell", data, () => {
-                $('#addModal').modal('hide');
+                $('#sellModal').modal('hide');
                 swal("正确", "添加成功", "success");
-                init();
+                bondClick(gpId);
             });
         }
     }
@@ -359,7 +359,7 @@
             parameterPostRequest("/bond/operating/buy", data, () => {
                 $('#addModal').modal('hide');
                 swal("正确", "添加成功", "success");
-                init();
+                bondClick(gpId);
             });
         }
     }

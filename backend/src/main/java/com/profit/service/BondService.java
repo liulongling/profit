@@ -701,8 +701,8 @@ public class BondService {
         eChartsData.setText(bondInfo.getName());
         //近30天收益
         Date startDate = DateUtils.getNeverDayStartTime(180);
-        Date endDate = DateUtils.getNeverDayEndTime(180);
-        Map<Object, Object> unsortMap = getProfitByGpId(bondSellRequest.getGpId(), DateUtils.getDateString(startDate), DateUtils.getDateString(endDate));
+        String endDate = DateUtils.getTimeString(DateUtils.getTodayDateTime(23, 59, 59));
+        Map<Object, Object> unsortMap = getProfitByGpId(bondSellRequest.getGpId(), DateUtils.getDateString(startDate), endDate);
         Map<Object, Object> lastMonthProfitMap = new TreeMap<>(unsortMap);
         List<Object> incomeDateList = new ArrayList<>(lastMonthProfitMap.keySet());
         eChartsData.getXAxis().addAll(((List<String>) (List) incomeDateList));

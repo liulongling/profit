@@ -103,7 +103,7 @@
        let data = {
             type: '0'
         };
-        getServerPaging($table, "/bond/operating/todayTransaction", params => {
+        getServerPaging($table, "/bond/operating/transactionLogs", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", type: data.type};
         });
     }
@@ -112,7 +112,7 @@
         let data = {
             type: '1'
         };
-        getServerPaging($table, "/bond/operating/todayTransaction", params => {
+        getServerPaging($table, "/bond/operating/transactionLogs", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", type: data.type};
         });
     }
@@ -121,7 +121,7 @@
         let data = {
             type: '2'
         };
-        getServerPaging($table, "/bond/operating/todayTransaction", params => {
+        getServerPaging($table, "/bond/operating/transactionLogs", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", type: data.type};
         });
     }

@@ -30,8 +30,8 @@ public class TemplatePath {
     public static final String ALL_BOND_HTML = "allBond";
 
     /**
-     * 今日交易
+     * 交易记录
      */
-    public static final String TODAY_TRANSACTION = "todayTransaction";
+    public static final String TRANSACTION_LOGS = "transactionLogs";
 
 }

@@ -34,8 +34,8 @@ public class BondOperController {
     @Resource
     private BondService bondService;
 
-    @GetMapping("todayTransaction")
-    public ResultDO<PageUtils<BondTransactionDTO>> todayTransaction(@RequestParam Map<String, Object> params) {
+    @GetMapping("transactionLogs")
+    public ResultDO<PageUtils<BondTransactionDTO>> transactionLogs(@RequestParam Map<String, Object> params) {
 
         int type = Integer.parseInt(params.get("type").toString());
 
@@ -47,8 +47,10 @@ public class BondOperController {
             if (params.get("id") != null) {
                 criteria.andGpIdEqualTo(params.get("id").toString());
             }
+            Date startDate = DateUtils.getNeverDayStartTime(5);
+            String endDate = DateUtils.getDateString(DateUtils.getTodayDateTime(23, 59, 59));
+            criteria.andBuyDateBetween(DateUtils.getDateString(startDate), endDate);
 
-            criteria.andBuyDateEqualTo(DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM));
             bondBuyLogExample.setOrderByClause("oper_time desc");
             List<BondBuyLog> buyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
             if (buyLogs != null) {
@@ -58,7 +60,12 @@ public class BondOperController {
                     bondTransactionDTO.setRemarks("买入");
 
                     BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
-                    bondTransactionDTO.setName(bondInfo.getName());
+                    if (bondInfo != null) {
+                        bondTransactionDTO.setName(bondInfo.getName());
+                    } else {
+                        LogUtil.error("id is null" + bondBuyLog.getGpId());
+                    }
+
                     list.add(bondTransactionDTO);
                 }
             }
@@ -70,8 +77,9 @@ public class BondOperController {
             if (params.get("id") != null) {
                 bondSellLogExampleCriteria.andGpIdEqualTo(params.get("id").toString());
             }
+            Date startDate = DateUtils.getNeverDayStartTime(5);
 
-            bondSellLogExampleCriteria.andCreateTimeBetween(DateUtils.getTodayDateTime(0, 0, 0), DateUtils.getTodayDateTime(23, 59, 59));
+            bondSellLogExampleCriteria.andCreateTimeBetween(startDate, DateUtils.getTodayDateTime(23, 59, 59));
             bondSellLogExample.setOrderByClause("create_time desc");
             List<BondSellLog> sellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
             if (sellLogs != null) {
@@ -86,11 +94,8 @@ public class BondOperController {
                 }
             }
         }
-
         ComparatorGpId comparator = new ComparatorGpId();
         Collections.sort(list, comparator);
-
-
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(list.size(), list));
     }
 
@@ -223,7 +228,7 @@ public class BondOperController {
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 
         if (isBuy) {
-            bondService.refeshBondStatistics(bondBuyLog.getCount() * bondBuyLog.getPrice(), bondBuyLog.getCost(),0.5);
+            bondService.refeshBondStatistics(bondBuyLog.getCount() * bondBuyLog.getPrice(), bondBuyLog.getCost(), 0.5);
         }
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }

@@ -38,8 +38,8 @@ public class ManagerController {
         return TemplatePath.USER_LOGIN;
     }
 
-    @GetMapping("todayTransaction")
-    public String todayTransaction() {
-        return TemplatePath.TODAY_TRANSACTION;
+    @GetMapping("transactionLogs")
+    public String transactionLogs() {
+        return TemplatePath.TRANSACTION_LOGS;
     }
 }

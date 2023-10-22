@@ -62,3 +62,6 @@ CREATE TABLE `sy_user` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+
+
+INSERT INTO `sy_user`(`id`, `login_name`, `password`, `create_time`, `update_time`) VALUES ('48d86796896411ea8fc654e1ad394a4a', 'admin', 'admin', '2020-05-04 22:30:44', '2020-05-04 22:30:44');

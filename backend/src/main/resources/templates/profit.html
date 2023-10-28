@@ -55,8 +55,7 @@
 
    function loadProfitData(url){
        let data = {
-          startTime:'2020',
-          endTime:'2020'
+          type:2
        };
       $.ajax({
             type: "POST",
@@ -117,6 +116,8 @@
      // 设置容器的相关配置项
      myChart.setOption(option);
     }
+
+
 
 
 

@@ -1,5 +1,7 @@
 package com.profit.service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.profit.base.domain.*;
 import com.profit.base.mapper.*;
 import com.profit.commons.constants.BondConstants;
@@ -462,6 +464,21 @@ public class BondService {
     }
 
     /**
+     * 查询指定范围内所有股票收益
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return
+     */
+    public Map<Object, Object> getAllBondProfitByDate(String startTime, String endTime) {
+        BondSellRequest bondSellRequest = new BondSellRequest();
+        bondSellRequest.setStartTime(startTime);
+        bondSellRequest.setEndTime(endTime);
+        List<Map<Object, Object>> profitList = bondSellLogMapper.listIncomeGroupByDate(bondSellRequest);
+        return BeanUtils.list2Map(profitList, "incomeDate", "income");
+    }
+
+    /**
      * 更新股价
      */
     public void refurbishBondPrice() {
@@ -681,21 +698,21 @@ public class BondService {
 
     public void initBondStatisticsTask() {
         TotalProfitDTO totalProfitDTO = loadTotalProfitDTO();
-        BondStatistics.BondStatisticsBuilder bondStatistics = BondStatistics.builder()
-                .id(1L)
-                .profitNumber(totalProfitDTO.getTotalProfitNumber())
-                .lossNumber(totalProfitDTO.getTotalLossNumber().intValue())
-                .stock(totalProfitDTO.getStockValue())
-                .winning(totalProfitDTO.getAvgWinning())
-                .profit(totalProfitDTO.getTotalProfit())
-                .lossMoney(totalProfitDTO.getLossMoney())
-                .cost(totalProfitDTO.getCost())
-                .updateTime(new Date());
-        bondStatisticsMapper.updateByPrimaryKeySelective(bondStatistics.build());
+        BondStatistics bondStatistics = new BondStatistics();
+        bondStatistics.setId(1L);
+        bondStatistics.setProfitNumber(totalProfitDTO.getTotalProfitNumber());
+        bondStatistics.setLossNumber(totalProfitDTO.getTotalLossNumber().intValue());
+        bondStatistics.setStock(totalProfitDTO.getStockValue());
+        bondStatistics.setWinning(totalProfitDTO.getAvgWinning());
+        bondStatistics.setProfit(totalProfitDTO.getTotalProfit());
+        bondStatistics.setLossMoney(totalProfitDTO.getLossMoney());
+        bondStatistics.setCost(totalProfitDTO.getCost());
+        bondStatistics.setUpdateTime(new Date());
+        bondStatisticsMapper.updateByPrimaryKeySelective(bondStatistics);
 
     }
 
-    public EChartsData countProfit(BondSellRequest bondSellRequest) {
+    public EChartsData countProfitByRequest(BondSellRequest bondSellRequest) {
         EChartsData eChartsData = new EChartsData();
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondSellRequest.getGpId());
         eChartsData.setText(bondInfo.getName());
@@ -723,5 +740,51 @@ public class BondService {
         series.add(eChartsElement);
         eChartsData.setSeries(series);
         return eChartsData;
+    }
+
+    public EChartsData countProfitByDay() {
+        EChartsData eChartsData = new EChartsData();
+        eChartsData.setText("每日收益");
+        //近30天收益
+        Date startDate = DateUtils.getNeverDayStartTime(180);
+        String endDate = DateUtils.getTimeString(DateUtils.getTodayDateTime(23, 59, 59));
+        Map<Object, Object> unsortMap = getAllBondProfitByDate(DateUtils.getDateString(startDate), endDate);
+        Map<Object, Object> lastMonthProfitMap = new TreeMap<>(unsortMap);
+        List<Object> incomeDateList = new ArrayList<>(lastMonthProfitMap.keySet());
+        eChartsData.getXAxis().addAll(((List<String>) (List) incomeDateList));
+
+
+        EChartsElement eChartsElement = new EChartsElement();
+        eChartsElement.setName("Direct");
+        eChartsElement.setType("bar");
+        eChartsElement.setBarWidth("50%");
+
+        List<Double> incomeList = new ArrayList<>();
+        for (Object object : lastMonthProfitMap.values()) {
+            incomeList.add(Double.parseDouble(String.format("%.0f", object)));
+        }
+        eChartsElement.setData(incomeList);
+
+        List<EChartsElement> series = new ArrayList<>();
+        series.add(eChartsElement);
+        eChartsData.setSeries(series);
+        return eChartsData;
+    }
+
+    public Double gpProfit() {
+        BondInfoExample bondInfoExample = new BondInfoExample();
+        BondInfoExample.Criteria criteria = bondInfoExample.createCriteria();
+        criteria.andStatusEqualTo((byte) 0);
+        List<BondInfo> result = bondInfoMapper.selectByExample(bondInfoExample);
+        Double totalProfit = 0.0;
+        for (BondInfo bondInfo : result) {
+            BondInfoDTO bondInfoDTO = loadBondInfoDTO(bondInfo);
+            if (bondInfoDTO == null) {
+                LogUtil.error("id is null" + bondInfo.getId());
+                continue;
+            }
+            totalProfit += bondInfoDTO.getGpProfit();
+        }
+        return Double.parseDouble(String.format("%.2f", totalProfit));
     }
 }

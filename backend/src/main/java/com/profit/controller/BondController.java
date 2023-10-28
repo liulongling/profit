@@ -113,12 +113,15 @@ public class BondController {
     @PostMapping("analyse")
     public ResultDO<EChartsData> analyse(@RequestBody BondSellRequest bondSellRequest) {
         EChartsData eChartsData = null;
-        if(bondSellRequest.getGpId() != null){
-            eChartsData = bondService.countProfit(bondSellRequest);
-        }else {
+        if (bondSellRequest.getType() == 1 && bondSellRequest.getGpId() != null) {
+            eChartsData = bondService.countProfitByRequest(bondSellRequest);
+        } else if (bondSellRequest.getType() == 2) {
             eChartsData = bondService.totalProfit();
-        }
+        } else if (bondSellRequest.getType() == 3) {
+            eChartsData = bondService.countProfitByDay();
+        } else {
 
+        }
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, eChartsData);
     }
 
@@ -131,11 +134,13 @@ public class BondController {
     }
 
     @PostMapping("total/analyse")
-    public ResultDO<BondStatistics> totalAnalyse(@RequestBody BondSellRequest bondSellRequest) {
+    public ResultDO<BondStatisticsDTO> totalAnalyse(@RequestBody BondSellRequest bondSellRequest) {
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
         double p = (bondStatistics.getStock() / (bondStatistics.getStock() + bondStatistics.getReady())) * 100;
         bondStatistics.setPosition(Double.parseDouble(String.format("%.2f", p)));
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondStatistics);
+        BondStatisticsDTO bondStatisticsDTO = BeanUtils.copyBean(new BondStatisticsDTO(), bondStatistics);
+        bondStatisticsDTO.setStockProfit(bondService.gpProfit());
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondStatisticsDTO);
     }
 
     @PostMapping("sell/log")

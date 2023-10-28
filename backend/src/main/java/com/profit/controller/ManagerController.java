@@ -42,4 +42,9 @@ public class ManagerController {
     public String transactionLogs() {
         return TemplatePath.TRANSACTION_LOGS;
     }
+
+    @GetMapping("profitAnlysis")
+    public String profitAnlysis() {
+        return TemplatePath.PROFIT_ANLYSIS;
+    }
 }

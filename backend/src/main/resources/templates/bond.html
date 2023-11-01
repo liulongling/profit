@@ -242,6 +242,13 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_remarks">备注</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="alert_input_remarks" title="不能为空">
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -854,6 +861,7 @@ function loadProfitData(url){
         $('#alert_input_count').val(rows[index].count);
         $('#alert_input_buy_date').val(rows[index].buyDate);
         $('#alert_input_status').val(rows[index].status);
+        $('#alert_input_remarks').val(rows[index].remarks);
         alterId = rows[index].id;
     }
 
@@ -868,6 +876,7 @@ function loadProfitData(url){
             price: $('#alert_input_price').val(),
             buyDate: $('#alert_input_buy_date').val(),
             status: $('#alert_input_status').val(),
+            remarks: $('#alert_input_remarks').val(),
         };
         if ("" === data.id) {
             swal("操作提示", "用户不存在", "info");

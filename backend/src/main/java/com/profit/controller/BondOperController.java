@@ -202,6 +202,7 @@ public class BondOperController {
         bondBuyLog.setPrice(bondBuyLogRequest.getPrice());
         bondBuyLog.setCount(bondBuyLogRequest.getCount());
         bondBuyLog.setBuyDate(bondBuyLogRequest.getBuyDate());
+        bondBuyLog.setRemarks(bondBuyLogRequest.getRemarks());
 
         boolean isBuy = false;
         if (bondBuyLog != null && bondBuyLog.getStatus() == BondConstants.WAIT_BUY && bondBuyLogRequest.getStatus() == BondConstants.NOT_SELL) {

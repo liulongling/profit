@@ -756,7 +756,7 @@ public class BondService {
 
         EChartsElement eChartsElement = new EChartsElement();
         eChartsElement.setName("Direct");
-        eChartsElement.setType("bar");
+        eChartsElement.setType("line");
         eChartsElement.setBarWidth("50%");
 
         List<Double> incomeList = new ArrayList<>();

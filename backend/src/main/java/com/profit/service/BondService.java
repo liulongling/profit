@@ -652,12 +652,12 @@ public class BondService {
 
         //买入税费计算
         double buyTaxation = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondSellLog.getCount(), false);
-        //计算收益 出售总价 - 买入总价 - 买卖费用
-        double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
+        //计算收益 出售总价 - 买入总价 - 买卖费用 - 利息
+        double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation - bondSellLog.getInterest();
 
         bondSellLog.setIncome(Double.parseDouble(String.format("%.2f", income)));
         bondSellLog.setGpId(bondInfo.getId());
-        bondSellLog.setTotalCost(Double.parseDouble(String.format("%.2f", buyTaxation + sellTaxation)));
+        bondSellLog.setTotalCost(Double.parseDouble(String.format("%.2f", buyTaxation + sellTaxation + bondSellLog.getInterest())));
         bondSellLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getPrice() * bondSellLog.getCount())));
         bondSellLog.setCreateTime(bondSellLog.getCreateTime());
 
@@ -676,6 +676,15 @@ public class BondService {
         bondSellLog.setRealyBefore(bondStatistics.getReady());
         bondStatistics = refeshBondStatistics(-bondSellLog.getTotalPrice(), bondSellLog.getCost(), bondSellLog.getFreeze());
         bondSellLog.setRealyAfter(bondStatistics.getReady());
+
+        if (bondSellLog.getInterest() > 0) {
+            if (bondBuyLog.getRemarks().length() == 0) {
+                bondBuyLog.setRemarks("利息：" + bondSellLog.getInterest());
+            } else {
+                bondBuyLog.setRemarks(bondBuyLog.getRemarks() + ";利息：" + bondSellLog.getInterest());
+            }
+        }
+
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 

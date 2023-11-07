@@ -641,6 +641,9 @@ public class BondService {
      * @param bondSellLog
      */
     public void sellBond(BondSellLog bondSellLog) {
+        if (bondSellLog.getInterest() == null) {
+            bondSellLog.setInterest(0.0);
+        }
         BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondSellLog.getBuyId());
 
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());

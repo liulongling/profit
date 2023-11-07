@@ -136,10 +136,14 @@ public class BondController {
     @PostMapping("total/analyse")
     public ResultDO<BondStatisticsDTO> totalAnalyse(@RequestBody BondSellRequest bondSellRequest) {
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
-        double p = (bondStatistics.getStock() / (bondStatistics.getStock() + bondStatistics.getReady())) * 100;
-        bondStatistics.setPosition(Double.parseDouble(String.format("%.2f", p)));
-        BondStatisticsDTO bondStatisticsDTO = BeanUtils.copyBean(new BondStatisticsDTO(), bondStatistics);
-        bondStatisticsDTO.setStockProfit(bondService.gpProfit());
+        BondStatisticsDTO bondStatisticsDTO = null;
+        if (bondStatistics != null) {
+            double p = (bondStatistics.getStock() / (bondStatistics.getStock() + bondStatistics.getReady())) * 100;
+            bondStatistics.setPosition(Double.parseDouble(String.format("%.2f", p)));
+            bondStatisticsDTO = BeanUtils.copyBean(new BondStatisticsDTO(), bondStatistics);
+            bondStatisticsDTO.setStockProfit(bondService.gpProfit());
+        }
+
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, bondStatisticsDTO);
     }
 

@@ -903,7 +903,7 @@ function loadProfitData(url){
         $('#sell_gp_id').val(rows[index].gpId);
         $('#sell_input_count').val(rows[index].count - rows[index].sellCount);
         $('#sell_input_price').val(curPrice);
-        $('#sell_input_freeze').val(0.5);
+        $('#sell_input_freeze').val(0);
         $('#sell_input_interest').val(0);
         var now = new Date();
         var day = ("0" + now.getDate()).slice(-2);

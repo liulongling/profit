@@ -4,6 +4,8 @@ package com.profit.commons.utils;
 import com.profit.base.domain.BondInfo;
 import com.profit.commons.constants.BondConstants;
 
+import java.util.Date;
+
 public class BondUtils {
 
     public static String getBaseId(String id) {
@@ -20,6 +22,19 @@ public class BondUtils {
         } else {
             return id;
         }
+    }
+
+    /**
+     * 计算利息
+     *
+     * @param lendMoney 借出 金额
+     * @param lendDate  借出时间
+     * @return
+     */
+    public static Double countInterest(Double lendMoney, Date lendDate) {
+        int lendDay = DateUtils.compareDateInterval(lendDate, new Date());
+        return Double.parseDouble(String.format("%.2f", lendMoney * (0.05 / 360) * lendDay));
+
     }
 
     /**

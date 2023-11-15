@@ -155,6 +155,11 @@ public class BondOperController {
                 girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
             }
             buyLogDTO.setGirdSpacing(girdSpacing);
+            if (bondBuyLog.getFinancing() == 1) {
+                Double lendMoney = bondBuyLog.getTotalPrice() + bondBuyLog.getBuyCost();
+                buyLogDTO.setInterest(BondUtils.countInterest(lendMoney, DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM)));
+            }
+
             list.add(buyLogDTO);
             if (status == 1) {
                 Collections.sort(list, new ComparatorBondSell());
@@ -202,6 +207,7 @@ public class BondOperController {
         bondBuyLog.setPrice(bondBuyLogRequest.getPrice());
         bondBuyLog.setCount(bondBuyLogRequest.getCount());
         bondBuyLog.setBuyDate(bondBuyLogRequest.getBuyDate());
+        bondBuyLog.setFinancing(bondBuyLogRequest.getFinancing());
         bondBuyLog.setRemarks(bondBuyLogRequest.getRemarks());
 
         boolean isBuy = false;

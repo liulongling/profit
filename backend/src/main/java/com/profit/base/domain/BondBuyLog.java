@@ -77,6 +77,11 @@ public class BondBuyLog {
     private String remarks;
 
     /**
+     * 是否融资买入 0:不是 1：是
+     */
+    private Byte financing;
+
+    /**
      * 创建时间
      */
     private Date createTime;

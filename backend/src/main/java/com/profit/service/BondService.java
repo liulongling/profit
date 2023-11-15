@@ -544,6 +544,7 @@ public class BondService {
         bondBuyLog.setSellCount(0);
         bondBuyLog.setSellIncome(0.00);
         bondBuyLog.setStatus(bondBuyLog.getStatus());
+        bondBuyLog.setFinancing(bondBuyLog.getFinancing());
 
         if (bondBuyLog.getStatus() != null && bondBuyLog.getStatus() != 3) {
             bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());

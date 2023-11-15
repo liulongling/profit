@@ -167,11 +167,11 @@
       <if test="operTime != null">
         oper_time,
       </if>
-      <if test="status != null">
-        `status`,
-      </if>
       <if test="financing != null">
         financing,
+      </if>
+      <if test="remarks != null">
+        remarks,
       </if>
       <if test="createTime != null">
         create_time,

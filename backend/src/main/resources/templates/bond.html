@@ -833,6 +833,7 @@ function loadProfitData(url){
             remarks: $('#insert_input_remarks').val(),
             type: $('#insert_input_type').val(),
             status: $('#insert_input_status').val(),
+            financing: $('#insert_input_financing').val(),
         };
          if (data.id <= 0) {
             swal("操作提示", "请输入股票代码", "info");
@@ -865,6 +866,7 @@ function loadProfitData(url){
             sellDate: $('#insert_input_bond_sell_date').val(),
             remarks: $('#insert_input_remarks').val(),
             type: $('#insert_input_type').val(),
+            financing: 0,
             status: 0,
             sellPrice: $('#insert_input_sell_price').val(),
         };

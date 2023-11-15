@@ -401,8 +401,14 @@ public class BondService {
         if (bondBuyLog.getCount() > bondBuyLog.getSellCount()) {
             int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
             Double curIncome = bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
+            //当前收益 扣除佣金税费
             curIncome -= BondUtils.getTaxation(bondInfo, surplusCount * bondInfo.getPrice(), true);
             curIncome -= BondUtils.getTaxation(bondInfo, surplusCount * bondBuyLog.getPrice(), false);
+            //当前收益 扣除利息
+            if (bondBuyLog.getFinancing() == 1) {
+                Double rzfz = surplusCount * bondBuyLog.getPrice() + BondUtils.getTaxation(bondInfo, surplusCount * bondBuyLog.getPrice(), false);
+                curIncome -= BondUtils.countInterest(rzfz, DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM));
+            }
             //涨跌幅
             Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
             buyLogDTO.setIncome(curIncome);

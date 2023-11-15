@@ -1,5 +1,6 @@
 package com.profit.base.domain;
 
+import com.profit.commons.utils.DateUtils;
 import lombok.Data;
 
 import java.util.Date;
@@ -85,4 +86,8 @@ public class BondBuyLog {
      * 创建时间
      */
     private Date createTime;
+
+    public Date getLendDate() {
+        return DateUtils.string2Date(buyDate, DateUtils.DATE_PATTERM);
+    }
 }

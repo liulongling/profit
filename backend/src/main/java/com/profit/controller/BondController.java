@@ -141,6 +141,21 @@ public class BondController {
             double p = (bondStatistics.getStock() / (bondStatistics.getStock() + bondStatistics.getReady())) * 100;
             bondStatistics.setPosition(Double.parseDouble(String.format("%.2f", p)));
             bondStatisticsDTO = BeanUtils.copyBean(new BondStatisticsDTO(), bondStatistics);
+
+            //查询负债
+            BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+            bondBuyLogExample.createCriteria().andFinancingEqualTo((byte) 1);
+            List<BondBuyLog> buyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
+            Double liability = 0.0;
+            Double interest = 0.0;
+            for (BondBuyLog bondBuyLog : buyLogs) {
+                BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+                Double stock = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice();
+                liability += stock + BondUtils.getTaxation(bondInfo, stock, false);
+                interest += BondUtils.countInterest(stock, bondBuyLog.getLendDate());
+            }
+            bondStatisticsDTO.setLiability(Double.parseDouble(String.format("%.2f", liability)));
+            bondStatisticsDTO.setInterest(Double.parseDouble(String.format("%.2f", interest)));
             bondStatisticsDTO.setStockProfit(bondService.gpProfit());
         }
 

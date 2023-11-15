@@ -975,6 +975,66 @@ public class BondBuyLogExample {
             return (Criteria) this;
         }
 
+        public Criteria andFinancingIsNull() {
+            addCriterion("financing is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingIsNotNull() {
+            addCriterion("financing is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingEqualTo(Byte value) {
+            addCriterion("financing =", value, "financing");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingNotEqualTo(Byte value) {
+            addCriterion("financing <>", value, "financing");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingGreaterThan(Byte value) {
+            addCriterion("financing >", value, "financing");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingGreaterThanOrEqualTo(Byte value) {
+            addCriterion("financing >=", value, "financing");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingLessThan(Byte value) {
+            addCriterion("financing <", value, "financing");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingLessThanOrEqualTo(Byte value) {
+            addCriterion("financing <=", value, "financing");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingIn(List<Byte> values) {
+            addCriterion("financing in", values, "financing");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingNotIn(List<Byte> values) {
+            addCriterion("financing not in", values, "financing");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingBetween(Byte value1, Byte value2) {
+            addCriterion("financing between", value1, value2, "financing");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinancingNotBetween(Byte value1, Byte value2) {
+            addCriterion("financing not between", value1, value2, "financing");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

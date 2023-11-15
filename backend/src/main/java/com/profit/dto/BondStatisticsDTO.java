@@ -12,4 +12,13 @@ public class BondStatisticsDTO extends BondStatistics {
      */
     private Double stockProfit;
 
+    /**
+     * 融资市值
+     */
+    private Double liability;
+
+    /**
+     * 利息
+     */
+    private Double interest;
 }

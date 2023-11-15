@@ -387,7 +387,8 @@
          var textHTML = '<tr>';
          textHTML+='<td>持股市值</td>';
          textHTML+='<td>持股盈亏</td>';
-         textHTML+='<td>预冻资金</td>';
+         textHTML+='<td>负债</td>';
+         textHTML+='<td>利息</td>';
          textHTML+='<td>现金</td>';
          textHTML+='<td>仓位</td>';
          textHTML+='<td>止损亏损(今年)</td>';
@@ -401,7 +402,8 @@
           textHTML +=('<tr>');
           textHTML+='<td>'+result.module.stock+'</td>';
           textHTML+='<td>'+result.module.stockProfit+'</td>';
-          textHTML+='<td>'+result.module.freeze+'</td>';
+          textHTML+='<td>'+result.module.liability+'</td>';
+          textHTML+='<td>'+result.module.interest+'</td>';
           textHTML+='<td>'+result.module.ready+'</td>';
           textHTML+='<td>'+result.module.position+'</td>';
           textHTML+='<td>'+result.module.lossMoney+'</td>';

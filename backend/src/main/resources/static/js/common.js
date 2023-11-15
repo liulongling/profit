@@ -156,6 +156,63 @@ function parameterPostRequest(url, data, callback, method = "POST") {
 }
 
 // 有参数请求
+function echartsParameterPostRequest(url, data, callback, method = "POST") {
+    $.ajax({
+        type: method,
+        url: url,
+        dataType: "json",
+        data: JSON.stringify(data),
+        traditional: true,
+        contentType : "application/json",
+        success: function (result) {
+            if (result.success === false) {
+                switch (result.code) {
+                    case 9001: swal("错误", "数据库错误", "error");   break;
+                    case 9002: swal("错误", "参数错误", "error");     break;
+                    case 9999: swal("错误", "系统错误", "error");     break;
+                }
+            } else {
+                option = {
+                      title: {
+                        text: result.module.text
+                      },
+                      tooltip: {
+                        trigger: 'axis'
+                      },
+                      legend: {
+                        data: result.module.legend
+                      },
+                      grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                      },
+                      toolbox: {
+                        feature: {
+                          saveAsImage: {}
+                        }
+                      },
+                      xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: result.module.xaxis
+                      },
+                      yAxis: {
+                        type: 'value'
+                      },
+                      series: result.module.series
+                    };
+                callback(option);
+            }
+        },
+        error: function () {
+            swal("错误", "404", "error");
+        }
+    });
+}
+
+// 有参数请求
 function parameterGetRequest(url, data, callback, method = "GET") {
     $.ajax({
         type: method,

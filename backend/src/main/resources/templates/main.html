@@ -29,7 +29,6 @@
        width:800px;height:500px;float:right
     }
 
-
 </style>
 
 
@@ -588,90 +587,23 @@
         }
     }
 
-
-    parameterPostRequest("/bond/analyse", {type:3}, function loadPageData(result){
-        option = {
-          title: {
-            text: result.module.text
-          },
-          tooltip: {
-            trigger: 'axis'
-          },
-          legend: {
-            data: result.module.legend
-          },
-          grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-          },
-          toolbox: {
-            feature: {
-              saveAsImage: {}
-            }
-          },
-          xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: result.module.xaxis
-          },
-          yAxis: {
-            type: 'value'
-          },
-          series: result.module.series
-        };
-
-      // 获取页面容器
-     var chartDom = document.getElementById('pie');
-     // 容器初始化初始化（echarts）
-     var myChart = echarts.init(chartDom);
-     // 设置容器的相关配置项
-     myChart.setOption(option);
+     echartsParameterPostRequest("/bond/analyse", {type:3}, function loadPageData(option){
+          // 获取页面容器
+         var chartDom = document.getElementById('pie');
+         // 容器初始化初始化（echarts）
+         var myChart = echarts.init(chartDom);
+         // 设置容器的相关配置项
+         myChart.setOption(option);
      });
 
-     parameterPostRequest("/bond/analyse", {type:2}, function loadPageData(result){
-        option = {
-          title: {
-            text: result.module.text
-          },
-          tooltip: {
-            trigger: 'axis'
-          },
-          legend: {
-            data: result.module.legend
-          },
-          grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-          },
-          toolbox: {
-            feature: {
-              saveAsImage: {}
-            }
-          },
-          xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: result.module.xaxis
-          },
-          yAxis: {
-            type: 'value'
-          },
-          series: result.module.series
-        };
-
-      // 获取页面容器
-     var chartDom = document.getElementById('pie1');
-     // 容器初始化初始化（echarts）
-     var myChart = echarts.init(chartDom);
-     // 设置容器的相关配置项
-     myChart.setOption(option);
+     echartsParameterPostRequest("/bond/analyse", {type:2}, function loadPageData(option){
+          // 获取页面容器
+         var chartDom = document.getElementById('pie1');
+         // 容器初始化初始化（echarts）
+         var myChart = echarts.init(chartDom);
+         // 设置容器的相关配置项
+         myChart.setOption(option);
      });
-
-
 
 
 

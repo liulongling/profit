@@ -18,20 +18,11 @@ public class ManagerController {
         return TemplatePath.BOND_HTML;
     }
 
-    @GetMapping("analyse")
-    public String showAnalyse() {
-        return TemplatePath.PROFIT_HTML;
-    }
-
     @GetMapping("allbond")
     public String allbond() {
         return TemplatePath.ALL_BOND_HTML;
     }
 
-    @GetMapping("profit")
-    public String profit() {
-        return TemplatePath.PROFIT_HTML;
-    }
 
     @GetMapping("login")
     public String login() {

@@ -16,27 +16,37 @@
     <!-- theme stylesheet-->
     <link rel="stylesheet" href="../../static/css/table.css" th:href="@{/css/table.css}">
     <!-- 每30秒钟刷新一次页面 -->
-<!--    <meta http-equiv="refresh" content="60">-->
+    <!--    <meta http-equiv="refresh" content="60">-->
 </head>
 
 <body onload="init();">
 
+<style>
+    .pieDiv {
+       width:800px;height:500px;float:left
+    }
+    .pieDiv1 {
+       width:800px;height:500px;float:right
+    }
+
+
+</style>
 
 
 <div class="container" style="width: 2000px;" align="center">
     <div class="panel-body">
         <table id="tableTodayProfit" class="table table-striped table-hover table-bordered"></table>
-    </div>
-</div>
-
-<div class="container" style="width: 2000px;" align="center">
-    <div class="panel-body">
         <table id="tableProfit" class="table table-striped table-hover table-bordered"></table>
     </div>
 </div>
 
-<div class="container" style="width: 2000px;" align="center">
-    <div id="pie" style="width:2000px; height: 600px;" align="center"></div>
+<div class="container" style="width: 2200px;height: 400px;">
+    <div class="pieDiv">
+        <div id="pie" style="width:800px; height: 400px;"></div>
+    </div>
+    <div class="pieDiv1">
+        <div id="pie1" style="width:800px; height: 400px;"></div>
+    </div>
 </div>
 
 <div class="panel-body" style="padding-bottom:0;">
@@ -348,10 +358,9 @@
         });
         loadTodayProfitData("/bond/today/analyse");
         loadTotalProfitData("/bond/total/analyse");
-        loadProfitData("/bond/analyse");
     }
 
-     function loadTotalProfitData(url){
+ function loadTotalProfitData(url){
        let data = {
           startTime:'2020',
           endTime:'2020'
@@ -398,13 +407,15 @@
           textHTML+='<td>'+result.module.position+'</td>';
           textHTML+='<td>'+result.module.lossMoney+'</td>';
           textHTML+='<td>'+result.module.cost+'</td>';
-          textHTML+='<td><a href = "http://127.0.0.1:'+window.location.port+'/profit" target= "http://127.0.0.1:'+window.location.port+'/profit">'+result.module.profit+'</a></td>';
+          textHTML+='<td>'+result.module.profit+'</td>';
           textHTML+='<td><a href = "http://127.0.0.1:'+window.location.port+'/allbond" target= "http://127.0.0.1:'+window.location.port+'/allbond">'+result.module.profitNumber+'</a></td>';
           textHTML+='<td>'+result.module.lossNumber+'</td>';
           textHTML+='<td>'+result.module.winning+'</td>';
           textHTML+='</tr>';
           document.getElementById("tableProfit").innerHTML = textHTML;
     }
+
+
 
     function loadTodayProfitData(url){
        let data = {
@@ -577,30 +588,8 @@
         }
     }
 
- function loadProfitData(url){
-       let data = {
-          type:3
-       };
-      $.ajax({
-            type: "POST",
-            url: url,
-            dataType: "json",
-            async : false, //同步执行
-            data: JSON.stringify(data),
-            traditional: true,
-            contentType : "application/json",
-            success: function (result) {
-                loadPageData(result);
-            },
-            error: function () {
-                swal("错误", "404", "error");
-            }
-         }
-        );
-    }
 
-
-    function loadPageData(result){
+    parameterPostRequest("/bond/analyse", {type:3}, function loadPageData(result){
         option = {
           title: {
             text: result.module.text
@@ -639,7 +628,51 @@
      var myChart = echarts.init(chartDom);
      // 设置容器的相关配置项
      myChart.setOption(option);
-     }
+     });
+
+     parameterPostRequest("/bond/analyse", {type:2}, function loadPageData(result){
+        option = {
+          title: {
+            text: result.module.text
+          },
+          tooltip: {
+            trigger: 'axis'
+          },
+          legend: {
+            data: result.module.legend
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          toolbox: {
+            feature: {
+              saveAsImage: {}
+            }
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: result.module.xaxis
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: result.module.series
+        };
+
+      // 获取页面容器
+     var chartDom = document.getElementById('pie1');
+     // 容器初始化初始化（echarts）
+     var myChart = echarts.init(chartDom);
+     // 设置容器的相关配置项
+     myChart.setOption(option);
+     });
+
+
+
 
 
 </script>

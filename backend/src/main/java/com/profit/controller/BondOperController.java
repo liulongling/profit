@@ -156,7 +156,7 @@ public class BondOperController {
             }
             buyLogDTO.setGirdSpacing(girdSpacing);
             if (bondBuyLog.getFinancing() == 1) {
-                Double lendMoney = bondBuyLog.getTotalPrice() + bondBuyLog.getBuyCost();
+                Double lendMoney = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() + bondBuyLog.getBuyCost();
                 buyLogDTO.setInterest(BondUtils.countInterest(lendMoney, DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM)));
             }
 

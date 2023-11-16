@@ -1,5 +1,6 @@
 package com.profit.base.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.profit.commons.utils.DateUtils;
 import lombok.Data;
 
@@ -86,8 +87,4 @@ public class BondBuyLog {
      * 创建时间
      */
     private Date createTime;
-
-    public Date getLendDate() {
-        return DateUtils.string2Date(buyDate, DateUtils.DATE_PATTERM);
-    }
 }

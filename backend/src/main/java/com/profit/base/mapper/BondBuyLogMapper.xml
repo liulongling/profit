@@ -7,6 +7,8 @@
     <result column="price" jdbcType="DOUBLE" property="price" />
     <result column="count" jdbcType="INTEGER" property="count" />
     <result column="total_price" jdbcType="DOUBLE" property="totalPrice" />
+    <result column="back_money" jdbcType="DOUBLE" property="backMoney" />
+    <result column="back_time" jdbcType="TIMESTAMP" property="backTime" />
     <result column="buy_cost" jdbcType="DOUBLE" property="buyCost" />
     <result column="cost" jdbcType="DOUBLE" property="cost" />
     <result column="type" jdbcType="TINYINT" property="type" />
@@ -16,7 +18,7 @@
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="oper_time" jdbcType="TIMESTAMP" property="operTime" />
     <result column="remarks" jdbcType="VARCHAR" property="remarks" />
-    <result column="financing" jdbcType="INTEGER" property="financing" />
+    <result column="financing" jdbcType="TINYINT" property="financing" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -78,8 +80,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, gp_id, price, `count`, total_price, buy_cost, cost, `type`, sell_count, sell_income,
-    buy_date, `status`, oper_time, `financing`,remarks, create_time
+    id, gp_id, price, `count`, total_price, back_money, back_time, buy_cost, cost, `type`,
+    sell_count, sell_income, buy_date, `status`, oper_time, remarks, financing, create_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondBuyLogExample" resultMap="BaseResultMap">
     select
@@ -111,21 +113,23 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.profit.base.domain.BondBuyLog"  keyProperty="id" useGeneratedKeys="true">
+  <insert id="insert" parameterType="com.profit.base.domain.BondBuyLog">
     insert into bond_buy_log (id, gp_id, price,
-    `count`, total_price, buy_cost,
-    cost, `type`, sell_count,
-    sell_income, buy_date, `status`,
-    oper_time, `financing`,remarks, create_time
+    `count`, total_price, back_money,
+    back_time, buy_cost, cost,
+    `type`, sell_count, sell_income,
+    buy_date, `status`, oper_time,
+    remarks, financing, create_time
     )
     values (#{id,jdbcType=BIGINT}, #{gpId,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE},
-    #{count,jdbcType=INTEGER}, #{totalPrice,jdbcType=DOUBLE}, #{buyCost,jdbcType=DOUBLE},
-    #{cost,jdbcType=DOUBLE}, #{type,jdbcType=TINYINT}, #{sellCount,jdbcType=INTEGER},
-    #{sellIncome,jdbcType=DOUBLE}, #{buyDate,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT},
-    #{operTime,jdbcType=TIMESTAMP}, #{financing,jdbcType=TINYINT}, #{remarks,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+    #{count,jdbcType=INTEGER}, #{totalPrice,jdbcType=DOUBLE}, #{backMoney,jdbcType=DOUBLE},
+    #{backTime,jdbcType=TIMESTAMP}, #{buyCost,jdbcType=DOUBLE}, #{cost,jdbcType=DOUBLE},
+    #{type,jdbcType=TINYINT}, #{sellCount,jdbcType=INTEGER}, #{sellIncome,jdbcType=DOUBLE},
+    #{buyDate,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{operTime,jdbcType=TIMESTAMP},
+    #{remarks,jdbcType=VARCHAR}, #{financing,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}
     )
   </insert>
-  <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog"  keyProperty="id" useGeneratedKeys="true">
+  <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog">
     insert into bond_buy_log
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -142,6 +146,12 @@
       </if>
       <if test="totalPrice != null">
         total_price,
+      </if>
+      <if test="backMoney != null">
+        back_money,
+      </if>
+      <if test="backTime != null">
+        back_time,
       </if>
       <if test="buyCost != null">
         buy_cost,
@@ -167,11 +177,11 @@
       <if test="operTime != null">
         oper_time,
       </if>
-      <if test="financing != null">
-        financing,
-      </if>
       <if test="remarks != null">
         remarks,
+      </if>
+      <if test="financing != null">
+        financing,
       </if>
       <if test="createTime != null">
         create_time,
@@ -192,6 +202,12 @@
       </if>
       <if test="totalPrice != null">
         #{totalPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="backMoney != null">
+        #{backMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="backTime != null">
+        #{backTime,jdbcType=TIMESTAMP},
       </if>
       <if test="buyCost != null">
         #{buyCost,jdbcType=DOUBLE},
@@ -217,11 +233,11 @@
       <if test="operTime != null">
         #{operTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="financing != null">
-        #{financing,jdbcType=TINYINT},
-      </if>
       <if test="remarks != null">
         #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="financing != null">
+        #{financing,jdbcType=TINYINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -252,6 +268,12 @@
       <if test="record.totalPrice != null">
         total_price = #{record.totalPrice,jdbcType=DOUBLE},
       </if>
+      <if test="record.backMoney != null">
+        back_money = #{record.backMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="record.backTime != null">
+        back_time = #{record.backTime,jdbcType=TIMESTAMP},
+      </if>
       <if test="record.buyCost != null">
         buy_cost = #{record.buyCost,jdbcType=DOUBLE},
       </if>
@@ -276,11 +298,11 @@
       <if test="record.operTime != null">
         oper_time = #{record.operTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.financing != null">
-        `type` = #{record.financing,jdbcType=TINYINT},
-      </if>
       <if test="record.remarks != null">
         remarks = #{record.remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="record.financing != null">
+        financing = #{record.financing,jdbcType=TINYINT},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -297,6 +319,8 @@
     price = #{record.price,jdbcType=DOUBLE},
     `count` = #{record.count,jdbcType=INTEGER},
     total_price = #{record.totalPrice,jdbcType=DOUBLE},
+    back_money = #{record.backMoney,jdbcType=DOUBLE},
+    back_time = #{record.backTime,jdbcType=TIMESTAMP},
     buy_cost = #{record.buyCost,jdbcType=DOUBLE},
     cost = #{record.cost,jdbcType=DOUBLE},
     `type` = #{record.type,jdbcType=TINYINT},
@@ -304,9 +328,9 @@
     sell_income = #{record.sellIncome,jdbcType=DOUBLE},
     buy_date = #{record.buyDate,jdbcType=VARCHAR},
     `status` = #{record.status,jdbcType=TINYINT},
-    `financing` = #{record.financing,jdbcType=TINYINT},
     oper_time = #{record.operTime,jdbcType=TIMESTAMP},
     remarks = #{record.remarks,jdbcType=VARCHAR},
+    financing = #{record.financing,jdbcType=TINYINT},
     create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -326,6 +350,12 @@
       </if>
       <if test="totalPrice != null">
         total_price = #{totalPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="backMoney != null">
+        back_money = #{backMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="backTime != null">
+        back_time = #{backTime,jdbcType=TIMESTAMP},
       </if>
       <if test="buyCost != null">
         buy_cost = #{buyCost,jdbcType=DOUBLE},
@@ -351,11 +381,11 @@
       <if test="operTime != null">
         oper_time = #{operTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="financing != null">
-        `financing` = #{financing,jdbcType=TINYINT},
-      </if>
       <if test="remarks != null">
         remarks = #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="financing != null">
+        financing = #{financing,jdbcType=TINYINT},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -369,6 +399,8 @@
     price = #{price,jdbcType=DOUBLE},
     `count` = #{count,jdbcType=INTEGER},
     total_price = #{totalPrice,jdbcType=DOUBLE},
+    back_money = #{backMoney,jdbcType=DOUBLE},
+    back_time = #{backTime,jdbcType=TIMESTAMP},
     buy_cost = #{buyCost,jdbcType=DOUBLE},
     cost = #{cost,jdbcType=DOUBLE},
     `type` = #{type,jdbcType=TINYINT},
@@ -377,12 +409,11 @@
     buy_date = #{buyDate,jdbcType=VARCHAR},
     `status` = #{status,jdbcType=TINYINT},
     oper_time = #{operTime,jdbcType=TIMESTAMP},
-    `financing` = #{financing,jdbcType=TINYINT},
     remarks = #{remarks,jdbcType=VARCHAR},
+    financing = #{financing,jdbcType=TINYINT},
     create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
-
   <select id="sumSellIncome" resultType="java.lang.Double">
     SELECT
     sum(sell_income)

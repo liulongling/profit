@@ -2,6 +2,8 @@
  * 渲染表格要用到的常用代码封装
  */
 
+
+
 // 初始化表格
 function initTable(node, url, pageList, queryParams, columns, toolbar = '#toolbar') {
     node.bootstrapTable("destroy");         // 先销毁用来的表格再构造新的表格

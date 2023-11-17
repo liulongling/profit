@@ -156,8 +156,14 @@ public class BondOperController {
             }
             buyLogDTO.setGirdSpacing(girdSpacing);
             if (bondBuyLog.getFinancing() == 1) {
-                Double lendMoney = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() + bondBuyLog.getBuyCost();
-                buyLogDTO.setInterest(BondUtils.countInterest(lendMoney, DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM)));
+                Double lendMoney = ((bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney()) + bondBuyLog.getBuyCost();
+                Date lendDate;
+                if (bondBuyLog.getBackTime() != null) {
+                    lendDate = bondBuyLog.getBackTime();
+                } else {
+                    lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM);
+                }
+                buyLogDTO.setInterest(BondUtils.countInterest(lendMoney, lendDate));
             }
 
             list.add(buyLogDTO);
@@ -195,6 +201,12 @@ public class BondOperController {
     @PostMapping("sell")
     public ResultDO<Void> sell(@RequestBody BondSellLog bondSellLog) {
         bondService.sellBond(bondSellLog);
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
+    }
+
+    @PostMapping("back")
+    public ResultDO<Void> back(@RequestBody BondBuyLogDTO bondBuyLogDTO) {
+        bondService.backBond(bondBuyLogDTO);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 

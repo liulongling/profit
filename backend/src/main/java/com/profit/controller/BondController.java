@@ -150,9 +150,15 @@ public class BondController {
             Double interest = 0.0;
             for (BondBuyLog bondBuyLog : buyLogs) {
                 BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
-                Double stock = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice();
+                Double stock = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney();
                 liability += stock + BondUtils.getTaxation(bondInfo, stock, false);
-                interest += BondUtils.countInterest(stock, DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM));
+                Date lendDate;
+                if (bondBuyLog.getBackTime() != null) {
+                    lendDate = bondBuyLog.getBackTime();
+                } else {
+                    lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM);
+                }
+                interest += BondUtils.countInterest(stock, lendDate);
             }
             bondStatisticsDTO.setLiability(Double.parseDouble(String.format("%.2f", liability)));
             bondStatisticsDTO.setInterest(Double.parseDouble(String.format("%.2f", interest)));

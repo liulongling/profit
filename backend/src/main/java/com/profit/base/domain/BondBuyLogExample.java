@@ -415,6 +415,126 @@ public class BondBuyLogExample {
             return (Criteria) this;
         }
 
+        public Criteria andBackMoneyIsNull() {
+            addCriterion("back_money is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyIsNotNull() {
+            addCriterion("back_money is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyEqualTo(Double value) {
+            addCriterion("back_money =", value, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyNotEqualTo(Double value) {
+            addCriterion("back_money <>", value, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyGreaterThan(Double value) {
+            addCriterion("back_money >", value, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyGreaterThanOrEqualTo(Double value) {
+            addCriterion("back_money >=", value, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyLessThan(Double value) {
+            addCriterion("back_money <", value, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyLessThanOrEqualTo(Double value) {
+            addCriterion("back_money <=", value, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyIn(List<Double> values) {
+            addCriterion("back_money in", values, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyNotIn(List<Double> values) {
+            addCriterion("back_money not in", values, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyBetween(Double value1, Double value2) {
+            addCriterion("back_money between", value1, value2, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackMoneyNotBetween(Double value1, Double value2) {
+            addCriterion("back_money not between", value1, value2, "backMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeIsNull() {
+            addCriterion("back_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeIsNotNull() {
+            addCriterion("back_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeEqualTo(Date value) {
+            addCriterion("back_time =", value, "backTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeNotEqualTo(Date value) {
+            addCriterion("back_time <>", value, "backTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeGreaterThan(Date value) {
+            addCriterion("back_time >", value, "backTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("back_time >=", value, "backTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeLessThan(Date value) {
+            addCriterion("back_time <", value, "backTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeLessThanOrEqualTo(Date value) {
+            addCriterion("back_time <=", value, "backTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeIn(List<Date> values) {
+            addCriterion("back_time in", values, "backTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeNotIn(List<Date> values) {
+            addCriterion("back_time not in", values, "backTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeBetween(Date value1, Date value2) {
+            addCriterion("back_time between", value1, value2, "backTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTimeNotBetween(Date value1, Date value2) {
+            addCriterion("back_time not between", value1, value2, "backTime");
+            return (Criteria) this;
+        }
+
         public Criteria andBuyCostIsNull() {
             addCriterion("buy_cost is null");
             return (Criteria) this;

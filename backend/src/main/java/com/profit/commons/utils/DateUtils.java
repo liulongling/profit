@@ -17,7 +17,7 @@ import java.util.*;
 public class DateUtils {
     public static final String DATE_PATTERM = "yyyy-MM-dd";
     public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-    private static final String PATTERN_DATE = "yyyyMMdd";
+    public static final String PATTERN_DATE = "yyyyMMdd";
     private static final String PATTERN_MONTH_DATE = "yyyyMM";
     private static final String PATTERN_TIME = "HH:mm:ss";
     private static final String PATTERN_DATE_TIME = "yyyyMMdd HH:mm:ss";

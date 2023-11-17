@@ -406,8 +406,14 @@ public class BondService {
             curIncome -= BondUtils.getTaxation(bondInfo, surplusCount * bondBuyLog.getPrice(), false);
             //当前收益 扣除利息
             if (bondBuyLog.getFinancing() == 1) {
-                Double rzfz = surplusCount * bondBuyLog.getPrice() + BondUtils.getTaxation(bondInfo, surplusCount * bondBuyLog.getPrice(), false);
-                curIncome -= BondUtils.countInterest(rzfz, DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM));
+                Double rzfz = (surplusCount * bondBuyLog.getPrice()) + BondUtils.getTaxation(bondInfo, surplusCount * bondBuyLog.getPrice(), false);
+                Date lendDate;
+                if (bondBuyLog.getBackTime() != null) {
+                    lendDate = bondBuyLog.getBackTime();
+                } else {
+                    lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM);
+                }
+                curIncome -= BondUtils.countInterest(rzfz, lendDate);
             }
             //涨跌幅
             Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
@@ -640,6 +646,26 @@ public class BondService {
         bondStatistics.setReady(Double.parseDouble(String.format("%.2f", bondStatistics.getReady() + value)));
         bondStatisticsMapper.updateByPrimaryKey(bondStatistics);
         return bondStatistics;
+    }
+
+    /**
+     * 归还股票融资
+     *
+     * @param bondBuyLogDTO
+     */
+    public void backBond(BondBuyLogDTO bondBuyLogDTO) {
+        BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondBuyLogDTO.getId());
+        bondBuyLog.setCost(bondBuyLog.getCost() + bondBuyLogDTO.getInterest());
+        bondBuyLog.setBackMoney(Double.parseDouble(String.format("%.2f", bondBuyLog.getBackMoney() + bondBuyLogDTO.getTotalPrice())));
+        if (bondBuyLog.getBackMoney().doubleValue() >= bondBuyLog.getTotalPrice().doubleValue()) {
+            //已归还完
+            bondBuyLog.setFinancing((byte) 0);
+            bondBuyLog.setBackMoney(bondBuyLog.getTotalPrice().doubleValue());
+        }
+        bondBuyLog.setBackTime(bondBuyLogDTO.getBackTime());
+        String remark = DateUtils.getDateString(new Date(), DateUtils.PATTERN_DATE) + "归还金额" + bondBuyLogDTO.getTotalPrice() + "利息:" + bondBuyLogDTO.getInterest() + "税费:" + bondBuyLogDTO.getCost() + ";";
+        bondBuyLog.setRemarks(bondBuyLog.getRemarks() + remark);
+        bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
     }
 
     /**

@@ -345,6 +345,60 @@
     </div><!--/.modal-->
 </div>
 
+<!--模态框（Modal） 归还融资-->
+<div class="modal fade" id="backModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="backModalLabel">
+                    出售股票
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_buy_id">序号</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="back_buy_id" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_gp_id">股票代码</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="back_gp_id" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_input_money">归还金额</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="back_input_money">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_input_interest">利息</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="back_input_interest">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_input_date">归还日期</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="back_input_date">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="backCommit()">归还融资</button>
+            </div>
+        </div> <!--/.modal-content -->
+    </div><!--/.modal-->
+</div>
+
 <!-- JavaScript files-->
 <!-- jquery.js -->
 <script src="../../static/js/lib/jquery.min.js" th:src="@{/js/lib/jquery.min.js}"></script>
@@ -400,6 +454,12 @@
             field: 'count',
             title: '购买数量',
             width: '30px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'backMoney',
+            title: '归还金额',
+            width: '70px',
             align: "center",
             formatter: stringFormatter
         }, {
@@ -591,6 +651,7 @@
         return [
             '<button class="btn btn-primary view" data-toggle="modal" data-target="#alterModal" onclick="initUpdate('+ index +');">编辑</button>&nbsp;&nbsp;'+
             '<button class="btn btn-primary view" data-toggle="modal" data-target="#sellModal" onclick="sell('+ index +');">出售</button>&nbsp;&nbsp;'+
+            '<button class="btn btn-primary view" data-toggle="modal" data-target="#backModal"  onclick="back('+ index +');">归还</button>&nbsp;&nbsp;'+
             '<button class="btn btn-primary view" onclick="deleteOne('+ index +');">删除</button>&nbsp;&nbsp;'
         ].join('');
     }
@@ -924,6 +985,35 @@ function loadProfitData(url){
         }
     }
 
+
+  function back(index) {
+        loadBondInfoData("/bond/info");
+        let rows = $table.bootstrapTable('getData');
+        $('#back_buy_id').val(rows[index].id);
+        $('#back_gp_id').val(rows[index].gpId);
+        $('#back_input_money').val(Math.round(parseFloat((rows[index].count - rows[index].sellCount)*rows[index].price - rows[index].backMoney)*100)/100);
+        $('#back_input_interest').val(rows[index].interest==null?0:rows[index].interest);
+        var now = new Date();
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+        $('#back_input_date').val(today);
+  }
+
+  function backCommit() {
+          let data = {
+            id: $('#back_buy_id').val(),
+            totalPrice:$('#back_input_money').val(),
+            interest:$('#back_input_interest').val(),
+            backTime: $('#back_input_date').val()
+         };
+        parameterPostRequest("/bond/operating/back", data, () => {
+                $('#addModal').modal('hide');
+                swal("正确", "添加成功", "success");
+                init();
+         });
+  }
+
   function sell(index) {
         loadBondInfoData("/bond/info");
         let rows = $table.bootstrapTable('getData');
@@ -972,6 +1062,9 @@ function loadProfitData(url){
             });
         });
     }
+
+
+
 
 
 </script>

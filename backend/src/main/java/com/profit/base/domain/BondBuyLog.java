@@ -1,7 +1,5 @@
 package com.profit.base.domain;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.profit.commons.utils.DateUtils;
 import lombok.Data;
 
 import java.util.Date;
@@ -34,6 +32,16 @@ public class BondBuyLog {
     private Double totalPrice;
 
     /**
+     * 融资归还金额
+     */
+    private Double backMoney;
+
+    /**
+     * 融资归还时间
+     */
+    private Date backTime;
+
+    /**
      * 购买消耗佣金
      */
     private Double buyCost;
@@ -44,7 +52,7 @@ public class BondBuyLog {
     private Double cost;
 
     /**
-     * type:0 网格 type:1短线 type:2流动短线
+     * type:0 网格 type:1短线
      */
     private Byte type;
 
@@ -64,7 +72,7 @@ public class BondBuyLog {
     private String buyDate;
 
     /**
-     * 0:未售完 1:已售完 3：待买入
+     * 0:未售完 1:已售完
      */
     private Byte status;
 

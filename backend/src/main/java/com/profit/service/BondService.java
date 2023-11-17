@@ -663,7 +663,7 @@ public class BondService {
             bondBuyLog.setBackMoney(bondBuyLog.getTotalPrice().doubleValue());
         }
         bondBuyLog.setBackTime(bondBuyLogDTO.getBackTime());
-        String remark = DateUtils.getDateString(new Date(), DateUtils.PATTERN_DATE) + "归还金额" + bondBuyLogDTO.getTotalPrice() + "利息:" + bondBuyLogDTO.getInterest() + "税费:" + bondBuyLogDTO.getCost() + ";";
+        String remark = DateUtils.getDateString(new Date(), DateUtils.PATTERN_DATE) + "归还金额" + bondBuyLogDTO.getTotalPrice() + "利息:" + bondBuyLogDTO.getInterest() + ";";
         bondBuyLog.setRemarks(bondBuyLog.getRemarks() + remark);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
     }

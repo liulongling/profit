@@ -129,7 +129,7 @@
     #{remarks,jdbcType=VARCHAR}, #{financing,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}
     )
   </insert>
-  <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog">
+  <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog" keyProperty="id" useGeneratedKeys="true">
     insert into bond_buy_log
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">

@@ -340,44 +340,18 @@
         getServerPaging($table, "/bond/list", params => {
             return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC" };
         });
-        loadTodayProfitData("/bond/today/analyse");
-        loadTotalProfitData("/bond/total/analyse");
     }
 
- function loadTotalProfitData(url){
-       let data = {
-          startTime:'2020',
-          endTime:'2020'
-       };
-      $.ajax({
-            type: "POST",
-            url: url,
-            dataType: "json",
-            async : false, //同步执行
-            data: JSON.stringify(data),
-            traditional: true,
-            contentType : "application/json",
-            success: function (result) {
-                loadStatisticsPageData(result);
-            },
-            error: function () {
-                swal("错误", "404", "error");
-            }
-         }
-        );
-    }
-
-
-    function loadStatisticsPageData(result){
+       parameterGetRequest("/bond/total/analyse",null,function loadStatisticsPageData(result){
          var textHTML = '<tr>';
          textHTML+='<td>持股市值</td>';
          textHTML+='<td>持股盈亏</td>';
          textHTML+='<td>负债</td>';
-         textHTML+='<td>利息</td>';
+         textHTML+='<td>融资利息(未还)</td>';
          textHTML+='<td>现金</td>';
          textHTML+='<td>仓位</td>';
          textHTML+='<td>止损亏损(今年)</td>';
-         textHTML+='<td>总佣金(今年)</td>';
+         textHTML+='<td>总税费利息(今年)</td>';
          textHTML+='<td>总收益(今年)</td>';
          textHTML+='<td>总盈利笔数(今年)</td>';
          textHTML+='<td>总亏损笔数(今年)</td>';
@@ -399,35 +373,11 @@
           textHTML+='<td>'+result.module.winning+'</td>';
           textHTML+='</tr>';
           document.getElementById("tableProfit").innerHTML = textHTML;
-    }
+        });
 
 
 
-    function loadTodayProfitData(url){
-       let data = {
-          startTime:'2020',
-          endTime:'2020'
-       };
-      $.ajax({
-            type: "POST",
-            url: url,
-            dataType: "json",
-            async : false, //同步执行
-            data: JSON.stringify(data),
-            traditional: true,
-            contentType : "application/json",
-            success: function (result) {
-                drawTodayPageData(result);
-            },
-            error: function () {
-                swal("错误", "404", "error");
-            }
-         }
-        );
-    }
-
-
-    function drawTodayPageData(result){
+       parameterGetRequest("/bond/today/analyse",null, function drawTodayPageData(result){
          var textHTML = '<tr>';
          textHTML+='<td>收益(今日)</td>';
          textHTML+='<td>止损亏损(今日)</td>';
@@ -459,7 +409,10 @@
           textHTML+='<td>'+result.module.maxProfit+'</td>';
           textHTML+='</tr>';
           document.getElementById("tableTodayProfit").innerHTML = textHTML;
-    }
+    });
+
+
+
 
     function filter() {
         let data = {
@@ -591,6 +544,8 @@
          // 设置容器的相关配置项
          myChart.setOption(option);
      });
+
+
 
 
 

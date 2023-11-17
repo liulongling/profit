@@ -662,9 +662,9 @@ public class BondService {
             bondBuyLog.setFinancing((byte) 0);
             bondBuyLog.setBackMoney(bondBuyLog.getTotalPrice().doubleValue());
         }
+        bondBuyLog.addInterest(bondBuyLogDTO.getInterest());
         bondBuyLog.setBackTime(bondBuyLogDTO.getBackTime());
-        String remark = DateUtils.getDateString(new Date(), DateUtils.PATTERN_DATE) + "归还金额" + bondBuyLogDTO.getTotalPrice() + "利息:" + bondBuyLogDTO.getInterest() + ";";
-        bondBuyLog.setRemarks(bondBuyLog.getRemarks() + remark);
+        bondBuyLog.addRemarks(bondBuyLogDTO.getBackMoney(), bondBuyLogDTO.getInterest());
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
     }
 
@@ -714,11 +714,9 @@ public class BondService {
         bondSellLog.setRealyAfter(bondStatistics.getReady());
 
         if (bondSellLog.getInterest() > 0) {
-            if (bondBuyLog.getRemarks().length() == 0) {
-                bondBuyLog.setRemarks("利息：" + bondSellLog.getInterest());
-            } else {
-                bondBuyLog.setRemarks(bondBuyLog.getRemarks() + ";利息：" + bondSellLog.getInterest());
-            }
+            bondBuyLog.addInterest(bondSellLog.getInterest());
+            bondBuyLog.setBackTime(bondSellLog.getCreateTime());
+            bondBuyLog.addRemarks(bondSellLog.getTotalPrice(), bondSellLog.getInterest());
         }
 
         bondSellLogMapper.insert(bondSellLog);

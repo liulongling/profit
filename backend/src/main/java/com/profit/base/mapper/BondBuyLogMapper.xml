@@ -459,4 +459,11 @@
     AND
     status in(0,1)
   </select>
+
+  <select id="sumInterest" resultType="java.lang.Double">
+    SELECT
+    sum(interest)
+    FROM
+    bond_buy_log
+  </select>
 </mapper>

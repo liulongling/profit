@@ -20,5 +20,5 @@ public class BondStatisticsDTO extends BondStatistics {
     /**
      * 利息
      */
-    private Double interest;
+    private String interest;
 }

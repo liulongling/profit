@@ -1,6 +1,5 @@
 package com.profit.base.domain;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;

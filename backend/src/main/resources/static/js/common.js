@@ -107,30 +107,6 @@ function changeToolTip() {
     });
 }
 
-// 无参数请求
-function noParameterPostRequest(url, callback, method = "POST") {
-    $.ajax({
-        type: method,
-        url: url,
-        dataType: "json",
-        contentType : "application/json",
-        success: function (result) {
-            if (result.success === false) {
-                switch (result.code) {
-                    case 9001: swal("错误", "数据库错误", "error");   break;
-                    case 9002: swal("错误", "参数错误", "error");     break;
-                    case 9999: swal("错误", "系统错误", "error");     break;
-                }
-            } else {
-                callback(result);
-            }
-        },
-        error: function () {
-            swal("错误", "404", "error");
-        }
-    });
-}
-
 // 有参数请求
 function parameterPostRequest(url, data, callback, method = "POST") {
     $.ajax({
@@ -213,6 +189,7 @@ function echartsParameterPostRequest(url, data, callback, method = "POST") {
         }
     });
 }
+
 
 // 有参数请求
 function parameterGetRequest(url, data, callback, method = "GET") {

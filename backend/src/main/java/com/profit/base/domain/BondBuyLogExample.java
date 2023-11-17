@@ -535,6 +535,66 @@ public class BondBuyLogExample {
             return (Criteria) this;
         }
 
+        public Criteria andInterestIsNull() {
+            addCriterion("interest is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestIsNotNull() {
+            addCriterion("interest is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestEqualTo(Double value) {
+            addCriterion("interest =", value, "interest");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestNotEqualTo(Double value) {
+            addCriterion("interest <>", value, "interest");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestGreaterThan(Double value) {
+            addCriterion("interest >", value, "interest");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestGreaterThanOrEqualTo(Double value) {
+            addCriterion("interest >=", value, "interest");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestLessThan(Double value) {
+            addCriterion("interest <", value, "interest");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestLessThanOrEqualTo(Double value) {
+            addCriterion("interest <=", value, "interest");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestIn(List<Double> values) {
+            addCriterion("interest in", values, "interest");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestNotIn(List<Double> values) {
+            addCriterion("interest not in", values, "interest");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestBetween(Double value1, Double value2) {
+            addCriterion("interest between", value1, value2, "interest");
+            return (Criteria) this;
+        }
+
+        public Criteria andInterestNotBetween(Double value1, Double value2) {
+            addCriterion("interest not between", value1, value2, "interest");
+            return (Criteria) this;
+        }
+
         public Criteria andBuyCostIsNull() {
             addCriterion("buy_cost is null");
             return (Criteria) this;

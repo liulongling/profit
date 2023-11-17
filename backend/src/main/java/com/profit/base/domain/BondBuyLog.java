@@ -1,5 +1,7 @@
 package com.profit.base.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.profit.commons.utils.DateUtils;
 import lombok.Data;
 
 import java.util.Date;
@@ -40,6 +42,11 @@ public class BondBuyLog {
      * 融资归还时间
      */
     private Date backTime;
+
+    /**
+     * 融资利息
+     */
+    private Double interest;
 
     /**
      * 购买消耗佣金
@@ -95,4 +102,14 @@ public class BondBuyLog {
      * 创建时间
      */
     private Date createTime;
+
+    @JSONField(serialize = false, deserialize = false)
+    public void addInterest(Double intersert) {
+        this.interest += intersert;
+    }
+
+    @JSONField(serialize = false, deserialize = false)
+    public void addRemarks(Double backMoney, Double intersert) {
+        remarks += DateUtils.getDateString(backTime, DateUtils.PATTERN_DATE) + "归还金额" + backMoney + "利息:" + intersert + ";";
+    }
 }

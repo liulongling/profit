@@ -125,16 +125,16 @@ public class BondController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, eChartsData);
     }
 
-    @PostMapping("today/analyse")
-    public ResultDO<TodayTaxationDTO> todayAnalyse(@RequestBody BondSellRequest bondSellRequest) {
+    @GetMapping("today/analyse")
+    public ResultDO<TodayTaxationDTO> todayAnalyse() {
         TotalProfitDTO totalProfitDTO = bondService.loadTotalProfitDTO();
         TodayTaxationDTO todayTaxationDTO = bondService.loadToadyTaxationDTO(null);
         todayTaxationDTO.setTodayStockProfit(totalProfitDTO.getTodayStockProfit());
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, todayTaxationDTO);
     }
 
-    @PostMapping("total/analyse")
-    public ResultDO<BondStatisticsDTO> totalAnalyse(@RequestBody BondSellRequest bondSellRequest) {
+    @GetMapping("total/analyse")
+    public ResultDO<BondStatisticsDTO> totalAnalyse() {
         BondStatistics bondStatistics = bondStatisticsMapper.selectByPrimaryKey(1L);
         BondStatisticsDTO bondStatisticsDTO = null;
         if (bondStatistics != null) {
@@ -142,12 +142,15 @@ public class BondController {
             bondStatistics.setPosition(Double.parseDouble(String.format("%.2f", p)));
             bondStatisticsDTO = BeanUtils.copyBean(new BondStatisticsDTO(), bondStatistics);
 
+            //查询总利息
+            Double totalInterest = bondBuyLogMapper.sumInterest();
             //查询负债
             BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
             bondBuyLogExample.createCriteria().andFinancingEqualTo((byte) 1);
             List<BondBuyLog> buyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
             Double liability = 0.0;
-            Double interest = 0.0;
+            //未归还利息
+            Double notBackInterest = 0.0;
             for (BondBuyLog bondBuyLog : buyLogs) {
                 BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
                 Double stock = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney();
@@ -158,10 +161,13 @@ public class BondController {
                 } else {
                     lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM);
                 }
-                interest += BondUtils.countInterest(stock, lendDate);
+                notBackInterest += BondUtils.countInterest(stock, lendDate);
+                totalInterest += notBackInterest;
             }
             bondStatisticsDTO.setLiability(Double.parseDouble(String.format("%.2f", liability)));
-            bondStatisticsDTO.setInterest(Double.parseDouble(String.format("%.2f", interest)));
+            totalInterest = Double.parseDouble(String.format("%.2f", totalInterest));
+            notBackInterest = Double.parseDouble(String.format("%.2f", notBackInterest));
+            bondStatisticsDTO.setInterest(totalInterest + "(" + notBackInterest + ")");
             bondStatisticsDTO.setStockProfit(bondService.gpProfit());
         }
 

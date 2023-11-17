@@ -32,5 +32,7 @@ public interface BondBuyLogMapper {
 
     Double sumSellIncome(@Param("gp_id") String gp_id,@Param("type") Byte type);
 
+    Double sumInterest();
+
     Map<Object, Object> sumBuySellCount(@Param("gp_id") String gp_id, @Param("type") Byte type);
 }

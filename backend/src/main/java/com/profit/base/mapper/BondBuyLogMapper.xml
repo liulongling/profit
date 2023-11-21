@@ -9,6 +9,7 @@
     <result column="total_price" jdbcType="DOUBLE" property="totalPrice" />
     <result column="back_money" jdbcType="DOUBLE" property="backMoney" />
     <result column="back_time" jdbcType="TIMESTAMP" property="backTime" />
+    <result column="interest" jdbcType="DOUBLE" property="interest" />
     <result column="buy_cost" jdbcType="DOUBLE" property="buyCost" />
     <result column="cost" jdbcType="DOUBLE" property="cost" />
     <result column="type" jdbcType="TINYINT" property="type" />
@@ -80,8 +81,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, gp_id, price, `count`, total_price, back_money, back_time, buy_cost, cost, `type`,
-    sell_count, sell_income, buy_date, `status`, oper_time, remarks, financing, create_time
+    id, gp_id, price, `count`, total_price, back_money, back_time, interest, buy_cost,
+    cost, `type`, sell_count, sell_income, buy_date, `status`, oper_time, remarks, financing,
+    create_time
   </sql>
   <select id="selectByExample" parameterType="com.profit.base.domain.BondBuyLogExample" resultMap="BaseResultMap">
     select
@@ -116,18 +118,18 @@
   <insert id="insert" parameterType="com.profit.base.domain.BondBuyLog">
     insert into bond_buy_log (id, gp_id, price,
     `count`, total_price, back_money,
-    back_time, buy_cost, cost,
-    `type`, sell_count, sell_income,
-    buy_date, `status`, oper_time,
-    remarks, financing, create_time
-    )
+    back_time, interest, buy_cost,
+    cost, `type`, sell_count,
+    sell_income, buy_date, `status`,
+    oper_time, remarks, financing,
+    create_time)
     values (#{id,jdbcType=BIGINT}, #{gpId,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE},
     #{count,jdbcType=INTEGER}, #{totalPrice,jdbcType=DOUBLE}, #{backMoney,jdbcType=DOUBLE},
-    #{backTime,jdbcType=TIMESTAMP}, #{buyCost,jdbcType=DOUBLE}, #{cost,jdbcType=DOUBLE},
-    #{type,jdbcType=TINYINT}, #{sellCount,jdbcType=INTEGER}, #{sellIncome,jdbcType=DOUBLE},
-    #{buyDate,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{operTime,jdbcType=TIMESTAMP},
-    #{remarks,jdbcType=VARCHAR}, #{financing,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}
-    )
+    #{backTime,jdbcType=TIMESTAMP}, #{interest,jdbcType=DOUBLE}, #{buyCost,jdbcType=DOUBLE},
+    #{cost,jdbcType=DOUBLE}, #{type,jdbcType=TINYINT}, #{sellCount,jdbcType=INTEGER},
+    #{sellIncome,jdbcType=DOUBLE}, #{buyDate,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT},
+    #{operTime,jdbcType=TIMESTAMP}, #{remarks,jdbcType=VARCHAR}, #{financing,jdbcType=TINYINT},
+    #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.profit.base.domain.BondBuyLog" keyProperty="id" useGeneratedKeys="true">
     insert into bond_buy_log
@@ -152,6 +154,9 @@
       </if>
       <if test="backTime != null">
         back_time,
+      </if>
+      <if test="interest != null">
+        interest,
       </if>
       <if test="buyCost != null">
         buy_cost,
@@ -208,6 +213,9 @@
       </if>
       <if test="backTime != null">
         #{backTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="interest != null">
+        #{interest,jdbcType=DOUBLE},
       </if>
       <if test="buyCost != null">
         #{buyCost,jdbcType=DOUBLE},
@@ -274,6 +282,9 @@
       <if test="record.backTime != null">
         back_time = #{record.backTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.interest != null">
+        interest = #{record.interest,jdbcType=DOUBLE},
+      </if>
       <if test="record.buyCost != null">
         buy_cost = #{record.buyCost,jdbcType=DOUBLE},
       </if>
@@ -321,6 +332,7 @@
     total_price = #{record.totalPrice,jdbcType=DOUBLE},
     back_money = #{record.backMoney,jdbcType=DOUBLE},
     back_time = #{record.backTime,jdbcType=TIMESTAMP},
+    interest = #{record.interest,jdbcType=DOUBLE},
     buy_cost = #{record.buyCost,jdbcType=DOUBLE},
     cost = #{record.cost,jdbcType=DOUBLE},
     `type` = #{record.type,jdbcType=TINYINT},
@@ -356,6 +368,9 @@
       </if>
       <if test="backTime != null">
         back_time = #{backTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="interest != null">
+        interest = #{interest,jdbcType=DOUBLE},
       </if>
       <if test="buyCost != null">
         buy_cost = #{buyCost,jdbcType=DOUBLE},
@@ -401,6 +416,7 @@
     total_price = #{totalPrice,jdbcType=DOUBLE},
     back_money = #{backMoney,jdbcType=DOUBLE},
     back_time = #{backTime,jdbcType=TIMESTAMP},
+    interest = #{interest,jdbcType=DOUBLE},
     buy_cost = #{buyCost,jdbcType=DOUBLE},
     cost = #{cost,jdbcType=DOUBLE},
     `type` = #{type,jdbcType=TINYINT},
@@ -414,6 +430,7 @@
     create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <select id="sumSellIncome" resultType="java.lang.Double">
     SELECT
     sum(sell_income)
@@ -466,4 +483,5 @@
     FROM
     bond_buy_log
   </select>
+
 </mapper>

@@ -156,6 +156,7 @@ public class BondOperController {
             }
             buyLogDTO.setGirdSpacing(girdSpacing);
             if (bondBuyLog.getFinancing() == 1) {
+                buyLogDTO.setName(buyLogDTO.getName()+"(融)");
                 Double lendMoney = ((bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney()) + bondBuyLog.getBuyCost();
                 Date lendDate;
                 if (bondBuyLog.getBackTime() != null) {
@@ -164,6 +165,8 @@ public class BondOperController {
                     lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM);
                 }
                 buyLogDTO.setInterest(BondUtils.countInterest(lendMoney, lendDate));
+            }else {
+                buyLogDTO.setInterest(0.0);
             }
 
             list.add(buyLogDTO);
@@ -206,8 +209,8 @@ public class BondOperController {
 
     @PostMapping("back")
     public ResultDO<Void> back(@RequestBody BondBuyLogDTO bondBuyLogDTO) {
-        bondService.backBond(bondBuyLogDTO);
-        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
+
+        return  bondService.backBond(bondBuyLogDTO);
     }
 
 

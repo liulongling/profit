@@ -1,10 +1,10 @@
 package com.profit.service;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
+import com.profit.base.ResultDO;
 import com.profit.base.domain.*;
 import com.profit.base.mapper.*;
 import com.profit.commons.constants.BondConstants;
+import com.profit.commons.constants.ResultCode;
 import com.profit.commons.utils.*;
 import com.profit.dto.*;
 import com.profit.model.EChartsData;
@@ -653,8 +653,11 @@ public class BondService {
      *
      * @param bondBuyLogDTO
      */
-    public void backBond(BondBuyLogDTO bondBuyLogDTO) {
+    public ResultDO backBond(BondBuyLogDTO bondBuyLogDTO) {
         BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondBuyLogDTO.getId());
+        if (bondBuyLog.getFinancing() != 1) {
+            return new ResultDO<>(false, ResultCode.PARAMETER_INVALID, "融资已归还，请勿重复操作", null);
+        }
         bondBuyLog.setCost(bondBuyLog.getCost() + bondBuyLogDTO.getInterest());
         bondBuyLog.setBackMoney(Double.parseDouble(String.format("%.2f", bondBuyLog.getBackMoney() + bondBuyLogDTO.getTotalPrice())));
         if (bondBuyLog.getBackMoney().doubleValue() >= bondBuyLog.getTotalPrice().doubleValue()) {
@@ -664,8 +667,9 @@ public class BondService {
         }
         bondBuyLog.addInterest(bondBuyLogDTO.getInterest());
         bondBuyLog.setBackTime(bondBuyLogDTO.getBackTime());
-        bondBuyLog.addRemarks(bondBuyLogDTO.getBackMoney(), bondBuyLogDTO.getInterest());
+        bondBuyLog.addRemarks(bondBuyLogDTO.getTotalPrice().doubleValue(), bondBuyLogDTO.getInterest());
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
+        return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 
     /**

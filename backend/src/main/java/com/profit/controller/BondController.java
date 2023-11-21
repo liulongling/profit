@@ -162,8 +162,8 @@ public class BondController {
                     lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM);
                 }
                 notBackInterest += BondUtils.countInterest(stock, lendDate);
-                totalInterest += notBackInterest;
             }
+            totalInterest += notBackInterest;
             bondStatisticsDTO.setLiability(Double.parseDouble(String.format("%.2f", liability)));
             totalInterest = Double.parseDouble(String.format("%.2f", totalInterest));
             notBackInterest = Double.parseDouble(String.format("%.2f", notBackInterest));

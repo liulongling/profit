@@ -271,7 +271,7 @@ public class BondService {
         for (int i = 1; i <= 12; i++) {
             Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
-            int curMonth = calendar.get(Calendar.MONTH);
+            int curMonth = calendar.get(Calendar.MONTH) + 1;
             if (i > curMonth) {
                 continue;
             }
@@ -658,9 +658,13 @@ public class BondService {
         if (bondBuyLog.getFinancing() != 1) {
             return new ResultDO<>(false, ResultCode.PARAMETER_INVALID, "融资已归还，请勿重复操作", null);
         }
+        //剩余归还金额
+        double surplusBackMoney = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney();
+
         bondBuyLog.setCost(bondBuyLog.getCost() + bondBuyLogDTO.getInterest());
         bondBuyLog.setBackMoney(Double.parseDouble(String.format("%.2f", bondBuyLog.getBackMoney() + bondBuyLogDTO.getTotalPrice())));
-        if (bondBuyLog.getBackMoney().doubleValue() >= bondBuyLog.getTotalPrice().doubleValue()) {
+
+        if (bondBuyLog.getBackMoney().doubleValue() >= bondBuyLog.getTotalPrice().doubleValue() || bondBuyLog.getBackMoney().doubleValue() >= surplusBackMoney) {
             //已归还完
             bondBuyLog.setFinancing((byte) 0);
             bondBuyLog.setBackMoney(bondBuyLog.getTotalPrice().doubleValue());

@@ -36,6 +36,8 @@ public class BondService {
     private BondStatisticsMapper bondStatisticsMapper;
     @Resource
     private BaseDataMapper baseDataMapper;
+    @Resource
+    private BondStatisticsLogMapper bondStatisticsLogMapper;
 
     /**
      * 股票今天数据
@@ -685,7 +687,18 @@ public class BondService {
         if (bondSellLog.getInterest() == null) {
             bondSellLog.setInterest(0.0);
         }
+
         BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondSellLog.getBuyId());
+        //如果是融资购买 先归还后出售
+        if (bondBuyLog.getFinancing() == 1) {
+            BondBuyLogDTO bondBuyLogDTO = new BondBuyLogDTO();
+            bondBuyLogDTO.setId(bondBuyLog.getId());
+            bondBuyLogDTO.setInterest(bondSellLog.getInterest());
+            bondBuyLogDTO.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getPrice() * bondSellLog.getCount())));
+            bondBuyLogDTO.setBackTime(bondSellLog.getCreateTime());
+            backBond(bondBuyLogDTO);
+            bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondSellLog.getBuyId());
+        }
 
         BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
 
@@ -721,26 +734,19 @@ public class BondService {
         bondStatistics = refeshBondStatistics(-bondSellLog.getTotalPrice(), bondSellLog.getCost(), bondSellLog.getFreeze());
         bondSellLog.setRealyAfter(bondStatistics.getReady());
 
-        if (bondSellLog.getInterest() > 0) {
-            bondBuyLog.addInterest(bondSellLog.getInterest());
-            bondBuyLog.setBackTime(bondSellLog.getCreateTime());
-            bondBuyLog.addRemarks(bondSellLog.getTotalPrice(), bondSellLog.getInterest());
-        }
-
         bondSellLogMapper.insert(bondSellLog);
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
 
-
         //长线股票出售完后 添加到待购买池中
-        if (bondBuyLog.getType() == BondConstants.LONG_LINE) {
-            BondBuyLog buyLog = new BondBuyLog();
-            buyLog.setPrice(bondBuyLog.getPrice());
-            buyLog.setStatus(BondConstants.WAIT_BUY);
-            buyLog.setCount(bondSellLog.getCount());
-            buyLog.setType(BondConstants.LONG_LINE);
-            buyLog.setGpId(bondSellLog.getGpId());
-            buyBond(buyLog);
-        }
+//        if (bondBuyLog.getType() == BondConstants.LONG_LINE) {
+//            BondBuyLog buyLog = new BondBuyLog();
+//            buyLog.setPrice(bondBuyLog.getPrice());
+//            buyLog.setStatus(BondConstants.WAIT_BUY);
+//            buyLog.setCount(bondSellLog.getCount());
+//            buyLog.setType(BondConstants.LONG_LINE);
+//            buyLog.setGpId(bondSellLog.getGpId());
+//            buyBond(buyLog);
+//        }
     }
 
     public void initTask() {
@@ -795,7 +801,7 @@ public class BondService {
 
     public EChartsData countProfitByDay() {
         EChartsData eChartsData = new EChartsData();
-        eChartsData.setText("每日收益");
+        eChartsData.setText("每日菜钱");
         //近30天收益
         Date startDate = DateUtils.getNeverDayStartTime(180);
         String endDate = DateUtils.getTimeString(DateUtils.getTodayDateTime(23, 59, 59));

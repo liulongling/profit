@@ -2,6 +2,7 @@ package com.profit.job;
 
 import com.profit.commons.utils.LogUtil;
 import com.profit.service.BondService;
+import com.profit.service.BondStatisticsService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,8 @@ import javax.annotation.Resource;
 public class AnalysisDataJob {
     @Resource
     private BondService bondService;
+    @Resource
+    private BondStatisticsService bondStatisticsService;
 
     /**
      * 每分钟执行一次
@@ -23,6 +26,12 @@ public class AnalysisDataJob {
     public void task() {
         LogUtil.info("定时任务[task]开始执行");
         bondService.refurbishBondPrice();
+
+        try {
+            bondStatisticsService.sysData();
+        } catch (Exception e) {
+            LogUtil.error(e);
+        }
         LogUtil.info("定时任务[task]执行结束");
 
     }
@@ -33,7 +42,17 @@ public class AnalysisDataJob {
     @Scheduled(cron = "0 */1 * * * ?")
     public void task1() {
         LogUtil.info("定时任务[task1]开始执行");
-        bondService.initTask();
+
+        try {
+            bondService.initTask();
+        } catch (Exception e) {
+           LogUtil.error(e);
+        }
+        try {
+//            bondStatisticsService.sysData();
+        } catch (Exception e) {
+            LogUtil.error(e);
+        }
         LogUtil.info("定时任务[task1]执行结束");
 
     }

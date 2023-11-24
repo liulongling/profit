@@ -32,6 +32,13 @@ public class DateUtils {
     private static final DateTimeFormatter FORMATTER_MONTH_DATE = DateTimeFormatter.ofPattern(DateUtils.PATTERN_MONTH_DATE).withLocale(Locale.SIMPLIFIED_CHINESE);
     private static final DateTimeFormatter FORMATTER_DATE_ES_INDEX_SUFFIX = DateTimeFormatter.ofPattern(DateUtils.PATTERN_DATE_ES_INDEX_SUFFIX).withLocale(Locale.getDefault());
 
+    /**
+     * 查询2个时间差 单位天
+     *
+     * @param date1
+     * @param date2
+     * @return
+     */
     public static int compareDateInterval(Date date1, Date date2) {
         Calendar aCalendar = Calendar.getInstance();
         aCalendar.setTime(date1);
@@ -116,7 +123,7 @@ public class DateUtils {
         return DateUtils.FORMATTER_DATE.format(dateTime);
     }
 
-    public static List<String> getDateList(final int startTime, int endTime) {
+    public static List<String> getDateList(int startTime, int endTime) {
         if (startTime == endTime) {
             return new ArrayList<String>() {{
                 this.add(DateUtils.formatDate(startTime));
@@ -291,7 +298,6 @@ public class DateUtils {
     }
 
 
-
     /**
      * 获取当天指定时间
      *
@@ -301,7 +307,7 @@ public class DateUtils {
      * @return
      */
     public static Date getTodayDateTime(int hour, int minute, int second) {
-        return string2Date(getTimeString(getTime(new Date(), hour, minute, second)),TIME_PATTERN);
+        return string2Date(getTimeString(getTime(new Date(), hour, minute, second)), TIME_PATTERN);
     }
 
     /**

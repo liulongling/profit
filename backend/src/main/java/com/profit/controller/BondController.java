@@ -119,8 +119,8 @@ public class BondController {
             eChartsData = bondService.totalProfit();
         } else if (bondSellRequest.getType() == 3) {
             eChartsData = bondService.countProfitByDay();
-        } else {
-
+        } else if (bondSellRequest.getType() == 4) {
+            eChartsData = bondService.statisticsLog();
         }
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, eChartsData);
     }
@@ -206,8 +206,8 @@ public class BondController {
         if (params.get("id") != null) {
             criteria.andGpIdEqualTo(params.get("id").toString());
         }
+        criteria.andFinancingEqualTo((byte) 1);
 
-        bondBuyLogExample.setOrderByClause(params.get("sort").toString() + " " + params.get("order").toString());
         Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()), true);
         List<BondBuyLog> result = bondBuyLogMapper.selectByExample(bondBuyLogExample);
         if (result == null) {

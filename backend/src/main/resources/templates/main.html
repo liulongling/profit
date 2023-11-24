@@ -29,8 +29,9 @@
 </div>
 
 <div class="container" style="width: 2200px;">
-    <div id="pie" style="width:800px; height: 400px;float:left"></div>
-    <div id="pie1" style="width:800px; height: 400px;float:left"></div>
+    <div id="pie" style="width:700px; height: 400px;float:left"></div>
+    <div id="pie1" style="width:700px; height: 400px;float:left"></div>
+    <div id="pie4" style="width:700px; height: 400px;float:left"></div>
 </div>
 
 <div class="panel-body" style="padding-bottom:0;">
@@ -545,7 +546,14 @@
          myChart.setOption(option);
      });
 
-
+    echartsParameterPostRequest("/bond/analyse", {type:4}, function loadPageData(option){
+          // 获取页面容器
+         var chartDom = document.getElementById('pie4');
+         // 容器初始化初始化（echarts）
+         var myChart = echarts.init(chartDom);
+         // 设置容器的相关配置项
+         myChart.setOption(option);
+     });
 
 
 

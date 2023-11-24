@@ -328,6 +328,51 @@ public class BondService {
     }
 
     /**
+     * 总收益
+     *
+     * @return
+     */
+    public EChartsData statisticsLog() {
+        EChartsData eChartsData = new EChartsData();
+        eChartsData.setText("历史数据分析");
+        eChartsData.getLegend().add("市值");
+        eChartsData.getLegend().add("现金");
+        eChartsData.getLegend().add("负债");
+        eChartsData.getLegend().add("盈亏");
+
+        BondStatisticsLogExample bondStatisticsLogExample = new BondStatisticsLogExample();
+        bondStatisticsLogExample.setOrderByClause("create_time asc limit 0 ,30");
+        List<BondStatisticsLog> bondStatisticsLogs = bondStatisticsLogMapper.selectByExample(bondStatisticsLogExample);
+        for (BondStatisticsLog bondStatisticsLog : bondStatisticsLogs) {
+            eChartsData.getXAxis().add(DateUtils.getDateString(bondStatisticsLog.getCreateTime(), DateUtils.PATTERN_DATE));
+        }
+
+        for (String s : eChartsData.getLegend()) {
+            List<Double> list = new ArrayList<>();
+            for (BondStatisticsLog bondStatisticsLog : bondStatisticsLogs) {
+                if (s.equals("市值")) {
+                    list.add(Double.parseDouble(String.format("%.0f", bondStatisticsLog.getStock())));
+                } else if (s.equals("现金")) {
+                    list.add(Double.parseDouble(String.format("%.0f", bondStatisticsLog.getStock())));
+                } else if (s.equals("负债")) {
+                    list.add(Double.parseDouble(String.format("%.0f", bondStatisticsLog.getLiability())));
+                } else if (s.equals("盈亏")) {
+                    list.add(Double.parseDouble(String.format("%.0f", bondStatisticsLog.getProfit())));
+                }
+            }
+
+            EChartsElement eChartsElement = new EChartsElement();
+            eChartsElement.setName(s);
+            eChartsElement.setType("line");
+            eChartsElement.setData(list);
+
+            eChartsData.getSeries().add(eChartsElement);
+        }
+        return eChartsData;
+    }
+
+
+    /**
      * 查询指定时间购买记录
      *
      * @param date

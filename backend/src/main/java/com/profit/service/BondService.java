@@ -353,7 +353,7 @@ public class BondService {
                 if (s.equals("市值")) {
                     list.add(Double.parseDouble(String.format("%.0f", bondStatisticsLog.getStock())));
                 } else if (s.equals("现金")) {
-                    list.add(Double.parseDouble(String.format("%.0f", bondStatisticsLog.getStock())));
+                    list.add(Double.parseDouble(String.format("%.0f", bondStatisticsLog.getReady())));
                 } else if (s.equals("负债")) {
                     list.add(Double.parseDouble(String.format("%.0f", bondStatisticsLog.getLiability())));
                 } else if (s.equals("盈亏")) {

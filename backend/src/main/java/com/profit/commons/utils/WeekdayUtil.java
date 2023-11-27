@@ -1,10 +1,9 @@
 package com.profit.commons.utils;
 
+import org.apache.commons.lang.BooleanUtils;
+
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 节假日判断工具类
@@ -32,6 +31,15 @@ public class WeekdayUtil {
                 config.put(f.getName().replace(".txt", ""), year);
             }
         }
+    }
+
+    public static boolean isWeekDay() {
+        String date = DateUtils.getDateString(new Date(), DateUtils.DATE_PATTERM);
+        Map<String, Object> map = WeekdayUtil.isWeekday(date);
+        if (map != null && BooleanUtils.toBoolean(map.get("isWeekDay").toString())) {
+            return true;
+        }
+        return false;
     }
 
     /**

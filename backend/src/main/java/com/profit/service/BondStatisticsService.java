@@ -42,57 +42,59 @@ public class BondStatisticsService {
         return timeTaskJob;
     }
 
-    /**
-     * 同步交通数据
-     */
+
     public void sysData() {
         if (executeing) {
             return;
         }
         executeing = !executeing;
 
-        TimeTaskJob timeTaskJob = timeTaskJobMapper.selectByPrimaryKey(JobEnum.SYS_STATISTICS_JOB.getCode());
-        if (timeTaskJob == null) {
-            timeTaskJob = initTimeTaskInfo();
-        }
-
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        if (hour <= 15) {
-            return;
-        }
-
-        if (DateUtils.isToday(timeTaskJob.getSyncTime())) {
-            return;
-        }
-
-        if (WeekdayUtil.isWeekDay()) {
-            TotalProfitDTO totalProfitDTO = bondService.loadTotalProfitDTO();
-
-            BondStatisticsLog bondStatisticsLog = new BondStatisticsLog();
-            bondStatisticsLog.setStock(totalProfitDTO.getStockValue());
-            bondStatisticsLog.setReady(totalProfitDTO.getReady());
-            bondStatisticsLog.setProfit(bondService.gpProfit());
-
-            //查询负债
-            BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
-            bondBuyLogExample.createCriteria().andFinancingEqualTo((byte) 1);
-            List<BondBuyLog> buyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
-            Double liability = 0.0;
-            for (BondBuyLog bondBuyLog : buyLogs) {
-                BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
-                Double stock = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney();
-                liability += stock + BondUtils.getTaxation(bondInfo, stock, false);
+        try {
+            TimeTaskJob timeTaskJob = timeTaskJobMapper.selectByPrimaryKey(JobEnum.SYS_STATISTICS_JOB.getCode());
+            if (timeTaskJob == null) {
+                timeTaskJob = initTimeTaskInfo();
             }
-            bondStatisticsLog.setLiability(liability);
-            bondStatisticsLog.setCreateTime(new Date());
-            bondStatisticsLogMapper.insertSelective(bondStatisticsLog);
+
+            Calendar calendar = Calendar.getInstance();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            if (hour <= 15) {
+                return;
+            }
+
+            if (DateUtils.isToday(timeTaskJob.getSyncTime())) {
+                return;
+            }
+
+            if (WeekdayUtil.isWeekDay()) {
+                TotalProfitDTO totalProfitDTO = bondService.loadTotalProfitDTO();
+
+                BondStatisticsLog bondStatisticsLog = new BondStatisticsLog();
+                bondStatisticsLog.setStock(totalProfitDTO.getStockValue());
+                bondStatisticsLog.setReady(totalProfitDTO.getReady());
+                bondStatisticsLog.setProfit(bondService.gpProfit());
+
+                //查询负债
+                BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+                bondBuyLogExample.createCriteria().andFinancingEqualTo((byte) 1);
+                List<BondBuyLog> buyLogs = bondBuyLogMapper.selectByExample(bondBuyLogExample);
+                Double liability = 0.0;
+                for (BondBuyLog bondBuyLog : buyLogs) {
+                    BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+                    Double stock = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney();
+                    liability += stock + BondUtils.getTaxation(bondInfo, stock, false);
+                }
+                bondStatisticsLog.setLiability(liability);
+                bondStatisticsLog.setCreateTime(new Date());
+                bondStatisticsLogMapper.insertSelective(bondStatisticsLog);
+            }
+
+            timeTaskJob.setSyncTime(new Date());
+            timeTaskJob.setSyncFlag(1);
+            timeTaskJobMapper.updateByPrimaryKeySelective(timeTaskJob);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            executeing = !executeing;
         }
-
-        timeTaskJob.setSyncTime(new Date());
-        timeTaskJob.setSyncFlag(1);
-        timeTaskJobMapper.updateByPrimaryKeySelective(timeTaskJob);
-
-        executeing = !executeing;
     }
 }

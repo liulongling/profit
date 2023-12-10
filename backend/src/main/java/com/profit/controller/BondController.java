@@ -32,8 +32,6 @@ public class BondController {
     private BondService bondService;
     @Resource
     private BondStatisticsMapper bondStatisticsMapper;
-    @Resource
-    private BaseDataMapper baseDataMapper;
 
     @GetMapping("list")
     public ResultDO<PageUtils<BondInfoDTO>> getBonds(@RequestParam Map<String, Object> params) throws Exception {

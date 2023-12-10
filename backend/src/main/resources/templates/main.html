@@ -232,13 +232,19 @@
             formatter: stringFormatter
         }, {
             field: 'stubCount',
-            title: '短线持股数量',
+            title: '短线股数',
             width: '70px',
             align: "center",
             formatter: stringFormatter
         }, {
             field: 'gridCount',
-            title: '长线持股数量',
+            title: '长线股数',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'superStubCount',
+            title: '超短股数',
             width: '70px',
             align: "center",
             formatter: stringFormatter
@@ -484,7 +490,7 @@
             });
         }
     }
-    
+
     function deleteOne(index) {
         dialog("确定删除吗？", () => {
             let data = { id: $table.bootstrapTable('getData')[index].id };
@@ -506,7 +512,7 @@
         $('#alert_input_isetf').val(rows[index].isEtf);
         alterId = rows[index].id;
     }
-    
+
     function alter() {
         let data = {
             id: alterId,

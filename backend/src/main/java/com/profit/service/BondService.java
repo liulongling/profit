@@ -9,7 +9,7 @@ import com.profit.commons.utils.*;
 import com.profit.dto.*;
 import com.profit.model.EChartsData;
 import com.profit.model.EChartsElement;
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,8 +34,6 @@ public class BondService {
     private BondBuyLogMapper bondBuyLogMapper;
     @Resource
     private BondStatisticsMapper bondStatisticsMapper;
-    @Resource
-    private BaseDataMapper baseDataMapper;
     @Resource
     private BondStatisticsLogMapper bondStatisticsLogMapper;
 
@@ -451,7 +449,7 @@ public class BondService {
             //当前收益 扣除佣金税费
             curIncome -= BondUtils.getTaxation(bondInfo, surplusCount * bondInfo.getPrice(), true);
             curIncome -= BondUtils.getTaxation(bondInfo, surplusCount * bondBuyLog.getPrice(), false);
-            //当前收益 扣除利息
+            //当前收益 扣除未还利息
             if (bondBuyLog.getFinancing() == 1) {
                 Double rzfz = (surplusCount * bondBuyLog.getPrice()) + BondUtils.getTaxation(bondInfo, surplusCount * bondBuyLog.getPrice(), false);
                 Date lendDate;
@@ -462,6 +460,7 @@ public class BondService {
                 }
                 curIncome -= BondUtils.countInterest(rzfz, lendDate);
             }
+            curIncome -= bondBuyLog.getInterest();
             //涨跌幅
             Double zdf = Double.parseDouble(String.format("%.2f", (((bondInfo.getPrice() - bondBuyLog.getPrice()) / bondInfo.getPrice()) * 100)));
             buyLogDTO.setIncome(curIncome);

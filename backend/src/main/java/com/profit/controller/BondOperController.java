@@ -155,6 +155,7 @@ public class BondOperController {
                 girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
             }
             buyLogDTO.setGirdSpacing(girdSpacing);
+            buyLogDTO.setSubCount(bondBuyLog.getCount() - bondBuyLog.getSellCount());
             if (bondBuyLog.getFinancing() == 1) {
                 buyLogDTO.setName(buyLogDTO.getName()+"(融)");
                 Double lendMoney = ((bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney()) + bondBuyLog.getBuyCost();

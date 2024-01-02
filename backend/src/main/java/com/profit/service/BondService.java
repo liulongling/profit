@@ -641,7 +641,7 @@ public class BondService {
         Date sellDate = DateUtils.string2Date(bondBuyRequest.getSellDate(), DateUtils.DATE_PATTERM);
 
         //计算国债利息
-        int day = DateUtils.compareDateInterval(buyDate, sellDate);
+        long day = DateUtils.compareDateInterval(buyDate, sellDate);
         Double profit = Double.parseDouble(String.format("%.2f", (bondBuyLog.getTotalPrice() * bondBuyLog.getPrice() * 0.01 * day) / 365));
         bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.2f", profit - bondBuyLog.getBuyCost())));
         bondBuyLogMapper.insertSelective(bondBuyLog);

@@ -173,21 +173,64 @@ public class BondOperController {
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
 
-//    public void repair(BondBuyLog bondBuyLog) {
-//        //纠正税费错误bug
-//        if(bondBuyLog.getInterest() > 0){
-//            BondSellLogExample bondSellLogExample = new BondSellLogExample();
-//            bondSellLogExample.createCriteria().andBuyIdEqualTo(bondBuyLog.getId());
-//            List<BondSellLog> list = bondSellLogMapper.selectByExample(bondSellLogExample);
+    public void repair(BondBuyLog bondBuyLog) {
+        //纠正税费错误bug
+        if (bondBuyLog.getInterest() > 0) {
+            BondInfo bondInfo = bondInfoMapper.selectByPrimaryKey(bondBuyLog.getGpId());
+            BondSellLogExample bondSellLogExample = new BondSellLogExample();
+            bondSellLogExample.createCriteria().andBuyIdEqualTo(bondBuyLog.getId());
+            List<BondSellLog> list = bondSellLogMapper.selectByExample(bondSellLogExample);
+            for (BondSellLog bondSellLog : list) {
+                if (bondSellLog.getPrice() == 0) {
+                    continue;
+                }
+                //卖出税费计算
+                double sellTaxation = BondUtils.getTaxation(bondInfo, bondSellLog.getPrice() * bondSellLog.getCount(), true);
+                //买入税费计算
+                double buyTaxation = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondSellLog.getCount(), false);
+                //计算收益 出售总价 - 买入总价 - 买卖费用
+                double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - sellTaxation - buyTaxation;
+                income = Double.parseDouble(String.format("%.2f", income));
+                double startIncome = Double.parseDouble(String.format("%.2f", bondSellLog.getIncome()));
+                if (startIncome != income) {
+                    System.out.println("" + bondSellLog.getIncome() + " after:" + income);
+                    bondSellLog.setIncome(income);
+                    bondSellLogMapper.updateByPrimaryKeySelective(bondSellLog);
+                }
+            }
+
+
+//            double income = 0;
+//            for (BondSellLog b : list) {
+//                if(b.getPrice() == 0){
+//                    income += b.getIncome();
+//                }
+//            }
+
+//            if (bondBuyLog.getInterest() > -income) {
+//                BondSellLog bondSellLog = new BondSellLog();
+//                bondSellLog.setBuyId(bondBuyLog.getId());
+//                bondSellLog.setGpId(bondBuyLog.getGpId());
+//                bondSellLog.setCost(0.0);
+//                bondSellLog.setTotalCost(0.0);
+//                bondSellLog.setTotalPrice(0.0);
+//                bondSellLog.setPrice(0.0);
+//                bondSellLog.setCount(0);
+//                bondSellLog.setIncome(-bondBuyLog.getInterest());
+//                bondSellLog.setCreateTime(new Date());
+//                bondSellLogMapper.insert(bondSellLog);
+//            }
+
+
 //            double cost = 0;
 //            for (BondSellLog bondSellLog : list) {
 //                cost += bondSellLog.getCost();
 //            }
 //            bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", cost)));
 //            bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
-//        }
-//
-//    }
+        }
+
+    }
 
     @PostMapping("buy")
     public ResultDO<Void> buy(@RequestBody BondBuyRequest bondBuyRequest) {

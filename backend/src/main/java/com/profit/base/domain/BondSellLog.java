@@ -22,11 +22,6 @@ public class BondSellLog {
     private Double freeze;
 
     /**
-     * 利息
-     */
-    private Double interest;
-
-    /**
      *
      */
     private Long buyId;

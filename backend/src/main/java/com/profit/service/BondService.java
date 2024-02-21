@@ -728,6 +728,19 @@ public class BondService {
         bondBuyLog.setBackTime(bondBuyLogDTO.getBackTime());
         bondBuyLog.addRemarks(bondBuyLogDTO.getTotalPrice().doubleValue(), bondBuyLogDTO.getInterest());
         bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
+
+        //出售日志新增一条归还利息产生的负收益
+        BondSellLog bondSellLog = new BondSellLog();
+        bondSellLog.setBuyId(bondBuyLog.getId());
+        bondSellLog.setGpId(bondBuyLog.getGpId());
+        bondSellLog.setCost(0.0);
+        bondSellLog.setTotalCost(0.0);
+        bondSellLog.setTotalPrice(0.0);
+        bondSellLog.setPrice(0.0);
+        bondSellLog.setCount(0);
+        bondSellLog.setIncome(-bondBuyLogDTO.getInterest());
+        bondSellLog.setCreateTime(new Date());
+        bondSellLogMapper.insert(bondSellLog);
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, null);
     }
 

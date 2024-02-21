@@ -184,6 +184,12 @@ public class BondService {
         }
         bondInfoDTO.setGridProfit(Double.parseDouble(String.format("%.2f", gridProfit)));
 
+        Double superProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 2);
+        if (superProfit == null) {
+            superProfit = 0.00;
+        }
+        bondInfoDTO.setSuperProfit(Double.parseDouble(String.format("%.2f", superProfit)));
+
         bondInfoDTO.setStubCount(getBondNumber(bondInfo, BondConstants.SHORT_LINE));
         bondInfoDTO.setGridCount(getBondNumber(bondInfo, BondConstants.LONG_LINE));
         bondInfoDTO.setSuperStubCount(getBondNumber(bondInfo, BondConstants.SUPER_SHORT_LINE));

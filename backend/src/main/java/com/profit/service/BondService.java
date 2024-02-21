@@ -717,7 +717,6 @@ public class BondService {
         //剩余归还金额
         double surplusBackMoney = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney();
 
-        bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost() + bondBuyLogDTO.getInterest())));
         bondBuyLog.setBackMoney(Double.parseDouble(String.format("%.2f", bondBuyLog.getBackMoney() + bondBuyLogDTO.getTotalPrice())));
 
         if (bondBuyLog.getBackMoney().doubleValue() >= bondBuyLog.getTotalPrice().doubleValue() || bondBuyLog.getBackMoney().doubleValue() >= surplusBackMoney) {
@@ -738,16 +737,14 @@ public class BondService {
      * @param bondSellLog
      */
     public void sellBond(BondSellLog bondSellLog) {
-        if (bondSellLog.getInterest() == null) {
-            bondSellLog.setInterest(0.0);
-        }
-
         BondBuyLog bondBuyLog = bondBuyLogMapper.selectByPrimaryKey(bondSellLog.getBuyId());
         //如果是融资购买 先归还后出售
+        double notbackInterest = 0;
         if (bondBuyLog.getFinancing() == 1) {
+            notbackInterest = bondBuyLog.notbackInterest();
             BondBuyLogDTO bondBuyLogDTO = new BondBuyLogDTO();
             bondBuyLogDTO.setId(bondBuyLog.getId());
-            bondBuyLogDTO.setInterest(bondSellLog.getInterest());
+            bondBuyLogDTO.setInterest(notbackInterest);
             bondBuyLogDTO.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getPrice() * bondSellLog.getCount())));
             bondBuyLogDTO.setBackTime(bondSellLog.getCreateTime());
             backBond(bondBuyLogDTO);
@@ -768,7 +765,7 @@ public class BondService {
 
         bondSellLog.setIncome(Double.parseDouble(String.format("%.2f", income)));
         bondSellLog.setGpId(bondInfo.getId());
-        bondSellLog.setTotalCost(Double.parseDouble(String.format("%.2f", buyTaxation + sellTaxation + bondSellLog.getInterest())));
+        bondSellLog.setTotalCost(Double.parseDouble(String.format("%.2f", buyTaxation + sellTaxation)));
         bondSellLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondSellLog.getPrice() * bondSellLog.getCount())));
         bondSellLog.setCreateTime(bondSellLog.getCreateTime());
 
@@ -778,7 +775,9 @@ public class BondService {
         //查看是否股票是否全部售出
         if (bondBuyLog.getCount().equals(bondBuyLog.getSellCount())) {
             bondBuyLog.setStatus((byte) 1);
-            bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.2f", bondBuyLog.getSellIncome() - bondBuyLog.getCost())));
+            if (bondBuyLog.getInterest() > 0) {
+                bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.2f", bondBuyLog.getSellIncome() - bondBuyLog.getInterest())));
+            }
         }
         int surplusCount = getBondNumber(bondInfo, bondBuyLog.getType()).intValue();
 

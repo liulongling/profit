@@ -143,6 +143,9 @@ public class BondOperController {
                     bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
                 }
             }
+
+//            repair(bondBuyLog);
+
             BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
             buyLogDTO.setName(bondInfo.getName());
             //卖出均价
@@ -157,18 +160,9 @@ public class BondOperController {
             buyLogDTO.setGirdSpacing(girdSpacing);
             buyLogDTO.setSubCount(bondBuyLog.getCount() - bondBuyLog.getSellCount());
             if (bondBuyLog.getFinancing() == 1) {
-                buyLogDTO.setName(buyLogDTO.getName()+"(融)");
-                Double lendMoney = ((bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney()) + bondBuyLog.getBuyCost();
-                Date lendDate;
-                if (bondBuyLog.getBackTime() != null) {
-                    lendDate = bondBuyLog.getBackTime();
-                } else {
-                    lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.DATE_PATTERM);
-                }
-                buyLogDTO.setInterest(BondUtils.countInterest(lendMoney, lendDate));
-            }else {
-                buyLogDTO.setInterest(0.0);
+                buyLogDTO.setName(buyLogDTO.getName() + "(融)");
             }
+            buyLogDTO.setInterest(bondBuyLog.countInterest());
 
             list.add(buyLogDTO);
             if (status == 1) {
@@ -178,6 +172,22 @@ public class BondOperController {
 
         return new ResultDO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, new PageUtils<>(page.getTotal(), list));
     }
+
+//    public void repair(BondBuyLog bondBuyLog) {
+//        //纠正税费错误bug
+//        if(bondBuyLog.getInterest() > 0){
+//            BondSellLogExample bondSellLogExample = new BondSellLogExample();
+//            bondSellLogExample.createCriteria().andBuyIdEqualTo(bondBuyLog.getId());
+//            List<BondSellLog> list = bondSellLogMapper.selectByExample(bondSellLogExample);
+//            double cost = 0;
+//            for (BondSellLog bondSellLog : list) {
+//                cost += bondSellLog.getCost();
+//            }
+//            bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", cost)));
+//            bondBuyLogMapper.updateByPrimaryKeySelective(bondBuyLog);
+//        }
+//
+//    }
 
     @PostMapping("buy")
     public ResultDO<Void> buy(@RequestBody BondBuyRequest bondBuyRequest) {
@@ -210,7 +220,7 @@ public class BondOperController {
 
     @PostMapping("back")
     public ResultDO<Void> back(@RequestBody BondBuyLogDTO bondBuyLogDTO) {
-        return  bondService.backBond(bondBuyLogDTO);
+        return bondService.backBond(bondBuyLogDTO);
     }
 
 

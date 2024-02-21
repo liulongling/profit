@@ -1,6 +1,7 @@
 package com.profit.base.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.profit.commons.utils.BondUtils;
 import com.profit.commons.utils.DateUtils;
 import lombok.Data;
 
@@ -111,5 +112,37 @@ public class BondBuyLog {
     @JSONField(serialize = false, deserialize = false)
     public void addRemarks(Double backMoney, Double intersert) {
         remarks += DateUtils.getDateString(backTime, DateUtils.PATTERN_DATE) + "归还金额" + backMoney + "利息:" + intersert + ";";
+    }
+
+    @JSONField(serialize = false, deserialize = false)
+    public double countInterest() {
+        double interest = this.interest;
+        if (financing == 1) {
+            Date lendDate;
+            if (backTime != null) {
+                lendDate = backTime;
+            } else {
+                lendDate = DateUtils.string2Date(buyDate, DateUtils.DATE_PATTERM);
+            }
+            Double lendMoney = (count - sellCount * price - backMoney) + buyCost;
+            interest += BondUtils.countInterest(lendMoney, lendDate);
+        }
+
+        return interest;
+    }
+
+    @JSONField(serialize = false, deserialize = false)
+    public double notbackInterest() {
+        if (financing == 1) {
+            Date lendDate;
+            if (backTime != null) {
+                lendDate = backTime;
+            } else {
+                lendDate = DateUtils.string2Date(buyDate, DateUtils.DATE_PATTERM);
+            }
+            Double lendMoney = (count - sellCount * price - backMoney) + buyCost;
+            return BondUtils.countInterest(lendMoney, lendDate);
+        }
+        return 0;
     }
 }

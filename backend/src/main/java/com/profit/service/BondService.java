@@ -174,10 +174,14 @@ public class BondService {
     public BondInfoDTO loadBondInfoDTO(BondInfo bondInfo) {
         BondInfoDTO bondInfoDTO = BeanUtils.copyBean(new BondInfoDTO(), bondInfo);
         Double stubProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 1);
-        if (stubProfit == null) stubProfit = 0.00;
+        if (stubProfit == null) {
+            stubProfit = 0.00;
+        }
         bondInfoDTO.setStubProfit(Double.parseDouble(String.format("%.2f", stubProfit)));
         Double gridProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 0);
-        if (gridProfit == null) gridProfit = 0.00;
+        if (gridProfit == null) {
+            gridProfit = 0.00;
+        }
         bondInfoDTO.setGridProfit(Double.parseDouble(String.format("%.2f", gridProfit)));
 
         bondInfoDTO.setStubCount(getBondNumber(bondInfo, BondConstants.SHORT_LINE));
@@ -707,7 +711,7 @@ public class BondService {
         //剩余归还金额
         double surplusBackMoney = (bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney();
 
-        bondBuyLog.setCost(bondBuyLog.getCost() + bondBuyLogDTO.getInterest());
+        bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost() + bondBuyLogDTO.getInterest())));
         bondBuyLog.setBackMoney(Double.parseDouble(String.format("%.2f", bondBuyLog.getBackMoney() + bondBuyLogDTO.getTotalPrice())));
 
         if (bondBuyLog.getBackMoney().doubleValue() >= bondBuyLog.getTotalPrice().doubleValue() || bondBuyLog.getBackMoney().doubleValue() >= surplusBackMoney) {
@@ -753,8 +757,8 @@ public class BondService {
 
         //买入税费计算
         double buyTaxation = BondUtils.getTaxation(bondInfo, bondBuyLog.getPrice() * bondSellLog.getCount(), false);
-        //计算收益 出售总价 - 买入总价 - 买卖费用 - 利息
-        double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation - bondSellLog.getInterest();
+        //计算收益 出售总价 - 买入总价 - 买卖费用
+        double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
 
         bondSellLog.setIncome(Double.parseDouble(String.format("%.2f", income)));
         bondSellLog.setGpId(bondInfo.getId());
@@ -766,8 +770,9 @@ public class BondService {
         bondBuyLog.setSellCount(bondBuyLog.getSellCount() + bondSellLog.getCount());
         bondBuyLog.setOperTime(new Date());
         //查看是否股票是否全部售出
-        if (bondBuyLog.getCount() == bondBuyLog.getSellCount()) {
+        if (bondBuyLog.getCount().equals(bondBuyLog.getSellCount())) {
             bondBuyLog.setStatus((byte) 1);
+            bondBuyLog.setSellIncome(Double.parseDouble(String.format("%.2f", bondBuyLog.getSellIncome() - bondBuyLog.getCost())));
         }
         int surplusCount = getBondNumber(bondInfo, bondBuyLog.getType()).intValue();
 

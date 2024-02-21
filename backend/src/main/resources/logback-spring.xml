@@ -152,7 +152,7 @@
         <appender-ref ref="errorAsyncAppender"/>
     </logger>
 
-    <logger name="com.profit.base.mapper" level="DEBUG">
+    <logger name="com.profit.base.mapper" level="INFO">
         <appender-ref ref="console"/>
     </logger>
 

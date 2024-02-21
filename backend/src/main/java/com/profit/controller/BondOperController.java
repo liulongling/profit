@@ -80,7 +80,7 @@ public class BondOperController {
             Date startDate = DateUtils.getNeverDayStartTime(5);
 
             bondSellLogExampleCriteria.andCreateTimeBetween(startDate, DateUtils.getTodayDateTime(23, 59, 59));
-            bondSellLogExample.setOrderByClause("create_time desc");
+            bondSellLogExample.setOrderByClause("create_time ,buy_id desc");
             List<BondSellLog> sellLogs = bondSellLogMapper.selectByExample(bondSellLogExample);
             if (sellLogs != null) {
                 for (BondSellLog bondSellLog : sellLogs) {
